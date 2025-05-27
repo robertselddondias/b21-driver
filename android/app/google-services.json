@@ -1,0 +1,107 @@
+{
+  "project_info": {
+    "project_number": "114149785250",
+    "firebase_url": "https://b21-project-default-rtdb.firebaseio.com",
+    "project_id": "b21-project",
+    "storage_bucket": "b21-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114149785250:android:b0eedf729ad9d3621d61fb",
+        "android_client_info": {
+          "package_name": "br.com.b21.customer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "114149785250-jklminbnfo1s7tafb51aa2ej4o596r66.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.b21.customer",
+            "certificate_hash": "44c8b610a20897d1a619f4a9a165794090a77bea"
+          }
+        },
+        {
+          "client_id": "114149785250-4uglhqmeehrqd2n8s3gbrp3i8a7g3ioa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCX3QIKH4lLoFOTwy6pSEXB8UPZ8azu1Xc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "114149785250-4uglhqmeehrqd2n8s3gbrp3i8a7g3ioa.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "114149785250-0i19vjqcvelkk89ubiapqt612v5vp5aq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "br.com.b21.customer.b21Customer"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:114149785250:android:1e273a98fbb4c2131d61fb",
+        "android_client_info": {
+          "package_name": "br.com.b21.driver"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "114149785250-sm51e527s0d4d1hf2ncc9n2b1ieltb2p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.b21.driver",
+            "certificate_hash": "44c8b610a20897d1a619f4a9a165794090a77bea"
+          }
+        },
+        {
+          "client_id": "114149785250-v906pprtle5hpf7qf0th234hgjioa9ql.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "br.com.b21.driver",
+            "certificate_hash": "f128401906f5a00e63a10223ee03905fc2cc3552"
+          }
+        },
+        {
+          "client_id": "114149785250-4uglhqmeehrqd2n8s3gbrp3i8a7g3ioa.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCX3QIKH4lLoFOTwy6pSEXB8UPZ8azu1Xc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "114149785250-4uglhqmeehrqd2n8s3gbrp3i8a7g3ioa.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "114149785250-0i19vjqcvelkk89ubiapqt612v5vp5aq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "br.com.b21.customer.b21Customer"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
