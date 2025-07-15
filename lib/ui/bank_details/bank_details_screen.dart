@@ -52,7 +52,10 @@ class BankDetailsScreen extends StatelessWidget {
                                   const SizedBox(
                                     height: 5,
                                   ),
-                                  TextFieldThem.buildTextFiled(context, hintText: 'Branch Name'.tr, controller: controller.branchNameController.value),
+                                  TextFieldThem.buildTextFiled(context,
+                                      hintText: 'Branch Name'.tr,
+                                      keyBoardType: TextInputType.number,
+                                      controller: controller.branchNameController.value),
                                   const SizedBox(
                                     height: 10,
                                   ),
@@ -68,7 +71,10 @@ class BankDetailsScreen extends StatelessWidget {
                                   const SizedBox(
                                     height: 5,
                                   ),
-                                  TextFieldThem.buildTextFiled(context, hintText: 'Account Number'.tr, controller: controller.accountNumberController.value),
+                                  TextFieldThem.buildTextFiled(context,
+                                      hintText: 'Account Number'.tr,
+                                      keyBoardType: TextInputType.number,
+                                      controller: controller.accountNumberController.value),
                                   const SizedBox(
                                     height: 10,
                                   ),

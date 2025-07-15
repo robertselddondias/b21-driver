@@ -43,14 +43,17 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+
+	<key>GIDClientID</key>
+    <string>114149785250-bk044m3bv8a5o2kdbfop5qv07534u0lf.apps.googleusercontent.com</string>
 	<key>CFBundleURLTypes</key>
     <array>
         <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>GoogleSignIn</string>
             <key>CFBundleURLSchemes</key>
             <array>
-                <string>com.googleusercontent.apps.114149785250-q38je766uc3t6r092q7820ec0enq81ln</string>
+                <string>com.googleusercontent.apps.114149785250-bk044m3bv8a5o2kdbfop5qv07534u0lf</string>
             </array>
         </dict>
     </array>

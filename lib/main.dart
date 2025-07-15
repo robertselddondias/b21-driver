@@ -5,7 +5,6 @@ import 'package:driver/controller/global_setting_conroller.dart';
 import 'package:driver/firebase_options.dart';
 import 'package:driver/ui/splash_screen.dart';
 import 'package:driver/utils/DarkThemeProvider.dart';
-// import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
@@ -24,20 +23,15 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // await FirebaseAppCheck.instance.activate(
-  //   androidProvider: AndroidProvider.playIntegrity,
-  //   appleProvider: AppleProvider.deviceCheck, // Ou use AppleProvider.appAttest
-  // );
-  // await FirebaseAppCheck.instance.setTokenAutoRefreshEnabled(true);
 
-  // FlutterError.onError = (errorDetails) {
-  //   FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-  // };
-  //
-  // PlatformDispatcher.instance.onError = (error, stack) {
-  //   FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-  //   return true;
-  // };
+  FlutterError.onError = (errorDetails) {
+    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
+  };
+
+  PlatformDispatcher.instance.onError = (error, stack) {
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
+    return true;
+  };
 
 
   final isDarkMode = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
@@ -90,8 +84,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               themeChangeProvider.darkTheme == 0
                   ? true
                   : themeChangeProvider.darkTheme == 1
-                      ? false
-                      : themeChangeProvider.getSystemThem(),
+                  ? false
+                  : themeChangeProvider.getSystemThem(),
               context),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
