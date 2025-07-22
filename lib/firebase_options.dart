@@ -69,4 +69,5 @@ class DefaultFirebaseOptions {
     iosClientId: '114149785250-bk044m3bv8a5o2kdbfop5qv07534u0lf.apps.googleusercontent.com',
     iosBundleId: 'br.com.b21.driver',
   );
+
 }
