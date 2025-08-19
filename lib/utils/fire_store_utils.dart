@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:math' hide log;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:driver/constant/collection_name.dart';
@@ -759,5 +760,353 @@ class FireStoreUtils {
       log(error.toString());
     });
     return airPortList;
+  }
+
+
+  static Stream<List<OrderModel>> getAvailableRidesForAutoAssignment({
+    required double driverLat,
+    required double driverLng,
+    double radiusKm = 10.0,
+  }) {
+    return fireStore
+        .collection(CollectionName.orders)
+        .where('status', isEqualTo: Constant.ridePlaced)
+        .where('assignedDriverId', isNull: true)
+        .orderBy('createdDate', descending: false)
+        .limit(50)
+        .snapshots()
+        .map((snapshot) {
+      List<OrderModel> rides = [];
+
+      for (var doc in snapshot.docs) {
+        try {
+          OrderModel order = OrderModel.fromJson(doc.data());
+
+          // Filtra por distância se tiver localização
+          if (order.sourceLocationLAtLng != null) {
+            double distance = _calculateDistance(
+              driverLat,
+              driverLng,
+              order.sourceLocationLAtLng!.latitude!,
+              order.sourceLocationLAtLng!.longitude!,
+            );
+
+            if (distance <= radiusKm) {
+              rides.add(order);
+            }
+          }
+        } catch (e) {
+          print('Erro ao processar corrida: $e');
+        }
+      }
+
+      return rides;
+    });
+  }
+
+  /// Atribui corrida automaticamente a um motorista
+  static Future<bool> assignRideToDriver(String orderId, String driverId) async {
+    try {
+      DocumentReference orderRef = fireStore.collection(CollectionName.orders).doc(orderId);
+
+      // Usa transação para evitar conflitos
+      return await fireStore.runTransaction((transaction) async {
+        DocumentSnapshot orderSnapshot = await transaction.get(orderRef);
+
+        if (!orderSnapshot.exists) {
+          throw Exception('Corrida não encontrada');
+        }
+
+        Map<String, dynamic> orderData = orderSnapshot.data() as Map<String, dynamic>;
+
+        // Verifica se já foi atribuída
+        if (orderData['assignedDriverId'] != null) {
+          return false; // Já foi atribuída para outro motorista
+        }
+
+        // Atribui ao motorista
+        transaction.update(orderRef, {
+          'assignedDriverId': driverId,
+          'assignedAt': Timestamp.now(),
+          'status': Constant.ridePlaced, // Mantém o status
+        });
+
+        return true;
+      });
+    } catch (e) {
+      print('Erro ao atribuir corrida: $e');
+      return false;
+    }
+  }
+
+  /// Remove atribuição e adiciona motorista à lista de rejeitados
+  static Future<bool> rejectAssignedRide(String orderId, String driverId) async {
+    try {
+      DocumentReference orderRef = fireStore.collection(CollectionName.orders).doc(orderId);
+
+      await fireStore.runTransaction((transaction) async {
+        DocumentSnapshot orderSnapshot = await transaction.get(orderRef);
+
+        if (!orderSnapshot.exists) {
+          throw Exception('Corrida não encontrada');
+        }
+
+        Map<String, dynamic> orderData = orderSnapshot.data() as Map<String, dynamic>;
+        List<dynamic> rejectedIds = List.from(orderData['rejectedDriverIds'] ?? []);
+
+        // Adiciona à lista de rejeitados se não estiver lá
+        if (!rejectedIds.contains(driverId)) {
+          rejectedIds.add(driverId);
+        }
+
+        // Remove atribuição e atualiza rejeitados
+        transaction.update(orderRef, {
+          'assignedDriverId': FieldValue.delete(),
+          'assignedAt': FieldValue.delete(),
+          'rejectedDriverIds': rejectedIds,
+        });
+      });
+
+      return true;
+    } catch (e) {
+      print('Erro ao rejeitar corrida: $e');
+      return false;
+    }
+  }
+
+  /// Aceita corrida atribuída automaticamente
+  static Future<bool> acceptAssignedRide(OrderModel order, DriverIdAcceptReject driverAcceptance) async {
+    try {
+      DocumentReference orderRef = fireStore.collection(CollectionName.orders).doc(order.id);
+
+      return await fireStore.runTransaction((transaction) async {
+        DocumentSnapshot orderSnapshot = await transaction.get(orderRef);
+
+        if (!orderSnapshot.exists) {
+          throw Exception('Corrida não encontrada');
+        }
+
+        Map<String, dynamic> orderData = orderSnapshot.data() as Map<String, dynamic>;
+
+        // Verifica se ainda está atribuída ao motorista correto
+        if (orderData['assignedDriverId'] != driverAcceptance.driverId) {
+          return false; // Não é mais atribuída a este motorista
+        }
+
+        // Atualiza para aceita
+        transaction.update(orderRef, {
+          'status': Constant.rideActive,
+          'driverId': driverAcceptance.driverId,
+          'acceptedAt': Timestamp.now(),
+          'finalRate': driverAcceptance.offerAmount,
+        });
+
+        // Salva registro de aceitação
+        transaction.set(
+          fireStore
+              .collection(CollectionName.orders)
+              .doc(order.id)
+              .collection('acceptedDrivers')
+              .doc(driverAcceptance.driverId),
+          driverAcceptance.toJson(),
+        );
+
+        return true;
+      });
+    } catch (e) {
+      print('Erro ao aceitar corrida atribuída: $e');
+      return false;
+    }
+  }
+
+  /// Busca corridas atribuídas para um motorista específico
+  static Stream<List<OrderModel>> getAssignedRidesForDriver(String driverId) {
+    return fireStore
+        .collection(CollectionName.orders)
+        .where('assignedDriverId', isEqualTo: driverId)
+        .where('status', isEqualTo: Constant.ridePlaced)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+        .map((doc) => OrderModel.fromJson(doc.data()))
+        .toList());
+  }
+
+  /// Verifica se motorista tem corrida atribuída pendente
+  static Future<OrderModel?> getDriverPendingAssignment(String driverId) async {
+    try {
+      QuerySnapshot query = await fireStore
+          .collection(CollectionName.orders)
+          .where('assignedDriverId', isEqualTo: driverId)
+          .where('status', isEqualTo: Constant.ridePlaced)
+          .limit(1)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        return OrderModel.fromJson(query.docs.first.data() as Map<String, dynamic>);
+      }
+
+      return null;
+    } catch (e) {
+      print('Erro ao buscar atribuição pendente: $e');
+      return null;
+    }
+  }
+
+  /// Limpa atribuições expiradas (chamado periodicamente)
+  static Future<void> cleanExpiredAssignments() async {
+    try {
+      // Busca corridas atribuídas há mais de 15 minutos
+      DateTime cutoffTime = DateTime.now().subtract(const Duration(minutes: 15));
+      Timestamp cutoffTimestamp = Timestamp.fromDate(cutoffTime);
+
+      QuerySnapshot expiredAssignments = await fireStore
+          .collection(CollectionName.orders)
+          .where('assignedAt', isLessThan: cutoffTimestamp)
+          .where('assignedDriverId', isNull: false)
+          .where('status', isEqualTo: Constant.ridePlaced)
+          .get();
+
+      WriteBatch batch = fireStore.batch();
+
+      for (var doc in expiredAssignments.docs) {
+        batch.update(doc.reference, {
+          'assignedDriverId': FieldValue.delete(),
+          'assignedAt': FieldValue.delete(),
+        });
+      }
+
+      await batch.commit();
+      print('Limpas ${expiredAssignments.docs.length} atribuições expiradas');
+
+    } catch (e) {
+      print('Erro ao limpar atribuições expiradas: $e');
+    }
+  }
+
+  /// Calcula distância entre dois pontos em km
+  static double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    const double earthRadius = 6371;
+
+    double dLat = _degreesToRadians(lat2 - lat1);
+    double dLon = _degreesToRadians(lon2 - lon1);
+
+    double a = sin(dLat / 2) * sin(dLat / 2) +
+        cos(_degreesToRadians(lat1)) * cos(_degreesToRadians(lat2)) *
+            sin(dLon / 2) * sin(dLon / 2);
+
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+    return earthRadius * c;
+  }
+
+  static double _degreesToRadians(double degrees) {
+    return degrees * (pi / 180);
+  }
+
+  /// Busca motoristas online próximos para uma corrida
+  static Future<List<String>> getNearbyOnlineDrivers({
+    required double lat,
+    required double lng,
+    required String serviceId,
+    double radiusKm = 10.0,
+    int limit = 10,
+  }) async {
+    try {
+      // Busca motoristas online do serviço específico
+      QuerySnapshot driversQuery = await fireStore
+          .collection(CollectionName.driverUsers)
+          .where('isOnline', isEqualTo: true)
+          .where('serviceId', isEqualTo: serviceId)
+          .where('documentVerification', isEqualTo: true)
+          .limit(50)
+          .get();
+
+      List<String> nearbyDrivers = [];
+
+      for (var doc in driversQuery.docs) {
+        try {
+          Map<String, dynamic> driverData = doc.data() as Map<String, dynamic>;
+
+          if (driverData['location'] != null) {
+            double driverLat = driverData['location']['latitude'] ?? 0.0;
+            double driverLng = driverData['location']['longitude'] ?? 0.0;
+
+            double distance = _calculateDistance(lat, lng, driverLat, driverLng);
+
+            if (distance <= radiusKm) {
+              nearbyDrivers.add(doc.id);
+            }
+          }
+        } catch (e) {
+          print('Erro ao processar motorista ${doc.id}: $e');
+        }
+      }
+
+      // Ordena por distância e retorna os mais próximos
+      return nearbyDrivers.take(limit).toList();
+
+    } catch (e) {
+      print('Erro ao buscar motoristas próximos: $e');
+      return [];
+    }
+  }
+
+  /// Sistema inteligente de atribuição de corridas
+  static Future<String?> findBestDriverForRide(OrderModel order) async {
+    if (order.sourceLocationLAtLng == null) return null;
+
+    try {
+      List<String> nearbyDrivers = await getNearbyOnlineDrivers(
+        lat: order.sourceLocationLAtLng!.latitude!,
+        lng: order.sourceLocationLAtLng!.longitude!,
+        serviceId: order.serviceId ?? '',
+        radiusKm: 15.0,
+      );
+
+      if (nearbyDrivers.isEmpty) return null;
+
+      // Remove motoristas que já rejeitaram esta corrida
+      List<String> rejectedIds = List.from(order.rejectedDriverIds ?? []);
+      nearbyDrivers.removeWhere((driverId) => rejectedIds.contains(driverId));
+
+      if (nearbyDrivers.isEmpty) return null;
+
+      // Por enquanto, retorna o primeiro disponível
+      // Pode ser expandido com algoritmo mais complexo (rating, tempo online, etc.)
+      return nearbyDrivers.first;
+
+    } catch (e) {
+      print('Erro ao encontrar melhor motorista: $e');
+      return null;
+    }
+  }
+
+  /// Atribui corrida automaticamente para o melhor motorista disponível
+  static Future<bool> autoAssignRide(String orderId) async {
+    try {
+      DocumentSnapshot orderDoc = await fireStore
+          .collection(CollectionName.orders)
+          .doc(orderId)
+          .get();
+
+      if (!orderDoc.exists) return false;
+
+      OrderModel order = OrderModel.fromJson(orderDoc.data() as Map<String, dynamic>);
+
+      // Verifica se já foi atribuída
+      if (order.assignedDriverId != null) return false;
+
+      // Encontra melhor motorista
+      String? bestDriverId = await findBestDriverForRide(order);
+
+      if (bestDriverId == null) return false;
+
+      // Atribui ao motorista
+      return await assignRideToDriver(orderId, bestDriverId);
+
+    } catch (e) {
+      print('Erro na atribuição automática: $e');
+      return false;
+    }
   }
 }

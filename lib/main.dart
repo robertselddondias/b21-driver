@@ -1,112 +1,99 @@
-import 'dart:ui';
-
-import 'package:driver/constant/show_toast_dialog.dart';
+// lib/main.dart (Modificações para integrar Auto Assignment)
+import 'package:driver/controller/auto_assignment_controller.dart';
 import 'package:driver/controller/global_setting_conroller.dart';
-import 'package:driver/firebase_options.dart';
+import 'package:driver/services/localization_service.dart';
 import 'package:driver/ui/splash_screen.dart';
 import 'package:driver/utils/DarkThemeProvider.dart';
+import 'package:driver/utils/Preferences.dart';
+import 'package:driver/utils/notification_service.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 
-import 'services/localization_service.dart';
-import 'themes/Styles.dart';
-import 'utils/Preferences.dart';
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
+  // Inicializa Firebase
+  await Firebase.initializeApp();
 
-  FlutterError.onError = (errorDetails) {
-    FirebaseCrashlytics.instance.recordFlutterFatalError(errorDetails);
-  };
-
-  PlatformDispatcher.instance.onError = (error, stack) {
-    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true);
-    return true;
-  };
-
-
-  final isDarkMode = WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark;
-  ShowToastDialog.configureLoader(isDarkMode: isDarkMode);
-
+  // Inicializa preferências
   await Preferences.initPref();
+
+  // Inicializa serviço de notificações
+  NotificationService notificationService = NotificationService();
+  await notificationService.initInfo();
+  await notificationService.setupRideAssignmentChannel();
+
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<DarkThemeProvider>(
+          create: (_) => DarkThemeProvider(),
+        ),
+      ],
+      child: Consumer<DarkThemeProvider>(
+          builder: (context, themeChangeProvider, child) {
+            return GetMaterialApp(
+              title: 'B-21 Driver',
+              debugShowCheckedModeBanner: false,
+              theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+                useMaterial3: true,
+              ),
+              darkTheme: ThemeData.dark(),
+              themeMode: themeChangeProvider.darkTheme == 0
+                  ? ThemeMode.system
+                  : themeChangeProvider.darkTheme == 1
+                  ? ThemeMode.dark
+                  : ThemeMode.light,
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              locale: const Locale('pt'),
+              supportedLocales: const [
+                Locale('pt', 'BR')
+              ],
+              fallbackLocale: LocalizationService.locale,
+              translations: LocalizationService(),
+              builder: EasyLoading.init(),
+
+              // Inicializa controllers globais
+              initialBinding: BindingsBuilder(() {
+                Get.put(GlobalSettingController());
+
+                // Inicializa AutoAssignmentController apenas quando o usuário estiver logado
+                // Isso será feito no DashBoardScreen após login
+              }),
+
+              home: GetBuilder<GlobalSettingController>(
+                init: GlobalSettingController(),
+                builder: (context) {
+                  return const SplashScreen();
+                },
+              ),
+            );
+          }
+      ),
+    );
+  }
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  // This widget is the root of your application. DarkThemeProvider themeChangeProvider = DarkThemeProvider();
-  //
-
-  DarkThemeProvider themeChangeProvider = DarkThemeProvider();
-
+/// Binding para inicializar controllers específicos do sistema de atribuição
+class AutoAssignmentBinding extends Bindings {
   @override
-  void initState() {
-    getCurrentAppTheme();
-    WidgetsBinding.instance.addObserver(this);
-    super.initState();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    getCurrentAppTheme();
-  }
-
-  void getCurrentAppTheme() async {
-    themeChangeProvider.darkTheme = await themeChangeProvider.darkThemePreference.getTheme();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) {
-        return themeChangeProvider;
-      },
-      child: Consumer<DarkThemeProvider>(builder: (context, value, child) {
-        return GetMaterialApp(
-          title: 'B-21 Motorista'.tr,
-          debugShowCheckedModeBanner: false,
-          theme: Styles.themeData(
-              themeChangeProvider.darkTheme == 0
-                  ? true
-                  : themeChangeProvider.darkTheme == 1
-                  ? false
-                  : themeChangeProvider.getSystemThem(),
-              context),
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          locale: const Locale('pt'),
-          supportedLocales: [
-            const Locale('pt', 'BR')
-          ],
-          fallbackLocale: LocalizationService.locale,
-          translations: LocalizationService(),
-          builder: EasyLoading.init(),
-          home: GetBuilder<GlobalSettingController>(
-            init: GlobalSettingController(),
-            builder: (context) {
-              return const SplashScreen();
-            },
-          ),
-        );
-      }),
-    );
+  void dependencies() {
+    Get.put(AutoAssignmentController());
   }
 }

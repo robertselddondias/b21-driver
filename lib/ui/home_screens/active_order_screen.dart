@@ -157,13 +157,25 @@ class ActiveOrderScreen extends StatelessWidget {
                                         btnHeight: 44,
                                         iconVisibility: false,
                                         onPress: () async {
-                                          showDialog(
-                                              context: context,
-                                              builder: (BuildContext dialogContext) => OtpDialog(
-                                                orderModel: orderModel,
-                                                controller: controller,
-                                              )
-                                          );
+                                          ShowToastDialog.showLoader("Please wait...".tr);
+                                          orderModel.status = Constant.rideInProgress;
+
+                                          await FireStoreUtils.getCustomer(orderModel.userId.toString()).then((value) async {
+                                            if (value != null) {
+                                              await SendNotification.sendOneNotification(
+                                                  token: value.fcmToken.toString(),
+                                                  title: 'Ride Started'.tr,
+                                                  body: 'The ride has officially started. Please follow the designated route to the destination.'.tr,
+                                                  payload: {});
+                                            }
+                                          });
+
+                                          await FireStoreUtils.setOrder(orderModel).then((value) {
+                                            if (value == true) {
+                                              ShowToastDialog.closeLoader();
+                                              ShowToastDialog.showToast("Customer pickup successfully".tr);
+                                            }
+                                          });
                                         },
                                       ),
                                     ),
