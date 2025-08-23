@@ -4,12 +4,9 @@ import 'dart:developer';
 
 import 'package:driver/controller/auto_assignment_controller.dart';
 import 'package:driver/model/driver_user_model.dart';
-import 'package:driver/model/intercity_order_model.dart';
 import 'package:driver/model/order_model.dart';
 import 'package:driver/model/user_model.dart';
 import 'package:driver/ui/chat_screen/chat_screen.dart';
-import 'package:driver/ui/home_screens/order_map_screen.dart';
-import 'package:driver/ui/order_intercity_screen/complete_intecity_order_screen.dart';
 import 'package:driver/ui/order_screen/complete_order_screen.dart';
 import 'package:driver/utils/fire_store_utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';

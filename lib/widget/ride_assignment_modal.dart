@@ -4,12 +4,10 @@ import 'package:driver/constant/constant.dart';
 import 'package:driver/model/order_model.dart';
 import 'package:driver/themes/app_colors.dart';
 import 'package:driver/themes/button_them.dart';
-import 'package:driver/themes/responsive.dart';
 import 'package:driver/utils/DarkThemeProvider.dart';
 import 'package:driver/widget/location_view.dart';
 import 'package:driver/widget/user_view.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
@@ -39,10 +37,13 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
 
   Timer? _countdownTimer;
   int _secondsRemaining = 15;
+  bool _isDisposed = false;
+  bool _hasResponded = false; // Evita múltiplas respostas
 
   @override
   void initState() {
     super.initState();
+    print('📱 Inicializando RideAssignmentModal para corrida ${widget.orderModel.id}');
 
     // Configuração das animações
     _animationController = AnimationController(
@@ -75,6 +76,8 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
 
   @override
   void dispose() {
+    print('📱 Descartando RideAssignmentModal para corrida ${widget.orderModel.id}');
+    _isDisposed = true;
     _animationController.dispose();
     _progressController.dispose();
     _countdownTimer?.cancel();
@@ -83,15 +86,52 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
 
   void _startCountdown() {
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_isDisposed || _hasResponded) {
+        timer.cancel();
+        return;
+      }
+
       if (_secondsRemaining > 0) {
-        setState(() {
-          _secondsRemaining--;
-        });
+        if (mounted) {
+          setState(() {
+            _secondsRemaining--;
+          });
+        }
       } else {
         timer.cancel();
-        widget.onReject();
+        if (!_hasResponded && mounted) {
+          _handleReject();
+        }
       }
     });
+  }
+
+  void _handleAccept() {
+    if (_hasResponded || _isDisposed) return;
+
+    _hasResponded = true;
+    print('✅ Usuário aceitou corrida ${widget.orderModel.id}');
+
+    // Cancela timer e animações
+    _countdownTimer?.cancel();
+    _animationController.stop();
+    _progressController.stop();
+
+    widget.onAccept();
+  }
+
+  void _handleReject() {
+    if (_hasResponded || _isDisposed) return;
+
+    _hasResponded = true;
+    print('❌ Usuário rejeitou corrida ${widget.orderModel.id}');
+
+    // Cancela timer e animações
+    _countdownTimer?.cancel();
+    _animationController.stop();
+    _progressController.stop();
+
+    widget.onReject();
   }
 
   @override
@@ -113,8 +153,8 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: themeChange.getThem()
-                        ? AppColors.darkContainerBackground
-                        : Colors.white,
+                        ? AppColors.darkBackground
+                        : AppColors.background,
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
@@ -127,27 +167,16 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Header com timer
                       _buildHeader(themeChange),
-
                       const SizedBox(height: 20),
-
-                      // Informações da corrida
+                      _buildCountdownTimer(themeChange),
+                      const SizedBox(height: 20),
                       _buildRideInfo(themeChange),
-
                       const SizedBox(height: 20),
-
-                      // Informações do usuário
                       _buildUserInfo(),
-
                       const SizedBox(height: 20),
-
-                      // Localizações
                       _buildLocationInfo(),
-
                       const SizedBox(height: 25),
-
-                      // Botões de ação
                       _buildActionButtons(themeChange),
                     ],
                   ),
@@ -161,31 +190,50 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
   }
 
   Widget _buildHeader(DarkThemeProvider themeChange) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Icon(
+            Icons.directions_car,
+            color: AppColors.primary,
+            size: 24,
+          ),
+        ),
+        const SizedBox(width: 15),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Nova Corrida Disponível',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: themeChange.getThem() ? Colors.white : Colors.black,
+                ),
+              ),
+              Text(
+                'Corrida ID: #${widget.orderModel.id?.substring(0, 8) ?? 'N/A'}',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCountdownTimer(DarkThemeProvider themeChange) {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.local_taxi,
-              color: AppColors.primary,
-              size: 30,
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'Nova Corrida!',
-              style: GoogleFonts.poppins(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: themeChange.getThem() ? Colors.white : Colors.black,
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 15),
-
-        // Barra de progresso circular
         Stack(
           alignment: Alignment.center,
           children: [
@@ -335,7 +383,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
               ),
             ),
             child: TextButton(
-              onPressed: widget.onReject,
+              onPressed: _hasResponded ? null : _handleReject,
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 shape: RoundedRectangleBorder(
@@ -369,12 +417,15 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
 
         // Botão Aceitar
         Expanded(
-          child: ButtonThem.buildButton(
-            context,
-            title: 'Aceitar',
-            btnHeight: 50,
-            onPress: widget.onAccept,
-            btnWidthRatio: 1.0,
+          child: Opacity(
+            opacity: _hasResponded ? 0.5 : 1.0,
+            child: ButtonThem.buildButton(
+              context,
+              title: 'Aceitar',
+              btnHeight: 50,
+              onPress: _hasResponded ? () {} : _handleAccept,
+              btnWidthRatio: 1.0,
+            ),
           ),
         ),
       ],

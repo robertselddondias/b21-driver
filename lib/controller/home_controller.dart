@@ -1,5 +1,5 @@
-// lib/controller/home_controller.dart
-import 'package:cloud_firestore/cloud_firestore.dart';
+// lib/controller/home_controller.dart - Versão corrigida
+
 import 'package:driver/constant/collection_name.dart';
 import 'package:driver/constant/constant.dart';
 import 'package:driver/controller/auto_assignment_controller.dart';
@@ -30,12 +30,23 @@ class HomeController extends GetxController {
   late AutoAssignmentController autoAssignmentController;
 
   void onItemTapped(int index) {
-    selectedIndex.value = index;
+    // CORREÇÃO: Validação para evitar RangeError
+    if (index >= 0 && index < widgetOptions.length) {
+      selectedIndex.value = index;
+    } else {
+      print('⚠️ Índice inválido: $index. Máximo permitido: ${widgetOptions.length - 1}');
+      selectedIndex.value = 0; // Volta para o primeiro tab
+    }
   }
 
   @override
   void onInit() {
     super.onInit();
+
+    // CORREÇÃO: Validação inicial do selectedIndex
+    if (selectedIndex.value >= widgetOptions.length) {
+      selectedIndex.value = 0;
+    }
 
     // Inicializa o sistema de atribuição automática
     Get.put(AutoAssignmentController());
@@ -149,4 +160,27 @@ class HomeController extends GetxController {
   Future<void> toggleOnlineStatus() async {
     await autoAssignmentController.toggleOnlineStatus();
   }
+
+  // CORREÇÃO: Getter seguro para widget atual
+  Widget get currentWidget {
+    if (selectedIndex.value >= 0 && selectedIndex.value < widgetOptions.length) {
+      return widgetOptions[selectedIndex.value];
+    } else {
+      print('⚠️ selectedIndex fora do range, retornando primeiro widget');
+      selectedIndex.value = 0;
+      return widgetOptions[0];
+    }
+  }
+
+  // CORREÇÃO: Método para resetar para tab válida
+  void resetToValidTab() {
+    if (selectedIndex.value >= widgetOptions.length) {
+      selectedIndex.value = 0;
+      print('🔄 Reset para tab 0 devido a índice inválido');
+    }
+  }
+
+  // Getter para validar se índice está correto
+  bool get isValidIndex =>
+      selectedIndex.value >= 0 && selectedIndex.value < widgetOptions.length;
 }

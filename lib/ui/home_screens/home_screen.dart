@@ -1,8 +1,8 @@
-// lib/ui/home_screens/home_screen.dart
+// lib/ui/home_screens/home_screen.dart - Versão corrigida
+
 import 'package:driver/controller/home_controller.dart';
 import 'package:driver/themes/app_colors.dart';
 import 'package:driver/utils/DarkThemeProvider.dart';
-import 'package:driver/utils/fire_store_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -20,6 +20,11 @@ class HomeScreen extends StatelessWidget {
       init: HomeController(),
       builder: (controller) {
         return Obx(() {
+          // CORREÇÃO: Valida e corrige o selectedIndex se necessário
+          if (!controller.isValidIndex) {
+            controller.resetToValidTab();
+          }
+
           return Column(
             children: [
               // Header com status online/offline
@@ -42,9 +47,9 @@ class HomeScreen extends StatelessWidget {
                       // Informações do motorista online
                       _buildDriverStatusCard(controller, themeChange),
 
-                      // Conteúdo das tabs
+                      // Conteúdo das tabs - CORREÇÃO: usando getter seguro
                       Expanded(
-                        child: controller.widgetOptions[controller.selectedIndex.value],
+                        child: controller.currentWidget,
                       ),
                     ],
                   ),
@@ -99,7 +104,7 @@ class HomeScreen extends StatelessWidget {
                   ],
                   backgroundColor: AppColors.primary,
                   type: BottomNavigationBarType.fixed,
-                  currentIndex: controller.selectedIndex.value,
+                  currentIndex: controller.isValidIndex ? controller.selectedIndex.value : 0,
                   selectedItemColor: AppColors.darkModePrimary,
                   unselectedItemColor: Colors.white,
                   selectedFontSize: 12,
@@ -326,13 +331,6 @@ class HomeScreen extends StatelessWidget {
                 Colors.green,
                 themeChange,
               ),
-              _buildStatItem(
-                'Avaliação',
-                '${_calculateRating(controller)}★',
-                Icons.star,
-                Colors.orange,
-                themeChange,
-              ),
             ],
           ),
         ],
@@ -353,7 +351,7 @@ class HomeScreen extends StatelessWidget {
           value,
           style: GoogleFonts.poppins(
             fontSize: 16,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
             color: themeChange.getThem() ? Colors.white : Colors.black,
           ),
         ),
@@ -366,20 +364,5 @@ class HomeScreen extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  String _calculateRating(HomeController controller) {
-    try {
-      double reviewsSum = double.parse(controller.driverModel.value.reviewsSum ?? '0');
-      double reviewsCount = double.parse(controller.driverModel.value.reviewsCount ?? '0');
-
-      if (reviewsCount > 0) {
-        double average = reviewsSum / reviewsCount;
-        return average.toStringAsFixed(1);
-      }
-    } catch (e) {
-      // Ignore parsing errors
-    }
-    return '5.0';
   }
 }

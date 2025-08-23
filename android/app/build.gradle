@@ -46,7 +46,7 @@ android {
     defaultConfig {
         applicationId "br.com.b21.driver"
         minSdk 24
-        targetSdk 34
+        targetSdk 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true

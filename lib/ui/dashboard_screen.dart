@@ -1,6 +1,5 @@
 // lib/ui/dashboard_screen.dart
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:driver/constant/collection_name.dart';
 import 'package:driver/constant/constant.dart';
 import 'package:driver/constant/show_toast_dialog.dart';
 import 'package:driver/controller/auto_assignment_controller.dart';
