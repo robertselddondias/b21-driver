@@ -1,3 +1,4 @@
+// lib/ui/bank_details/bank_details_screen.dart - Versão com temas e responsividade
 import 'package:driver/constant/constant.dart';
 import 'package:driver/constant/show_toast_dialog.dart';
 import 'package:driver/controller/bank_details_controller.dart';
@@ -6,16 +7,20 @@ import 'package:driver/themes/app_colors.dart';
 import 'package:driver/themes/button_them.dart';
 import 'package:driver/themes/responsive.dart';
 import 'package:driver/themes/text_field_them.dart';
+import 'package:driver/utils/DarkThemeProvider.dart';
 import 'package:driver/utils/fire_store_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
 class BankDetailsScreen extends StatelessWidget {
   const BankDetailsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final themeChange = Provider.of<DarkThemeProvider>(context);
+
     return GetX<BankDetailsController>(
         init: BankDetailsController(),
         builder: (controller) {
@@ -24,71 +29,165 @@ class BankDetailsScreen extends StatelessWidget {
             body: Column(
               children: [
                 SizedBox(
-                  height: Responsive.width(12, context),
+                  height: Responsive.height(8, context),
                   width: Responsive.width(100, context),
                 ),
                 Expanded(
                   child: Container(
                     height: Responsive.height(100, context),
                     width: Responsive.width(100, context),
-                    decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25))),
+                    decoration: BoxDecoration(
+                      color: themeChange.getThem()
+                          ? AppColors.darkBackground
+                          : AppColors.background,
+                      borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(25),
+                          topRight: Radius.circular(25)
+                      ),
+                    ),
                     child: controller.isLoading.value
-                        ? Constant.loader(context)
-                        : Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            child: SingleChildScrollView(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text("Bank Name".tr, style: GoogleFonts.poppins()),
-                                  const SizedBox(
-                                    height: 5,
+                        ? Center(child: Constant.loader(context))
+                        : Column(
+                      children: [
+                        // Header
+                        Container(
+                          width: Responsive.width(100, context),
+                          padding: EdgeInsets.all(Responsive.width(5, context)),
+                          child: Text(
+                            'Detalhes Bancários',
+                            style: GoogleFonts.poppins(
+                              fontSize: Responsive.width(5, context),
+                              fontWeight: FontWeight.w600,
+                              color: themeChange.getThem() ? Colors.white : Colors.black,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+
+                        // Content
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: Responsive.width(5, context),
+                              vertical: Responsive.height(1.2, context),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Bank Name
+                                _buildFormField(
+                                  context,
+                                  themeChange,
+                                  label: "Bank Name".tr,
+                                  child: TextFieldThem.buildTextFiled(
+                                    context,
+                                    hintText: 'Bank Name'.tr,
+                                    controller: controller.bankNameController.value,
                                   ),
-                                  TextFieldThem.buildTextFiled(context, hintText: 'Bank Name'.tr, controller: controller.bankNameController.value),
-                                  const SizedBox(
-                                    height: 10,
+                                ),
+
+                                SizedBox(height: Responsive.height(2, context)),
+
+                                // Branch Name
+                                _buildFormField(
+                                  context,
+                                  themeChange,
+                                  label: "Branch Name".tr,
+                                  child: TextFieldThem.buildTextFiled(
+                                    context,
+                                    hintText: 'Branch Name'.tr,
+                                    keyBoardType: TextInputType.text,
+                                    controller: controller.branchNameController.value,
                                   ),
-                                  Text("Branch Name".tr, style: GoogleFonts.poppins()),
-                                  const SizedBox(
-                                    height: 5,
+                                ),
+
+                                SizedBox(height: Responsive.height(2, context)),
+
+                                // Holder Name
+                                _buildFormField(
+                                  context,
+                                  themeChange,
+                                  label: "Holder Name".tr,
+                                  child: TextFieldThem.buildTextFiled(
+                                    context,
+                                    hintText: 'Holder Name'.tr,
+                                    controller: controller.holderNameController.value,
                                   ),
-                                  TextFieldThem.buildTextFiled(context,
-                                      hintText: 'Branch Name'.tr,
-                                      keyBoardType: TextInputType.number,
-                                      controller: controller.branchNameController.value),
-                                  const SizedBox(
-                                    height: 10,
+                                ),
+
+                                SizedBox(height: Responsive.height(2, context)),
+
+                                // Account Number
+                                _buildFormField(
+                                  context,
+                                  themeChange,
+                                  label: "Account Number".tr,
+                                  child: TextFieldThem.buildTextFiled(
+                                    context,
+                                    hintText: 'Account Number'.tr,
+                                    keyBoardType: TextInputType.number,
+                                    controller: controller.accountNumberController.value,
                                   ),
-                                  Text("Holder Name".tr, style: GoogleFonts.poppins()),
-                                  const SizedBox(
-                                    height: 5,
+                                ),
+
+                                SizedBox(height: Responsive.height(2, context)),
+
+                                // Other Information
+                                _buildFormField(
+                                  context,
+                                  themeChange,
+                                  label: "Other Information".tr,
+                                  child: TextFieldThem.buildTextFiled(
+                                    context,
+                                    hintText: 'Other Information'.tr,
+                                    controller: controller.otherInformationController.value,
+                                    maxLine: 3,
                                   ),
-                                  TextFieldThem.buildTextFiled(context, hintText: 'Holder Name'.tr, controller: controller.holderNameController.value),
-                                  const SizedBox(
-                                    height: 10,
+                                ),
+
+                                SizedBox(height: Responsive.height(4, context)),
+
+                                // Information Card
+                                Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(Responsive.width(4, context)),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.blue.withOpacity(0.3),
+                                    ),
                                   ),
-                                  Text("Account Number".tr, style: GoogleFonts.poppins()),
-                                  const SizedBox(
-                                    height: 5,
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.info_outline,
+                                        color: Colors.blue,
+                                        size: Responsive.width(5, context),
+                                      ),
+                                      SizedBox(width: Responsive.width(3, context)),
+                                      Expanded(
+                                        child: Text(
+                                          'Certifique-se de que os detalhes bancários estão corretos. Eles serão usados para transferências.',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: Responsive.width(3, context),
+                                            color: Colors.blue.shade700,
+                                            height: 1.4,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  TextFieldThem.buildTextFiled(context,
-                                      hintText: 'Account Number'.tr,
-                                      keyBoardType: TextInputType.number,
-                                      controller: controller.accountNumberController.value),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text("Other Information".tr, style: GoogleFonts.poppins()),
-                                  const SizedBox(
-                                    height: 5,
-                                  ),
-                                  TextFieldThem.buildTextFiled(context, hintText: 'Other Information'.tr, controller: controller.otherInformationController.value),
-                                  const SizedBox(
-                                    height: 40,
-                                  ),
-                                  ButtonThem.buildButton(
+                                ),
+
+                                SizedBox(height: Responsive.height(4, context)),
+
+                                // Save Button
+                                Center(
+                                  child: ButtonThem.buildButton(
                                     context,
                                     title: "Save".tr,
+                                    btnWidthRatio: 0.8,
                                     onPress: () async {
                                       if (controller.bankNameController.value.text.isEmpty) {
                                         ShowToastDialog.showToast("Please enter bank name".tr);
@@ -115,16 +214,44 @@ class BankDetailsScreen extends StatelessWidget {
                                         });
                                       }
                                     },
-                                  )
-                                ],
-                              ),
+                                  ),
+                                ),
+
+                                SizedBox(height: Responsive.height(3, context)),
+                              ],
                             ),
                           ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
           );
         });
+  }
+
+  Widget _buildFormField(
+      BuildContext context,
+      DarkThemeProvider themeChange, {
+        required String label,
+        required Widget child,
+      }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w500,
+            fontSize: Responsive.width(3.5, context),
+            color: themeChange.getThem() ? Colors.white70 : Colors.black87,
+          ),
+        ),
+        SizedBox(height: Responsive.height(0.8, context)),
+        child,
+      ],
+    );
   }
 }

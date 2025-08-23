@@ -20,359 +20,684 @@ class CompleteOrderScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeChange = Provider.of<DarkThemeProvider>(context);
+
     return GetX<CompleteOrderController>(
-        init: CompleteOrderController(),
-        builder: (controller) {
-          return Scaffold(
-              appBar: AppBar(
-                backgroundColor: AppColors.primary,
-                title:  Text("Ride Details".tr),
-                leading: InkWell(
-                    onTap: () {
-                      Get.back();
-                    },
-                    child: const Icon(
-                      Icons.arrow_back,
-                    )),
+      init: CompleteOrderController(),
+      builder: (controller) {
+        return Scaffold(
+          backgroundColor: AppColors.primary,
+          appBar: _buildAppBar(context, themeChange),
+          body: Column(
+            children: [
+              SizedBox(height: Responsive.height(4, context)),
+              Expanded(
+                child: controller.isLoading.value
+                    ? Constant.loader(context)
+                    : _buildMainContent(context, controller, themeChange),
               ),
-              backgroundColor: AppColors.primary,
-              body: Column(
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  /// AppBar responsiva e temática
+  PreferredSizeWidget _buildAppBar(BuildContext context, DarkThemeProvider themeChange) {
+    return AppBar(
+      backgroundColor: AppColors.primary,
+      elevation: 0,
+      title: Text(
+        "Ride Details".tr,
+        style: GoogleFonts.poppins(
+          color: Colors.white,
+          fontSize: Responsive.width(4.5, context),
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      leading: InkWell(
+        onTap: () => Get.back(),
+        borderRadius: BorderRadius.circular(25),
+        child: Container(
+          margin: EdgeInsets.all(Responsive.width(2, context)),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.white,
+            size: Responsive.width(5, context),
+          ),
+        ),
+      ),
+      centerTitle: true,
+    );
+  }
+
+  /// Conteúdo principal com container responsivo
+  Widget _buildMainContent(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+    return Container(
+      decoration: BoxDecoration(
+        color: themeChange.getThem() ? AppColors.darkBackground : AppColors.background,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        ),
+      ),
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: EdgeInsets.all(Responsive.width(5, context)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header com indicador visual
+            _buildScreenHeader(context, themeChange),
+
+            SizedBox(height: Responsive.height(2, context)),
+
+            // Ride ID Card
+            _buildRideIdCard(context, controller, themeChange),
+
+            SizedBox(height: Responsive.height(2.5, context)),
+
+            // Informações do usuário
+            UserDriverView(
+              userId: controller.orderModel.value.userId.toString(),
+              amount: controller.orderModel.value.finalRate.toString(),
+            ),
+
+            _buildDivider(context, themeChange),
+
+            // Seção de localizações
+            _buildLocationsSection(context, controller, themeChange),
+
+            SizedBox(height: Responsive.height(2, context)),
+
+            // Status da corrida
+            _buildRideStatus(context, controller, themeChange),
+
+            SizedBox(height: Responsive.height(2, context)),
+
+            // Resumo da reserva
+            _buildBookingSummary(context, controller, themeChange),
+
+            SizedBox(height: Responsive.height(2, context)),
+
+            // Comissão do admin
+            _buildAdminCommission(context, controller, themeChange),
+
+            SizedBox(height: Responsive.height(3, context)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Header da tela com indicador visual
+  Widget _buildScreenHeader(BuildContext context, DarkThemeProvider themeChange) {
+    return Column(
+      children: [
+        // Indicador de arraste
+        Container(
+          width: Responsive.width(12, context),
+          height: Responsive.height(0.6, context),
+          decoration: BoxDecoration(
+            color: themeChange.getThem() ? Colors.white24 : Colors.black26,
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        SizedBox(height: Responsive.height(2, context)),
+
+        // Título da seção
+        Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(Responsive.width(2, context)),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.receipt_long,
+                color: AppColors.primary,
+                size: Responsive.width(6, context),
+              ),
+            ),
+            SizedBox(width: Responsive.width(3, context)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: Responsive.width(10, context),
-                    width: Responsive.width(100, context),
+                  Text(
+                    'Detalhes da Corrida'.tr,
+                    style: GoogleFonts.poppins(
+                      fontSize: Responsive.width(5, context),
+                      fontWeight: FontWeight.bold,
+                      color: themeChange.getThem() ? Colors.white : Colors.black,
+                    ),
                   ),
-                  Expanded(
-                    child: controller.isLoading.value
-                        ? Constant.loader(context)
-                        : Container(
-                            decoration:
-                                BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25))),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 20),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
-                                            borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                            border: Border.all(color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder, width: 0.5),
-                                            boxShadow: themeChange.getThem()
-                                                ? null
-                                                : [
-                                                    BoxShadow(
-                                                      color: Colors.black.withOpacity(0.10),
-                                                      blurRadius: 5,
-                                                      offset: const Offset(0, 4), // changes position of shadow
-                                                    ),
-                                                  ],
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text(
-                                                        "Ride ID".tr,
-                                                        style: GoogleFonts.poppins(
-                                                          fontWeight: FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    InkWell(
-                                                      onTap: () {
-                                                        FlutterClipboard.copy(controller.orderModel.value.id.toString()).then((value) {
-                                                          ShowToastDialog.showToast("OrderId copied".tr);
-                                                        });
-                                                      },
-                                                      child: DottedBorder(
-                                                        borderType: BorderType.RRect,
-                                                        radius: const Radius.circular(4),
-                                                        dashPattern: const [6, 6, 6, 6],
-                                                        color: AppColors.textFieldBorder,
-                                                        child: Padding(
-                                                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                                                          child: Text(
-                                                            "Copy".tr,
-                                                            style: GoogleFonts.poppins(fontWeight: FontWeight.w700),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Text(
-                                                  "#${controller.orderModel.value.id!.toUpperCase()}",
-                                                  style: GoogleFonts.poppins(
-                                                    fontWeight: FontWeight.w400,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                        UserDriverView(userId: controller.orderModel.value.userId.toString(), amount: controller.orderModel.value.finalRate.toString()),
-                                        const Padding(
-                                          padding: EdgeInsets.symmetric(vertical: 5),
-                                          child: Divider(thickness: 1),
-                                        ),
-                                        Text(
-                                          "Pickup and drop-off locations".tr,
-                                          style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
-                                            borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                            border: Border.all(color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder, width: 0.5),
-                                            boxShadow: themeChange.getThem()
-                                                ? null
-                                                : [
-                                                    BoxShadow(
-                                                      color: Colors.grey.withOpacity(0.5),
-                                                      blurRadius: 8,
-                                                      offset: const Offset(0, 2), // changes position of shadow
-                                                    ),
-                                                  ],
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: LocationView(
-                                              sourceLocation: controller.orderModel.value.sourceLocationName.toString(),
-                                              destinationLocation: controller.orderModel.value.destinationLocationName.toString(),
-                                            ),
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 14),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                                color: themeChange.getThem() ? AppColors.darkGray : AppColors.gray, borderRadius: const BorderRadius.all(Radius.circular(10))),
-                                            child: Padding(
-                                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
-                                                child: Center(
-                                                  child: Row(
-                                                    children: [
-                                                      Expanded(child: Text(controller.orderModel.value.status.toString(), style: GoogleFonts.poppins(fontWeight: FontWeight.w500))),
-                                                      Text(Constant().formatTimestamp(controller.orderModel.value.createdDate), style: GoogleFonts.poppins()),
-                                                    ],
-                                                  ),
-                                                )),
-                                          ),
-                                        ),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
-                                            borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                            border: Border.all(color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder, width: 0.5),
-                                            boxShadow: themeChange.getThem()
-                                                ? null
-                                                : [
-                                                    BoxShadow(
-                                                      color: Colors.grey.withOpacity(0.5),
-                                                      blurRadius: 8,
-                                                      offset: const Offset(0, 2), // changes position of shadow
-                                                    ),
-                                                  ],
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Booking summary".tr,
-                                                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                                                ),
-                                                const Divider(
-                                                  thickness: 1,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text(
-                                                        "Ride Amount".tr,
-                                                        style: GoogleFonts.poppins(color: AppColors.subTitleColor),
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      Constant.amountShow(amount: controller.orderModel.value.finalRate.toString()),
-                                                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                                                    ),
-                                                  ],
-                                                ),
-                                                const Divider(
-                                                  thickness: 1,
-                                                ),
-                                                controller.orderModel.value.taxList == null
-                                                    ? const SizedBox()
-                                                    : ListView.builder(
-                                                        itemCount: controller.orderModel.value.taxList!.length,
-                                                        shrinkWrap: true,
-                                                        padding: EdgeInsets.zero,
-                                                        itemBuilder: (context, index) {
-                                                          TaxModel taxModel = controller.orderModel.value.taxList![index];
-                                                          return Column(
-                                                            children: [
-                                                              Row(
-                                                                children: [
-                                                                  Expanded(
-                                                                    child: Text(
-                                                                      "${taxModel.title.toString()} (${taxModel.type == "fix" ? Constant.amountShow(amount: taxModel.tax) : "${taxModel.tax}%"})",
-                                                                      style: GoogleFonts.poppins(color: AppColors.subTitleColor),
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    Constant.amountShow(
-                                                                        amount: Constant()
-                                                                            .calculateTax(
-                                                                                amount: (double.parse(controller.orderModel.value.finalRate.toString()) -
-                                                                                        double.parse(controller.couponAmount.value.toString()))
-                                                                                    .toString(),
-                                                                                taxModel: taxModel)
-                                                                            .toString()),
-                                                                    style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                                                                  ),
-                                                                ],
-                                                              ),
-                                                              const Divider(
-                                                                thickness: 1,
-                                                              ),
-                                                            ],
-                                                          );
-                                                        },
-                                                      ),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text(
-                                                        "Discount".tr,
-                                                        style: GoogleFonts.poppins(color: AppColors.subTitleColor),
-                                                      ),
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          "(-${controller.couponAmount.value == "0.0" ? Constant.amountShow(amount: "0.0") : Constant.amountShow(amount: controller.couponAmount.value)})",
-                                                          style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: Colors.red),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                                const Divider(
-                                                  thickness: 1,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text(
-                                                        "Payable amount".tr,
-                                                        style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      Constant.amountShow(amount: controller.calculateAmount().toString()),
-                                                      style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
-                                            borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                            border: Border.all(color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder, width: 0.5),
-                                            boxShadow: themeChange.getThem()
-                                                ? null
-                                                : [
-                                                    BoxShadow(
-                                                      color: Colors.black.withOpacity(0.10),
-                                                      blurRadius: 5,
-                                                      offset: const Offset(0, 4), // changes position of shadow
-                                                    ),
-                                                  ],
-                                          ),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Admin Commission".tr,
-                                                  style: GoogleFonts.poppins(
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                                const SizedBox(
-                                                  height: 5,
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Expanded(
-                                                      child: Text(
-                                                        "Admin commission".tr,
-                                                        style: GoogleFonts.poppins(color: AppColors.subTitleColor),
-                                                      ),
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          "(-${Constant.amountShow(amount: Constant.calculateAdminCommission(amount: (double.parse(controller.orderModel.value.finalRate.toString()) - double.parse(controller.couponAmount.value.toString())).toString(), adminCommission: controller.orderModel.value.adminCommission).toString())})",
-                                                          style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: Colors.red),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Text(
-                                                  "Note : Admin commission will be debited from your wallet balance. \n Admin commission will apply on Ride Amount minus Discount(if applicable).".tr,
-                                                  style: GoogleFonts.poppins(color: Colors.red),
-                                                )
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+                  Text(
+                    'Informações completas do pedido'.tr,
+                    style: GoogleFonts.poppins(
+                      fontSize: Responsive.width(3.2, context),
+                      color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                    ),
                   ),
                 ],
-              ));
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  /// Card do Ride ID com funcionalidade de cópia
+  Widget _buildRideIdCard(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+    return Container(
+      decoration: BoxDecoration(
+        color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder,
+          width: 1,
+        ),
+        boxShadow: _buildCardShadow(themeChange),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(Responsive.width(4, context)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.confirmation_number_outlined,
+                  color: AppColors.primary,
+                  size: Responsive.width(5.5, context),
+                ),
+                SizedBox(width: Responsive.width(2, context)),
+                Expanded(
+                  child: Text(
+                    "Ride ID".tr,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: Responsive.width(4, context),
+                      color: themeChange.getThem() ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ),
+                _buildCopyButton(context, controller, themeChange),
+              ],
+            ),
+            SizedBox(height: Responsive.height(1.5, context)),
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: Responsive.width(3, context),
+                vertical: Responsive.height(1, context),
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      "#${controller.orderModel.value.id!.toUpperCase()}",
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w500,
+                        fontSize: Responsive.width(3.5, context),
+                        color: AppColors.primary,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    Icons.verified_outlined,
+                    color: AppColors.primary,
+                    size: Responsive.width(4, context),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Botão de cópia com design moderno
+  Widget _buildCopyButton(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+    return InkWell(
+      onTap: () {
+        FlutterClipboard.copy(controller.orderModel.value.id.toString()).then((value) {
+          ShowToastDialog.showToast("OrderId copied".tr);
         });
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          horizontal: Responsive.width(3, context),
+          vertical: Responsive.height(0.8, context),
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
+            width: 1.5,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.content_copy,
+              color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
+              size: Responsive.width(4, context),
+            ),
+            SizedBox(width: Responsive.width(1.5, context)),
+            Text(
+              "Copy".tr,
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                fontSize: Responsive.width(3.2, context),
+                color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Seção de localizações
+  Widget _buildLocationsSection(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(
+              Icons.location_on,
+              color: AppColors.primary,
+              size: Responsive.width(5.5, context),
+            ),
+            SizedBox(width: Responsive.width(2, context)),
+            Text(
+              "Pickup and drop-off locations".tr,
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.w600,
+                fontSize: Responsive.width(4, context),
+                color: themeChange.getThem() ? Colors.white : Colors.black,
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: Responsive.height(1.5, context)),
+        Container(
+          decoration: BoxDecoration(
+            color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
+            borderRadius: BorderRadius.circular(15),
+            border: Border.all(
+              color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder,
+              width: 1,
+            ),
+            boxShadow: _buildCardShadow(themeChange),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(Responsive.width(4, context)),
+            child: LocationView(
+              sourceLocation: controller.orderModel.value.sourceLocationName.toString(),
+              destinationLocation: controller.orderModel.value.destinationLocationName.toString(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Status da corrida
+  Widget _buildRideStatus(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: Responsive.width(4, context),
+        vertical: Responsive.height(2, context),
+      ),
+      decoration: BoxDecoration(
+        color: themeChange.getThem() ? AppColors.darkGray : AppColors.gray,
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(Responsive.width(2, context)),
+            decoration: BoxDecoration(
+              color: _getStatusColor(controller.orderModel.value.status.toString()),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              _getStatusIcon(controller.orderModel.value.status.toString()),
+              color: Colors.white,
+              size: Responsive.width(4.5, context),
+            ),
+          ),
+          SizedBox(width: Responsive.width(3, context)),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  controller.orderModel.value.status.toString(),
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: Responsive.width(3.8, context),
+                    color: themeChange.getThem() ? Colors.white : Colors.black87,
+                  ),
+                ),
+                Text(
+                  Constant().formatTimestamp(controller.orderModel.value.createdDate),
+                  style: GoogleFonts.poppins(
+                    fontSize: Responsive.width(3.2, context),
+                    color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Resumo da reserva
+  Widget _buildBookingSummary(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+    return Container(
+      decoration: BoxDecoration(
+        color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder,
+          width: 1,
+        ),
+        boxShadow: _buildCardShadow(themeChange),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(Responsive.width(4, context)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.receipt,
+                  color: AppColors.primary,
+                  size: Responsive.width(5.5, context),
+                ),
+                SizedBox(width: Responsive.width(2, context)),
+                Text(
+                  "Booking summary".tr,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: Responsive.width(4, context),
+                    color: themeChange.getThem() ? Colors.white : Colors.black,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: Responsive.height(1, context)),
+            _buildDivider(context, themeChange),
+
+            // Valor da corrida
+            _buildSummaryRow(
+              context,
+              "Ride Amount".tr,
+              Constant.amountShow(amount: controller.orderModel.value.finalRate.toString()),
+              themeChange,
+            ),
+
+            _buildDivider(context, themeChange),
+
+            // Lista de taxas
+            if (controller.orderModel.value.taxList != null) ...[
+              ...controller.orderModel.value.taxList!.map((taxModel) => Column(
+                children: [
+                  _buildSummaryRow(
+                    context,
+                    "${taxModel.title.toString()} (${taxModel.type == "fix" ? Constant.amountShow(amount: taxModel.tax) : "${taxModel.tax}%"})",
+                    Constant.amountShow(
+                      amount: Constant()
+                          .calculateTax(
+                        amount: (double.parse(controller.orderModel.value.finalRate.toString()) -
+                            double.parse(controller.couponAmount.value.toString()))
+                            .toString(),
+                        taxModel: taxModel,
+                      )
+                          .toString(),
+                    ),
+                    themeChange,
+                  ),
+                  _buildDivider(context, themeChange),
+                ],
+              )).toList(),
+            ],
+
+            // Desconto
+            _buildSummaryRow(
+              context,
+              "Discount".tr,
+              "(-${controller.couponAmount.value == "0.0" ? Constant.amountShow(amount: "0.0") : Constant.amountShow(amount: controller.couponAmount.value)})",
+              themeChange,
+              valueColor: Colors.red,
+            ),
+
+            _buildDivider(context, themeChange),
+
+            // Total a pagar
+            Container(
+              padding: EdgeInsets.symmetric(vertical: Responsive.height(1, context)),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: _buildSummaryRow(
+                context,
+                "Payable amount".tr,
+                Constant.amountShow(amount: controller.calculateAmount().toString()),
+                themeChange,
+                isBold: true,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Comissão do administrador
+  Widget _buildAdminCommission(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+    return Container(
+      decoration: BoxDecoration(
+        color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(
+          color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder,
+          width: 1,
+        ),
+        boxShadow: _buildCardShadow(themeChange),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(Responsive.width(4, context)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.admin_panel_settings,
+                  color: Colors.orange,
+                  size: Responsive.width(5.5, context),
+                ),
+                SizedBox(width: Responsive.width(2, context)),
+                Text(
+                  "Admin Commission".tr,
+                  style: GoogleFonts.poppins(
+                    fontWeight: FontWeight.w600,
+                    fontSize: Responsive.width(4, context),
+                    color: themeChange.getThem() ? Colors.white : Colors.black,
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: Responsive.height(1.5, context)),
+
+            _buildSummaryRow(
+              context,
+              "Admin commission".tr,
+              "(-${Constant.amountShow(amount: Constant.calculateAdminCommission(amount: (double.parse(controller.orderModel.value.finalRate.toString()) - double.parse(controller.couponAmount.value.toString())).toString(), adminCommission: controller.orderModel.value.adminCommission).toString())})",
+              themeChange,
+              valueColor: Colors.red,
+            ),
+
+            SizedBox(height: Responsive.height(2, context)),
+
+            Container(
+              padding: EdgeInsets.all(Responsive.width(3, context)),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.red.withOpacity(0.3)),
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    color: Colors.red,
+                    size: Responsive.width(5, context),
+                  ),
+                  SizedBox(width: Responsive.width(2, context)),
+                  Expanded(
+                    child: Text(
+                      "Note : Admin commission will be debited from your wallet balance. \n Admin commission will apply on Ride Amount minus Discount(if applicable).".tr,
+                      style: GoogleFonts.poppins(
+                        color: Colors.red,
+                        fontSize: Responsive.width(3, context),
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Widget para linha do resumo
+  Widget _buildSummaryRow(
+      BuildContext context,
+      String title,
+      String value,
+      DarkThemeProvider themeChange, {
+        Color? valueColor,
+        bool isBold = false,
+      }) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: Responsive.height(0.8, context)),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: GoogleFonts.poppins(
+                color: isBold
+                    ? (themeChange.getThem() ? Colors.white : Colors.black)
+                    : AppColors.subTitleColor,
+                fontSize: Responsive.width(3.5, context),
+                fontWeight: isBold ? FontWeight.w600 : FontWeight.w400,
+              ),
+            ),
+          ),
+          Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600,
+              fontSize: Responsive.width(3.5, context),
+              color: valueColor ?? (themeChange.getThem() ? Colors.white : Colors.black),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Divisor responsivo
+  Widget _buildDivider(BuildContext context, DarkThemeProvider themeChange) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: Responsive.height(1, context)),
+      child: Divider(
+        thickness: 1,
+        color: themeChange.getThem() ? Colors.white24 : Colors.black12,
+      ),
+    );
+  }
+
+  /// Sombras dos cards
+  List<BoxShadow> _buildCardShadow(DarkThemeProvider themeChange) {
+    return themeChange.getThem()
+        ? [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.3),
+        blurRadius: 8,
+        offset: const Offset(0, 4),
+      ),
+    ]
+        : [
+      BoxShadow(
+        color: Colors.grey.withOpacity(0.2),
+        blurRadius: 10,
+        offset: const Offset(0, 3),
+      ),
+    ];
+  }
+
+  /// Cor do status
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+      case 'complete':
+        return Colors.green;
+      case 'active':
+        return Colors.blue;
+      case 'pending':
+        return Colors.orange;
+      case 'cancelled':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  /// Ícone do status
+  IconData _getStatusIcon(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+      case 'complete':
+        return Icons.check_circle;
+      case 'active':
+        return Icons.directions_car;
+      case 'pending':
+        return Icons.schedule;
+      case 'cancelled':
+        return Icons.cancel;
+      default:
+        return Icons.info;
+    }
   }
 }

@@ -1,3 +1,4 @@
+// lib/ui/profile_screen.dart - Versão com temas e responsividade
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -30,245 +31,574 @@ class ProfileScreen extends StatelessWidget {
         init: ProfileController(),
         builder: (controller) {
           return Scaffold(
-              backgroundColor: AppColors.primary,
-              body: Column(
-                children: [
-                  SizedBox(
-                    height: Responsive.width(45, context),
+            backgroundColor: AppColors.primary,
+            body: Column(
+              children: [
+                // Profile Header Section
+                _buildProfileHeader(context, controller, themeChange),
+
+                // Form Section
+                Expanded(
+                  child: Container(
                     width: Responsive.width(100, context),
-                    child: Stack(
-                      alignment: Alignment.bottomCenter,
+                    decoration: BoxDecoration(
+                      color: themeChange.getThem()
+                          ? AppColors.darkBackground
+                          : AppColors.background,
+                      borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(25),
+                          topRight: Radius.circular(25)
+                      ),
+                    ),
+                    child: controller.isLoading.value
+                        ? Center(child: Constant.loader(context))
+                        : Column(
                       children: [
-                        Positioned(
-                          bottom: 50,
-                          child: Center(
-                            child: controller.profileImage.isEmpty
-                                ? ClipRRect(
-                                    borderRadius: BorderRadius.circular(60),
-                                    child: CachedNetworkImage(
-                                      imageUrl: Constant.userPlaceHolder,
-                                      fit: BoxFit.fill,
-                                      height: Responsive.width(30, context),
-                                      width: Responsive.width(30, context),
-                                      placeholder: (context, url) => Constant.loader(context),
-                                      errorWidget: (context, url, error) => Image.network(Constant.userPlaceHolder),
-                                    ),
-                                  )
-                                : ClipRRect(
-                                    borderRadius: BorderRadius.circular(60),
-                                    child: Constant().hasValidUrl(controller.profileImage.value) == false
-                                        ? Image.file(
-                                            File(controller.profileImage.value),
-                                            height: Responsive.width(30, context),
-                                            width: Responsive.width(30, context),
-                                            fit: BoxFit.fill,
-                                          )
-                                        : CachedNetworkImage(
-                                            imageUrl: controller.profileImage.value.toString(),
-                                            fit: BoxFit.fill,
-                                            height: Responsive.width(30, context),
-                                            width: Responsive.width(30, context),
-                                            placeholder: (context, url) => Constant.loader(context),
-                                            errorWidget: (context, url, error) => Image.network(Constant.userPlaceHolder),
-                                          ),
-                                  ),
+                        // Title Section
+                        Container(
+                          width: Responsive.width(100, context),
+                          padding: EdgeInsets.all(Responsive.width(5, context)),
+                          child: Text(
+                            'Editar Perfil',
+                            style: GoogleFonts.poppins(
+                              fontSize: Responsive.width(5, context),
+                              fontWeight: FontWeight.w600,
+                              color: themeChange.getThem() ? Colors.white : Colors.black,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ),
-                        Positioned(
-                          bottom: 50,
-                          right: Responsive.width(36, context),
-                          child: InkWell(
-                            onTap: () {
-                              buildBottomSheet(context, controller);
-                            },
-                            child: ClipOval(
-                              child: Container(
-                                color: Colors.white,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: SvgPicture.asset(
-                                    'assets/icons/ic_edit_profile.svg',
-                                    width: 22,
-                                    height: 22,
+
+                        // Form Content
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: Responsive.width(5, context),
+                              vertical: Responsive.height(1, context),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Full Name Field
+                                _buildFormField(
+                                  context,
+                                  themeChange,
+                                  label: 'Nome Completo',
+                                  child: TextFieldThem.buildTextFiled(
+                                    context,
+                                    hintText: 'Full name'.tr,
+                                    controller: controller.fullNameController.value,
                                   ),
                                 ),
-                              ),
+
+                                SizedBox(height: Responsive.height(2, context)),
+
+                                // Phone Number Field
+                                _buildFormField(
+                                  context,
+                                  themeChange,
+                                  label: 'Número de Telefone',
+                                  child: TextFormField(
+                                    validator: (value) => value != null && value.isNotEmpty ? null : 'Required',
+                                    keyboardType: TextInputType.number,
+                                    textCapitalization: TextCapitalization.sentences,
+                                    controller: controller.phoneNumberController.value,
+                                    textAlign: TextAlign.start,
+                                    enabled: false,
+                                    style: GoogleFonts.poppins(
+                                      color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                                      fontSize: Responsive.width(3.5, context),
+                                    ),
+                                    decoration: InputDecoration(
+                                      isDense: true,
+                                      filled: true,
+                                      fillColor: themeChange.getThem()
+                                          ? AppColors.darkTextField
+                                          : AppColors.textField,
+                                      contentPadding: EdgeInsets.symmetric(
+                                          vertical: Responsive.height(1.5, context)
+                                      ),
+                                      prefixIcon: CountryCodePicker(
+                                        onChanged: (value) {
+                                          controller.countryCode.value = value.dialCode.toString();
+                                        },
+                                        dialogBackgroundColor: themeChange.getThem()
+                                            ? AppColors.darkBackground
+                                            : AppColors.background,
+                                        initialSelection: controller.countryCode.value,
+                                        comparator: (a, b) => b.name!.compareTo(a.name.toString()),
+                                        flagDecoration: const BoxDecoration(
+                                          borderRadius: BorderRadius.all(Radius.circular(2)),
+                                        ),
+                                        textStyle: GoogleFonts.poppins(
+                                          color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                                          fontSize: Responsive.width(3.5, context),
+                                        ),
+                                      ),
+                                      hintText: "Phone number".tr,
+                                      hintStyle: GoogleFonts.poppins(
+                                        color: AppColors.subTitleColor,
+                                        fontSize: Responsive.width(3.5, context),
+                                      ),
+                                      disabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                            color: themeChange.getThem()
+                                                ? AppColors.darkTextFieldBorder
+                                                : AppColors.textFieldBorder,
+                                            width: 1
+                                        ),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: AppColors.primary,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                            color: themeChange.getThem()
+                                                ? AppColors.darkTextFieldBorder
+                                                : AppColors.textFieldBorder,
+                                            width: 1
+                                        ),
+                                      ),
+                                      errorBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                          color: Colors.red,
+                                          width: 1,
+                                        ),
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                        borderSide: BorderSide(
+                                            color: themeChange.getThem()
+                                                ? AppColors.darkTextFieldBorder
+                                                : AppColors.textFieldBorder,
+                                            width: 1
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                SizedBox(height: Responsive.height(2, context)),
+
+                                // Email Field
+                                _buildFormField(
+                                  context,
+                                  themeChange,
+                                  label: 'Email',
+                                  child: TextFieldThem.buildTextFiled(
+                                    context,
+                                    hintText: 'Email'.tr,
+                                    controller: controller.emailController.value,
+                                    enable: false,
+                                  ),
+                                ),
+
+                                SizedBox(height: Responsive.height(4, context)),
+
+                                // Info Card
+                                Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(Responsive.width(4, context)),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: Colors.blue.withOpacity(0.3),
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.info_outline,
+                                        color: Colors.blue,
+                                        size: Responsive.width(5, context),
+                                      ),
+                                      SizedBox(width: Responsive.width(3, context)),
+                                      Expanded(
+                                        child: Text(
+                                          'O telefone e email não podem ser alterados por questões de segurança.',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: Responsive.width(3, context),
+                                            color: Colors.blue.shade700,
+                                            height: 1.4,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                SizedBox(height: Responsive.height(4, context)),
+
+                                // Update Button
+                                Center(
+                                  child: ButtonThem.buildButton(
+                                    context,
+                                    title: "Update Profile".tr,
+                                    btnWidthRatio: 0.8,
+                                    onPress: () async {
+                                      ShowToastDialog.showLoader("Aguarde...".tr);
+                                      if (controller.profileImage.value.isNotEmpty) {
+                                        controller.profileImage.value = await Constant.uploadUserImageToFireStorage(
+                                            File(controller.profileImage.value),
+                                            "profileImage/${FireStoreUtils.getCurrentUid()}",
+                                            File(controller.profileImage.value).path.split('/').last
+                                        );
+                                      }
+
+                                      DriverUserModel driverUserModel = controller.driverModel.value;
+                                      driverUserModel.fullName = controller.fullNameController.value.text;
+                                      driverUserModel.profilePic = controller.profileImage.value;
+
+                                      FireStoreUtils.updateDriverUser(driverUserModel).then((value) {
+                                        ShowToastDialog.closeLoader();
+                                        ShowToastDialog.showToast("Profile update successfully".tr);
+                                      });
+                                    },
+                                  ),
+                                ),
+
+                                SizedBox(height: Responsive.height(3, context)),
+                              ],
                             ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Expanded(
-                    child: controller.isLoading.value
-                        ? Constant.loader(context)
-                        : Container(
-                            decoration:
-                                BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25))),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 20),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      children: [
-                                        TextFieldThem.buildTextFiled(context, hintText: 'Full name'.tr, controller: controller.fullNameController.value),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        TextFormField(
-                                            validator: (value) => value != null && value.isNotEmpty ? null : 'Required',
-                                            keyboardType: TextInputType.number,
-                                            textCapitalization: TextCapitalization.sentences,
-                                            controller: controller.phoneNumberController.value,
-                                            textAlign: TextAlign.start,
-                                            enabled: false,
-                                            decoration: InputDecoration(
-                                                isDense: true,
-                                                filled: true,
-                                                fillColor: themeChange.getThem() ? AppColors.darkTextField : AppColors.textField,
-                                                contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                                                prefixIcon: CountryCodePicker(
-                                                  onChanged: (value) {
-                                                    controller.countryCode.value = value.dialCode.toString();
-                                                  },
-                                                  dialogBackgroundColor: themeChange.getThem() ? AppColors.darkBackground : AppColors.background,
-                                                  initialSelection: controller.countryCode.value,
-                                                  comparator: (a, b) => b.name!.compareTo(a.name.toString()),
-                                                  flagDecoration: const BoxDecoration(
-                                                    borderRadius: BorderRadius.all(Radius.circular(2)),
-                                                  ),
-                                                ),
-                                                disabledBorder: OutlineInputBorder(
-                                                  borderRadius: const BorderRadius.all(Radius.circular(4)),
-                                                  borderSide: BorderSide(color: themeChange.getThem() ? AppColors.darkTextFieldBorder : AppColors.textFieldBorder, width: 1),
-                                                ),
-                                                focusedBorder: OutlineInputBorder(
-                                                  borderRadius: const BorderRadius.all(Radius.circular(4)),
-                                                  borderSide: BorderSide(color: themeChange.getThem() ? AppColors.darkTextFieldBorder : AppColors.textFieldBorder, width: 1),
-                                                ),
-                                                enabledBorder: OutlineInputBorder(
-                                                  borderRadius: const BorderRadius.all(Radius.circular(4)),
-                                                  borderSide: BorderSide(color: themeChange.getThem() ? AppColors.darkTextFieldBorder : AppColors.textFieldBorder, width: 1),
-                                                ),
-                                                errorBorder: OutlineInputBorder(
-                                                  borderRadius: const BorderRadius.all(Radius.circular(4)),
-                                                  borderSide: BorderSide(color: themeChange.getThem() ? AppColors.darkTextFieldBorder : AppColors.textFieldBorder, width: 1),
-                                                ),
-                                                border: OutlineInputBorder(
-                                                  borderRadius: const BorderRadius.all(Radius.circular(4)),
-                                                  borderSide: BorderSide(color: themeChange.getThem() ? AppColors.darkTextFieldBorder : AppColors.textFieldBorder, width: 1),
-                                                ),
-                                                hintText: "Phone number".tr)),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        TextFieldThem.buildTextFiled(context, hintText: 'Email'.tr, controller: controller.emailController.value, enable: false),
-                                        const SizedBox(
-                                          height: 20,
-                                        ),
-                                        ButtonThem.buildButton(
-                                          context,
-                                          title: "Update Profile".tr,
-                                          onPress: () async {
-                                            ShowToastDialog.showLoader("Aguarde...".tr);
-                                            if (controller.profileImage.value.isNotEmpty) {
-                                              controller.profileImage.value = await Constant.uploadUserImageToFireStorage(
-                                                  File(controller.profileImage.value), "profileImage/${FireStoreUtils.getCurrentUid()}", File(controller.profileImage.value).path.split('/').last);
-                                            }
-
-                                            DriverUserModel driverUserModel = controller.driverModel.value;
-                                            driverUserModel.fullName = controller.fullNameController.value.text;
-                                            driverUserModel.profilePic = controller.profileImage.value;
-
-                                            FireStoreUtils.updateDriverUser(driverUserModel).then((value) {
-                                              ShowToastDialog.closeLoader();
-                                              ShowToastDialog.showToast("Profile update successfully".tr);
-                                            });
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                  ),
-                ],
-              ));
+                ),
+              ],
+            ),
+          );
         });
   }
 
-  buildBottomSheet(BuildContext context, ProfileController controller) {
-    return showModalBottomSheet(
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(builder: (context, setState) {
-            return SizedBox(
-              height: Responsive.height(22, context),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15),
-                    child: Text(
-                      "Please Select".tr,
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+  Widget _buildProfileHeader(BuildContext context, ProfileController controller, DarkThemeProvider themeChange) {
+    return Container(
+      height: Responsive.height(32, context),
+      width: Responsive.width(100, context),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.primary,
+            AppColors.primary.withOpacity(0.8),
+          ],
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Profile Image
+            Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                Container(
+                  width: Responsive.width(28, context),
+                  height: Responsive.width(28, context),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.3),
+                      width: 3,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(Responsive.width(14, context)),
+                    child: controller.profileImage.isEmpty
+                        ? CachedNetworkImage(
+                      imageUrl: Constant.userPlaceHolder,
+                      fit: BoxFit.cover,
+                      height: Responsive.width(28, context),
+                      width: Responsive.width(28, context),
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey.shade300,
+                        child: Center(child: Constant.loader(context)),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.grey.shade300,
+                        child: Icon(
+                          Icons.person,
+                          size: Responsive.width(12, context),
+                          color: Colors.grey,
+                        ),
+                      ),
+                    )
+                        : Constant().hasValidUrl(controller.profileImage.value) == false
+                        ? Image.file(
+                      File(controller.profileImage.value),
+                      height: Responsive.width(28, context),
+                      width: Responsive.width(28, context),
+                      fit: BoxFit.cover,
+                    )
+                        : CachedNetworkImage(
+                      imageUrl: controller.profileImage.value.toString(),
+                      fit: BoxFit.cover,
+                      height: Responsive.width(28, context),
+                      width: Responsive.width(28, context),
+                      placeholder: (context, url) => Container(
+                        color: Colors.grey.shade300,
+                        child: Center(child: Constant.loader(context)),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: Colors.grey.shade300,
+                        child: Icon(
+                          Icons.person,
+                          size: Responsive.width(12, context),
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(18.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            IconButton(
-                                onPressed: () => controller.pickFile(source: ImageSource.camera),
-                                icon: const Icon(
-                                  Icons.camera_alt,
-                                  size: 32,
-                                )),
-                             Padding(
-                              padding: EdgeInsets.only(top: 3),
-                              child: Text("Camera".tr),
-                            ),
-                          ],
+                ),
+
+                // Edit Button
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: InkWell(
+                    onTap: () {
+                      _buildBottomSheet(context, controller, themeChange);
+                    },
+                    child: Container(
+                      width: Responsive.width(10, context),
+                      height: Responsive.width(10, context),
+                      decoration: BoxDecoration(
+                        color: themeChange.getThem() ? AppColors.darkModePrimary : Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppColors.primary,
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 5,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.camera_alt,
+                        color: themeChange.getThem() ? Colors.black : AppColors.primary,
+                        size: Responsive.width(5, context),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: Responsive.height(2, context)),
+
+            // Name
+            Text(
+              'Meu Perfil',
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: Responsive.width(5, context),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+
+            SizedBox(height: Responsive.height(0.5, context)),
+
+            Text(
+              'Gerencie suas informações pessoais',
+              style: GoogleFonts.poppins(
+                color: Colors.white70,
+                fontSize: Responsive.width(3.2, context),
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFormField(
+      BuildContext context,
+      DarkThemeProvider themeChange, {
+        required String label,
+        required Widget child,
+      }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w500,
+            fontSize: Responsive.width(3.5, context),
+            color: themeChange.getThem() ? Colors.white70 : Colors.black87,
+          ),
+        ),
+        SizedBox(height: Responsive.height(0.8, context)),
+        child,
+      ],
+    );
+  }
+
+  void _buildBottomSheet(BuildContext context, ProfileController controller, DarkThemeProvider themeChange) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return Container(
+          height: Responsive.height(25, context),
+          decoration: BoxDecoration(
+            color: themeChange.getThem() ? AppColors.darkBackground : AppColors.background,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(25),
+              topRight: Radius.circular(25),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Handle
+              Container(
+                margin: EdgeInsets.only(top: Responsive.height(1, context)),
+                width: Responsive.width(12, context),
+                height: 4,
+                decoration: BoxDecoration(
+                  color: AppColors.subTitleColor,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+
+              SizedBox(height: Responsive.height(2, context)),
+
+              // Title
+              Text(
+                "Please Select".tr,
+                style: GoogleFonts.poppins(
+                  fontSize: Responsive.width(4.5, context),
+                  fontWeight: FontWeight.w600,
+                  color: themeChange.getThem() ? Colors.white : Colors.black,
+                ),
+              ),
+
+              SizedBox(height: Responsive.height(3, context)),
+
+              // Options
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Camera Option
+                  InkWell(
+                    onTap: () => controller.pickFile(source: ImageSource.camera),
+                    borderRadius: BorderRadius.circular(15),
+                    child: Container(
+                      width: Responsive.width(35, context),
+                      padding: EdgeInsets.all(Responsive.width(6, context)),
+                      decoration: BoxDecoration(
+                        color: themeChange.getThem()
+                            ? AppColors.darkContainerBackground
+                            : AppColors.containerBackground,
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: themeChange.getThem()
+                              ? AppColors.darkContainerBorder
+                              : AppColors.containerBorder,
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(18.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            IconButton(
-                                onPressed: () => controller.pickFile(source: ImageSource.gallery),
-                                icon: const Icon(
-                                  Icons.photo_library_sharp,
-                                  size: 32,
-                                )),
-                             Padding(
-                              padding: EdgeInsets.only(top: 3),
-                              child: Text("Gallery".tr),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(Responsive.width(4, context)),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withOpacity(0.1),
+                              shape: BoxShape.circle,
                             ),
-                          ],
+                            child: Icon(
+                              Icons.camera_alt,
+                              size: Responsive.width(8, context),
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          SizedBox(height: Responsive.height(1, context)),
+                          Text(
+                            "Camera".tr,
+                            style: GoogleFonts.poppins(
+                              fontSize: Responsive.width(3.5, context),
+                              fontWeight: FontWeight.w500,
+                              color: themeChange.getThem() ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Gallery Option
+                  InkWell(
+                    onTap: () => controller.pickFile(source: ImageSource.gallery),
+                    borderRadius: BorderRadius.circular(15),
+                    child: Container(
+                      width: Responsive.width(35, context),
+                      padding: EdgeInsets.all(Responsive.width(6, context)),
+                      decoration: BoxDecoration(
+                        color: themeChange.getThem()
+                            ? AppColors.darkContainerBackground
+                            : AppColors.containerBackground,
+                        borderRadius: BorderRadius.circular(15),
+                        border: Border.all(
+                          color: themeChange.getThem()
+                              ? AppColors.darkContainerBorder
+                              : AppColors.containerBorder,
                         ),
-                      )
-                    ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(Responsive.width(4, context)),
+                            decoration: BoxDecoration(
+                              color: AppColors.darkModePrimary.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.photo_library_sharp,
+                              size: Responsive.width(8, context),
+                              color: AppColors.darkModePrimary,
+                            ),
+                          ),
+                          SizedBox(height: Responsive.height(1, context)),
+                          Text(
+                            "Gallery".tr,
+                            style: GoogleFonts.poppins(
+                              fontSize: Responsive.width(3.5, context),
+                              fontWeight: FontWeight.w500,
+                              color: themeChange.getThem() ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
-            );
-          });
-        });
+            ],
+          ),
+        );
+      },
+    );
   }
 }
