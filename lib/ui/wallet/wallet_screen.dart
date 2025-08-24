@@ -24,6 +24,26 @@ import 'package:provider/provider.dart';
 class WalletScreen extends StatelessWidget {
   const WalletScreen({super.key});
 
+  // Função para tratar valores nulos de double
+  static double safeParseDouble(String? value, {double defaultValue = 0.0}) {
+    if (value == null || value.isEmpty || value == 'null') {
+      return defaultValue;
+    }
+    try {
+      return double.parse(value);
+    } catch (e) {
+      return defaultValue;
+    }
+  }
+
+  // Função para tratar valores nulos de string
+  static String safeString(dynamic value, {String defaultValue = "0"}) {
+    if (value == null || value.toString() == 'null') {
+      return defaultValue;
+    }
+    return value.toString();
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeChange = Provider.of<DarkThemeProvider>(context);
@@ -61,7 +81,7 @@ class WalletScreen extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                Constant.amountShow(amount:controller.driverUserModel.value.walletAmount.toString()),
+                                Constant.amountShow(amount: safeString(controller.driverUserModel.value.walletAmount, defaultValue: "0")),
                                 style: GoogleFonts.poppins(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -196,16 +216,16 @@ class WalletScreen extends StatelessWidget {
                                                     ),
                                                   ),
                                                   Text(
-                                                    "${Constant.IsNegative(double.parse(walletTransactionModel.amount.toString())) ? "(-" : "+"}${Constant.amountShow(amount: walletTransactionModel.amount.toString().replaceAll("-", ""))}${Constant.IsNegative(double.parse(walletTransactionModel.amount.toString())) ? ")" : ""}",
+                                                    "${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? "(-" : "+"}${Constant.amountShow(amount: safeString(walletTransactionModel.amount?.toString()?.replaceAll("-", ""), defaultValue: "0"))}${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? ")" : ""}",
                                                     style: GoogleFonts.poppins(
                                                         fontWeight: FontWeight.w600,
                                                         fontSize: Responsive.width(3.5, context),
-                                                        color: Constant.IsNegative(double.parse(walletTransactionModel.amount.toString())) ? Colors.red : Colors.green),
+                                                        color: safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? Colors.red : Colors.green),
                                                   ),
                                                 ],
                                               ),
                                               Text(
-                                                walletTransactionModel.note.toString(),
+                                                safeString(walletTransactionModel.note, defaultValue: ""),
                                                 style: GoogleFonts.poppins(
                                                   fontWeight: FontWeight.w400,
                                                   fontSize: Responsive.width(3.2, context),
@@ -236,7 +256,9 @@ class WalletScreen extends StatelessWidget {
                       context,
                       title: "withdraw".tr,
                       onPress: () async {
-                        if (double.parse(controller.driverUserModel.value.walletAmount.toString()) <= 0) {
+                        double currentBalance = safeParseDouble(controller.driverUserModel.value.walletAmount?.toString());
+
+                        if (currentBalance <= 0) {
                           ShowToastDialog.showToast("Insufficient balance".tr);
                         } else {
                           ShowToastDialog.showLoader("Aguarde...".tr);
@@ -350,7 +372,7 @@ class WalletScreen extends StatelessWidget {
                                     ),
                                   ),
                                   Visibility(
-                                    visible: controller.paymentModel.value.strip!.enable == true,
+                                    visible: controller.paymentModel.value.strip?.enable == true,
                                     child: Obx(
                                           () => Column(
                                         children: [
@@ -359,13 +381,13 @@ class WalletScreen extends StatelessWidget {
                                           ),
                                           InkWell(
                                             onTap: () {
-                                              controller.selectedPaymentMethod.value = controller.paymentModel.value.strip!.name.toString();
+                                              controller.selectedPaymentMethod.value = safeString(controller.paymentModel.value.strip?.name, defaultValue: "");
                                             },
                                             child: Container(
                                               decoration: BoxDecoration(
                                                 borderRadius: const BorderRadius.all(Radius.circular(10)),
                                                 border: Border.all(
-                                                    color: controller.selectedPaymentMethod.value == controller.paymentModel.value.strip!.name.toString()
+                                                    color: controller.selectedPaymentMethod.value == safeString(controller.paymentModel.value.strip?.name, defaultValue: "")
                                                         ? themeChange.getThem()
                                                         ? AppColors.darkModePrimary
                                                         : AppColors.primary
@@ -392,7 +414,7 @@ class WalletScreen extends StatelessWidget {
                                                     ),
                                                     Expanded(
                                                       child: Text(
-                                                        controller.paymentModel.value.strip!.name.toString(),
+                                                        safeString(controller.paymentModel.value.strip?.name, defaultValue: "Stripe"),
                                                         style: GoogleFonts.poppins(
                                                           fontSize: Responsive.width(3.8, context),
                                                           color: themeChange.getThem() ? Colors.white : Colors.black,
@@ -400,11 +422,11 @@ class WalletScreen extends StatelessWidget {
                                                       ),
                                                     ),
                                                     Radio(
-                                                      value: controller.paymentModel.value.strip!.name.toString(),
+                                                      value: safeString(controller.paymentModel.value.strip?.name, defaultValue: ""),
                                                       groupValue: controller.selectedPaymentMethod.value,
                                                       activeColor: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
                                                       onChanged: (value) {
-                                                        controller.selectedPaymentMethod.value = controller.paymentModel.value.strip!.name.toString();
+                                                        controller.selectedPaymentMethod.value = safeString(controller.paymentModel.value.strip?.name, defaultValue: "");
                                                       },
                                                     )
                                                   ],
@@ -416,7 +438,7 @@ class WalletScreen extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  // Continue with all other payment methods exactly as in original...
+                                  // Adicione outros métodos de pagamento aqui se necessário
                                 ],
                               ),
                             ),
@@ -424,6 +446,23 @@ class WalletScreen extends StatelessWidget {
                         ),
                         SizedBox(
                           height: Responsive.height(1.2, context),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: Responsive.width(5, context)),
+                          child: ButtonThem.buildButton(
+                            context,
+                            title: "Add Amount".tr,
+                            onPress: () {
+                              if (controller.amountController.value.text.isEmpty) {
+                                ShowToastDialog.showToast("Please enter amount".tr);
+                              } else if (controller.selectedPaymentMethod.value.isEmpty) {
+                                ShowToastDialog.showToast("Please select payment method".tr);
+                              } else {
+                                controller.walletTopUp();
+                                Get.back();
+                              }
+                            },
+                          ),
                         ),
                       ],
                     ),
@@ -483,37 +522,76 @@ class WalletScreen extends StatelessWidget {
                         ),
                         child: Padding(
                           padding: EdgeInsets.all(Responsive.width(2, context)),
-                          child: Row(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Transaction ID".tr,
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: Responsive.width(3.8, context),
-                                      color: themeChange.getThem() ? Colors.white : Colors.black,
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    height: Responsive.height(0.6, context),
-                                  ),
-                                  Text(
-                                    "#${walletTransactionModel.transactionId!.toUpperCase()}",
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: Responsive.width(3.5, context),
-                                      color: themeChange.getThem() ? Colors.white70 : Colors.black54,
-                                    ),
-                                  ),
-                                ],
+                              Text(
+                                "Transaction ID".tr,
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: Responsive.width(3.8, context),
+                                  color: themeChange.getThem() ? Colors.white : Colors.black,
+                                ),
+                              ),
+                              SizedBox(
+                                height: Responsive.height(0.6, context),
+                              ),
+                              Text(
+                                "#${safeString(walletTransactionModel.transactionId, defaultValue: "N/A").toUpperCase()}",
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: Responsive.width(3.5, context),
+                                  color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                                ),
+                              ),
+                              SizedBox(
+                                height: Responsive.height(1.2, context),
+                              ),
+                              Text(
+                                "Amount".tr,
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: Responsive.width(3.8, context),
+                                  color: themeChange.getThem() ? Colors.white : Colors.black,
+                                ),
+                              ),
+                              SizedBox(
+                                height: Responsive.height(0.6, context),
+                              ),
+                              Text(
+                                "${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? "(-" : "+"}${Constant.amountShow(amount: safeString(walletTransactionModel.amount?.toString()?.replaceAll("-", ""), defaultValue: "0"))}${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? ")" : ""}",
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: Responsive.width(3.8, context),
+                                  color: safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? Colors.red : Colors.green,
+                                ),
+                              ),
+                              SizedBox(
+                                height: Responsive.height(1.2, context),
+                              ),
+                              Text(
+                                "Note".tr,
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: Responsive.width(3.8, context),
+                                  color: themeChange.getThem() ? Colors.white : Colors.black,
+                                ),
+                              ),
+                              SizedBox(
+                                height: Responsive.height(0.6, context),
+                              ),
+                              Text(
+                                safeString(walletTransactionModel.note, defaultValue: "No note available"),
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: Responsive.width(3.5, context),
+                                  color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                                ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                      // Continue with rest of transaction details...
                       SizedBox(
                         height: Responsive.height(2.5, context),
                       )
@@ -560,7 +638,6 @@ class WalletScreen extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // Bank details container...
                       Container(
                           decoration: BoxDecoration(
                             color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
@@ -586,7 +663,7 @@ class WalletScreen extends StatelessWidget {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        controller.bankDetailsModel.value.bankName.toString(),
+                                        safeString(controller.bankDetailsModel.value.bankName, defaultValue: "Bank Name"),
                                         style: GoogleFonts.poppins(
                                           fontSize: Responsive.width(5.5, context),
                                           fontWeight: FontWeight.bold,
@@ -605,7 +682,7 @@ class WalletScreen extends StatelessWidget {
                                   height: Responsive.height(0.2, context),
                                 ),
                                 Text(
-                                  controller.bankDetailsModel.value.accountNumber.toString(),
+                                  safeString(controller.bankDetailsModel.value.accountNumber, defaultValue: "Account Number"),
                                   style: GoogleFonts.poppins(
                                     fontSize: Responsive.width(5, context),
                                     fontWeight: FontWeight.w600,
@@ -616,7 +693,7 @@ class WalletScreen extends StatelessWidget {
                                   height: Responsive.height(0.6, context),
                                 ),
                                 Text(
-                                  controller.bankDetailsModel.value.holderName.toString(),
+                                  safeString(controller.bankDetailsModel.value.holderName, defaultValue: "Holder Name"),
                                   style: GoogleFonts.poppins(
                                     fontSize: Responsive.width(4.5, context),
                                     fontWeight: FontWeight.bold,
@@ -627,14 +704,14 @@ class WalletScreen extends StatelessWidget {
                                   height: Responsive.height(0.4, context),
                                 ),
                                 Text(
-                                  controller.bankDetailsModel.value.branchName.toString(),
+                                  safeString(controller.bankDetailsModel.value.branchName, defaultValue: "Branch Name"),
                                   style: GoogleFonts.poppins(
                                     fontSize: Responsive.width(4.5, context),
                                     color: themeChange.getThem() ? Colors.white70 : Colors.black87,
                                   ),
                                 ),
                                 Text(
-                                  controller.bankDetailsModel.value.otherInformation.toString(),
+                                  safeString(controller.bankDetailsModel.value.otherInformation, defaultValue: "Other Information"),
                                   style: GoogleFonts.poppins(
                                     fontSize: Responsive.width(3.8, context),
                                     color: themeChange.getThem() ? Colors.white60 : Colors.black54,
@@ -676,9 +753,13 @@ class WalletScreen extends StatelessWidget {
                             context,
                             title: "Withdrawal".tr,
                             onPress: () async {
-                              if (double.parse(controller.driverUserModel.value.walletAmount.toString()) < double.parse(controller.withdrawalAmountController.value.text)) {
+                              double currentBalance = safeParseDouble(controller.driverUserModel.value.walletAmount?.toString());
+                              double withdrawAmount = safeParseDouble(controller.withdrawalAmountController.value.text);
+                              double minimumAmount = safeParseDouble(Constant.minimumAmountToWithdrawal);
+
+                              if (currentBalance < withdrawAmount) {
                                 ShowToastDialog.showToast("Insufficient balance".tr);
-                              } else if (double.parse(Constant.minimumAmountToWithdrawal) > double.parse(controller.withdrawalAmountController.value.text)) {
+                              } else if (minimumAmount > withdrawAmount) {
                                 ShowToastDialog.showToast(
                                     "Withdraw amount must be greater or equal to ${Constant.amountShow(amount: Constant.minimumAmountToWithdrawal.toString())}".tr);
                               } else {
