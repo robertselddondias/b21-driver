@@ -1,18 +1,16 @@
 // lib/controller/auto_assignment_controller.dart - VERSÃO DEBUG SIMPLIFICADA
 import 'dart:async';
 import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:driver/constant/collection_name.dart';
 import 'package:driver/constant/constant.dart';
 import 'package:driver/constant/send_notification.dart';
 import 'package:driver/constant/show_toast_dialog.dart';
-import 'package:driver/controller/home_controller.dart';
 import 'package:driver/model/driver_user_model.dart';
-import 'package:driver/model/order_model.dart';
 import 'package:driver/model/order/driverId_accept_reject.dart';
-import 'package:driver/themes/app_colors.dart';
+import 'package:driver/model/order_model.dart';
 import 'package:driver/ui/dashboard_screen.dart';
-import 'package:driver/ui/home_screens/live_tracking_screen.dart';
 import 'package:driver/utils/fire_store_utils.dart';
 import 'package:driver/widget/ride_assignment_modal.dart';
 import 'package:flutter/material.dart';

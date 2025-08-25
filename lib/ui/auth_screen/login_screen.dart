@@ -7,7 +7,6 @@ import 'package:driver/constant/show_toast_dialog.dart';
 import 'package:driver/controller/login_controller.dart';
 import 'package:driver/model/driver_user_model.dart';
 import 'package:driver/themes/app_colors.dart';
-import 'package:driver/themes/button_them.dart';
 import 'package:driver/themes/responsive.dart';
 import 'package:driver/ui/auth_screen/information_screen.dart';
 import 'package:driver/ui/dashboard_screen.dart';

@@ -1,5 +1,6 @@
 // lib/ui/home_screens/home_screen.dart - Versão com temas e responsividade
 
+import 'package:badges/badges.dart' as badges;
 import 'package:driver/controller/home_controller.dart';
 import 'package:driver/themes/app_colors.dart';
 import 'package:driver/themes/responsive.dart';
@@ -8,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:badges/badges.dart' as badges;
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -375,7 +375,7 @@ class HomeScreen extends StatelessWidget {
               _buildStatItem(
                 context,
                 'Carteira',
-                'R\$ ${controller.driverModel.value.walletAmount ?? '0.00'}',
+                'R\$ ${double.parse(controller.driverModel.value.walletAmount ?? '0.00').toStringAsFixed(2)}',
                 Icons.account_balance_wallet,
                 AppColors.darkModePrimary,
                 themeChange,

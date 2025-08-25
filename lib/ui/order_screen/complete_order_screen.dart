@@ -1,9 +1,7 @@
 import 'package:clipboard/clipboard.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:driver/constant/constant.dart';
 import 'package:driver/constant/show_toast_dialog.dart';
 import 'package:driver/model/complete_order_controller.dart';
-import 'package:driver/model/tax_model.dart';
 import 'package:driver/themes/app_colors.dart';
 import 'package:driver/themes/responsive.dart';
 import 'package:driver/utils/DarkThemeProvider.dart';
