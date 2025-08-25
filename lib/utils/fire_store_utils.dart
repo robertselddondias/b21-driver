@@ -499,6 +499,7 @@ class FireStoreUtils {
     await fireStore
         .collection(CollectionName.walletTransaction)
         .where('userId', isEqualTo: FireStoreUtils.getCurrentUid())
+        .where("userType", isEqualTo: "driver")
         .orderBy('createdDate', descending: true)
         .get()
         .then((value) {

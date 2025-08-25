@@ -1,6 +1,8 @@
 // lib/utils/notification_service.dart
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
+import 'dart:ui';
 
 import 'package:driver/controller/auto_assignment_controller.dart';
 import 'package:driver/model/driver_user_model.dart';
@@ -23,68 +25,202 @@ Future<void> firebaseMessageBackgroundHandle(RemoteMessage message) async {
 }
 
 class NotificationService {
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  static final NotificationService _instance = NotificationService._internal();
+  factory NotificationService() => _instance;
+  NotificationService._internal();
 
-  initInfo() async {
-    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
 
-    var request = await FirebaseMessaging.instance.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-
-    if (request.authorizationStatus == AuthorizationStatus.authorized ||
-        request.authorizationStatus == AuthorizationStatus.provisional) {
-
-      const AndroidInitializationSettings initializationSettingsAndroid =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
-
-      var iosInitializationSettings = const DarwinInitializationSettings();
-
-      final InitializationSettings initializationSettings = InitializationSettings(
-        android: initializationSettingsAndroid,
-        iOS: iosInitializationSettings,
+  Future<void> initInfo() async {
+    try {
+      // Configurações do Firebase Messaging
+      await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
       );
 
-      await flutterLocalNotificationsPlugin.initialize(
+      // Solicita permissões
+      NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: true, // Importante para iOS
+        provisional: false,
+        sound: true,
+      );
+
+      log('Notification Permission Status: ${settings.authorizationStatus}');
+
+      if (settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional) {
+
+        // Configurações do Android
+        const AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+        // Configurações do iOS
+        const DarwinInitializationSettings iosInitializationSettings =
+        DarwinInitializationSettings(
+          requestAlertPermission: true,
+          requestBadgePermission: true,
+          requestSoundPermission: true,
+          requestCriticalPermission: true
+        );
+
+        final InitializationSettings initializationSettings = InitializationSettings(
+          android: initializationSettingsAndroid,
+          iOS: iosInitializationSettings,
+        );
+
+        await flutterLocalNotificationsPlugin.initialize(
           initializationSettings,
-          onDidReceiveNotificationResponse: (payload) {}
-      );
+          onDidReceiveNotificationResponse: _onNotificationResponse,
+        );
 
-      setupInteractedMessage();
+        // Configura canais de notificação
+        await _setupNotificationChannels();
+
+        // Configura listeners
+        await setupInteractedMessage();
+
+        log('NotificationService inicializado com sucesso');
+      } else {
+        log('Permissões de notificação negadas');
+      }
+    } catch (e) {
+      log('Erro ao inicializar NotificationService: $e');
+    }
+  }
+
+  /// Método separado para configurar canal de ride assignment
+  /// Chamado no main.dart após inicialização
+  Future<void> setupRideAssignmentChannel() async {
+    try {
+      if (Platform.isAndroid) {
+        const AndroidNotificationChannel rideAssignmentChannel = AndroidNotificationChannel(
+          'ride_assignment_channel',
+          'Atribuição de Corridas',
+          description: 'Notificações de corridas atribuídas automaticamente',
+          importance: Importance.max,
+          playSound: true,
+          enableVibration: true,
+          showBadge: true,
+          enableLights: true,
+          ledColor: Color(0xFFFF6B35),
+        );
+
+        final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+        flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+
+        await androidImplementation?.createNotificationChannel(rideAssignmentChannel);
+        log('Canal de ride assignment configurado');
+      }
+    } catch (e) {
+      log('Erro ao configurar canal de ride assignment: $e');
+    }
+  }
+
+  Future<void> _setupNotificationChannels() async {
+    if (Platform.isAndroid) {
+      try {
+        // Canal principal
+        const AndroidNotificationChannel mainChannel = AndroidNotificationChannel(
+          'b21_driver_channel',
+          'B-21 Driver Notifications',
+          description: 'Notificações gerais do app B-21 Driver',
+          importance: Importance.high,
+          playSound: true,
+          enableVibration: true,
+          showBadge: true,
+        );
+
+        // Canal para chat
+        const AndroidNotificationChannel chatChannel = AndroidNotificationChannel(
+          'chat_channel',
+          'Mensagens de Chat',
+          description: 'Notificações de mensagens de chat',
+          importance: Importance.high,
+          playSound: true,
+          enableVibration: true,
+          showBadge: true,
+        );
+
+        final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+        flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>();
+
+        await androidImplementation?.createNotificationChannel(mainChannel);
+        await androidImplementation?.createNotificationChannel(chatChannel);
+
+        log('Canais básicos de notificação configurados');
+      } catch (e) {
+        log('Erro ao configurar canais básicos: $e');
+      }
+    }
+  }
+
+  void _onNotificationResponse(NotificationResponse response) {
+    log('Notification clicked: ${response.payload}');
+
+    if (response.payload != null) {
+      try {
+        Map<String, dynamic> data = jsonDecode(response.payload!);
+        _handleNotificationData(data);
+      } catch (e) {
+        log('Erro ao processar payload da notificação: $e');
+      }
+    }
+  }
+
+  void _handleNotificationData(Map<String, dynamic> data) {
+    String type = data['type'] ?? '';
+
+    switch (type) {
+      case 'ride_assignment':
+        _handleRideAssignmentNotification(data);
+        break;
+      case 'order':
+        String orderId = data['orderId'] ?? '';
+        if (orderId.isNotEmpty) _navigateToOrder(orderId);
+        break;
+      case 'chat':
+        String senderId = data['senderId'] ?? '';
+        String orderId = data['orderId'] ?? '';
+        if (senderId.isNotEmpty && orderId.isNotEmpty) {
+          _navigateToChat(senderId, orderId);
+        }
+        break;
     }
   }
 
   Future<void> setupInteractedMessage() async {
+    // Mensagem que abriu o app
     RemoteMessage? initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-
     if (initialMessage != null) {
       _handleMessage(initialMessage);
     }
 
+    // Mensagem clicada quando o app está em background
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
 
-    // Listener para mensagens em foreground
+    // Mensagens recebidas em foreground
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      log('Got a message whilst in the foreground!');
-      log('Message data: ${message.data}');
+      log('Mensagem recebida em foreground: ${message.messageId}');
+      log('Dados: ${message.data}');
 
       if (message.notification != null) {
-        log('Message also contained a notification: ${message.notification}');
+        log('Notificação: ${message.notification?.title} - ${message.notification?.body}');
       }
 
-      // Processa notificações de atribuição automática
-      if (message.data['type'] == 'ride_assignment') {
-        NotificationService._handleRideAssignmentNotification(message.data);
+      // Processa diferentes tipos de notificação
+      String type = message.data['type'] ?? '';
+
+      if (type == 'ride_assignment') {
+        _handleRideAssignmentNotification(message.data);
       } else {
         // Mostra notificação local para outros tipos
         _showLocalNotification(message);
@@ -93,24 +229,10 @@ class NotificationService {
   }
 
   void _handleMessage(RemoteMessage message) {
-    log('_handleMessage');
+    log('_handleMessage: ${message.messageId}');
 
     try {
-      // Processa diferentes tipos de notificação
-      if (message.data['type'] == 'ride_assignment') {
-        NotificationService._handleRideAssignmentNotification(message.data);
-        return;
-      }
-
-      if (message.data['type'] == 'order') {
-        String orderId = message.data['orderId'] ?? '';
-        _navigateToOrder(orderId);
-      } else if (message.data['type'] == 'chat') {
-        String senderId = message.data['senderId'] ?? '';
-        String orderId = message.data['orderId'] ?? '';
-        _navigateToChat(senderId, orderId);
-      }
-
+      _handleNotificationData(message.data);
     } catch (e) {
       log('Erro ao processar mensagem: $e');
     }
@@ -121,14 +243,34 @@ class NotificationService {
     try {
       String orderId = data['orderId'] ?? '';
 
-      if (orderId.isEmpty) return;
+      if (orderId.isEmpty) {
+        log('OrderId vazio na notificação de ride assignment');
+        return;
+      }
 
-      // Verifica se o AutoAssignmentController está inicializado
+      log('Processando atribuição automática para pedido: $orderId');
+
+      // Verifica se o AutoAssignmentController está registrado
       if (Get.isRegistered<AutoAssignmentController>()) {
-        AutoAssignmentController autoController = AutoAssignmentController.instance;
+        AutoAssignmentController autoController = Get.find<AutoAssignmentController>();
 
         // Força verificação de nova atribuição
         autoController.checkForAvailableRides();
+
+        log('AutoAssignmentController notificado da nova corrida');
+      } else {
+        log('AutoAssignmentController não está registrado - usuário pode não estar logado');
+
+        // Se não estiver registrado, pode ser que o usuário não esteja logado
+        // Registra o controller temporariamente para processar a notificação
+        try {
+          Get.put(AutoAssignmentController());
+          AutoAssignmentController autoController = Get.find<AutoAssignmentController>();
+          autoController.checkForAvailableRides();
+          log('AutoAssignmentController criado temporariamente para processar notificação');
+        } catch (e) {
+          log('Erro ao criar AutoAssignmentController temporariamente: $e');
+        }
       }
 
     } catch (e) {
@@ -152,7 +294,8 @@ class NotificationService {
   void _navigateToChat(String senderId, String orderId) async {
     try {
       UserModel? sender = await FireStoreUtils.getCustomer(senderId);
-      DriverUserModel? driver = await FireStoreUtils.getDriverProfile(FireStoreUtils.getCurrentUid());
+      DriverUserModel? driver = await FireStoreUtils.getDriverProfile(
+          FireStoreUtils.getCurrentUid());
 
       if (sender != null && driver != null) {
         Get.to(() => ChatScreens(), arguments: {
@@ -171,6 +314,8 @@ class NotificationService {
   /// Mostra notificação local
   Future<void> _showLocalNotification(RemoteMessage message) async {
     try {
+      String channelId = _getChannelIdFromType(message.data['type'] ?? '');
+
       const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
         'b21_driver_channel',
@@ -181,6 +326,7 @@ class NotificationService {
         showWhen: true,
         enableVibration: true,
         playSound: true,
+        icon: '@mipmap/ic_launcher',
       );
 
       const DarwinNotificationDetails iOSPlatformChannelSpecifics =
@@ -188,6 +334,7 @@ class NotificationService {
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
+        interruptionLevel: InterruptionLevel.active,
       );
 
       const NotificationDetails platformChannelSpecifics = NotificationDetails(
@@ -207,6 +354,17 @@ class NotificationService {
     }
   }
 
+  String _getChannelIdFromType(String type) {
+    switch (type) {
+      case 'chat':
+        return 'chat_channel';
+      case 'ride_assignment':
+        return 'ride_assignment_channel';
+      default:
+        return 'b21_driver_channel';
+    }
+  }
+
   /// Mostra notificação de alta prioridade para atribuição de corrida
   Future<void> showRideAssignmentNotification(OrderModel order) async {
     try {
@@ -220,9 +378,15 @@ class NotificationService {
         showWhen: true,
         enableVibration: true,
         playSound: true,
-        fullScreenIntent: true, // Mostra em tela cheia
+        fullScreenIntent: true,
         category: AndroidNotificationCategory.call,
         visibility: NotificationVisibility.public,
+        icon: '@mipmap/ic_launcher',
+        color: Color(0xFFFF6B35),
+        enableLights: true,
+        ledColor: Color(0xFFFF6B35),
+        ledOnMs: 1000,
+        ledOffMs: 500,
       );
 
       const DarwinNotificationDetails iOSPlatformChannelSpecifics =
@@ -231,6 +395,7 @@ class NotificationService {
         presentBadge: true,
         presentSound: true,
         interruptionLevel: InterruptionLevel.critical,
+        sound: 'default',
       );
 
       const NotificationDetails platformChannelSpecifics = NotificationDetails(
@@ -267,30 +432,71 @@ class NotificationService {
     }
   }
 
-  /// Método estático para obter FCM token
-  static getToken() async {
-    String? token = await FirebaseMessaging.instance.getToken();
-    return token!;
+  /// Cancela todas as notificações
+  Future<void> cancelAllNotifications() async {
+    try {
+      await flutterLocalNotificationsPlugin.cancelAll();
+    } catch (e) {
+      log('Erro ao cancelar todas as notificações: $e');
+    }
   }
 
-  /// Configurações específicas para notificações de atribuição automática
-  Future<void> setupRideAssignmentChannel() async {
+  /// Método para ser chamado quando o usuário fizer login
+  /// Garantir que todos os canais estão configurados
+  Future<void> initializeForLoggedUser() async {
     try {
-      const AndroidNotificationChannel channel = AndroidNotificationChannel(
-        'ride_assignment_channel',
-        'Atribuição de Corridas',
-        description: 'Canal para notificações de corridas atribuídas automaticamente',
-        importance: Importance.max,
-        playSound: true,
-        enableVibration: true,
-        showBadge: true,
+      await setupRideAssignmentChannel();
+
+      // Atualiza o token FCM se necessário
+      String token = await getToken();
+      if (token.isNotEmpty) {
+        log('FCM Token atualizado após login: $token');
+        // Aqui você pode salvar o token no Firestore se necessário
+      }
+
+      log('NotificationService configurado para usuário logado');
+    } catch (e) {
+      log('Erro ao inicializar NotificationService para usuário logado: $e');
+    }
+  }
+  static Future<String> getToken() async {
+    try {
+      String? token = await FirebaseMessaging.instance.getToken();
+      log('FCM Token: $token');
+      return token ?? '';
+    } catch (e) {
+      log('Erro ao obter FCM token: $e');
+      return '';
+    }
+  }
+
+  /// Verifica status das permissões
+  Future<bool> hasNotificationPermission() async {
+    try {
+      NotificationSettings settings = await FirebaseMessaging.instance.getNotificationSettings();
+      return settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional;
+    } catch (e) {
+      log('Erro ao verificar permissões: $e');
+      return false;
+    }
+  }
+
+  /// Solicita permissões novamente
+  Future<bool> requestNotificationPermission() async {
+    try {
+      NotificationSettings settings = await FirebaseMessaging.instance.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+        criticalAlert: true,
       );
 
-      await flutterLocalNotificationsPlugin
-          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-          ?.createNotificationChannel(channel);
+      return settings.authorizationStatus == AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional;
     } catch (e) {
-      log('Erro ao configurar canal de notificação: $e');
+      log('Erro ao solicitar permissões: $e');
+      return false;
     }
   }
 }

@@ -1,4 +1,4 @@
-// lib/widget/ride_assignment_modal.dart
+// lib/widget/ride_assignment_modal.dart - VERSÃO SIMPLES E FUNCIONAL
 import 'dart:async';
 import 'package:driver/constant/constant.dart';
 import 'package:driver/model/order_model.dart';
@@ -36,14 +36,20 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
   late Animation<double> _fadeAnimation;
 
   Timer? _countdownTimer;
-  int _secondsRemaining = 15;
-  bool _isDisposed = false;
-  bool _hasResponded = false; // Evita múltiplas respostas
+  bool _hasResponded = false;
+
+  // CORREÇÃO CRÍTICA: ValueNotifier para evitar rebuild do widget
+  late ValueNotifier<int> _secondsNotifier;
+  late ValueNotifier<bool> _isUrgentNotifier;
 
   @override
   void initState() {
     super.initState();
     print('📱 Inicializando RideAssignmentModal para corrida ${widget.orderModel.id}');
+
+    // Inicializa notifiers
+    _secondsNotifier = ValueNotifier<int>(15);
+    _isUrgentNotifier = ValueNotifier<bool>(false);
 
     // Configuração das animações
     _animationController = AnimationController(
@@ -70,33 +76,43 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
     _animationController.forward();
     _progressController.forward();
 
-    // Inicia countdown
-    _startCountdown();
+    // Inicia countdown SEM setState
+    _startCountdownWithoutRebuild();
   }
 
   @override
   void dispose() {
     print('📱 Descartando RideAssignmentModal para corrida ${widget.orderModel.id}');
-    _isDisposed = true;
+
+    // Dispose dos notifiers
+    _secondsNotifier.dispose();
+    _isUrgentNotifier.dispose();
+
     _animationController.dispose();
     _progressController.dispose();
     _countdownTimer?.cancel();
     super.dispose();
   }
 
-  void _startCountdown() {
+  /// MÉTODO CORRIGIDO: Countdown que NÃO causa rebuild
+  void _startCountdownWithoutRebuild() {
+    int secondsRemaining = 15;
+
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_isDisposed || _hasResponded) {
+      if (_hasResponded) {
         timer.cancel();
         return;
       }
 
-      if (_secondsRemaining > 0) {
-        if (mounted) {
-          setState(() {
-            _secondsRemaining--;
-          });
-        }
+      if (secondsRemaining > 0) {
+        secondsRemaining--;
+
+        // CORREÇÃO: Atualiza apenas os ValueNotifiers (sem setState)
+        _secondsNotifier.value = secondsRemaining;
+        _isUrgentNotifier.value = secondsRemaining <= 5;
+
+        // NÃO CHAMA setState() - Esta era a causa do refresh!
+
       } else {
         timer.cancel();
         if (!_hasResponded && mounted) {
@@ -107,7 +123,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
   }
 
   void _handleAccept() {
-    if (_hasResponded || _isDisposed) return;
+    if (_hasResponded) return;
 
     _hasResponded = true;
     print('✅ Usuário aceitou corrida ${widget.orderModel.id}');
@@ -121,7 +137,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
   }
 
   void _handleReject() {
-    if (_hasResponded || _isDisposed) return;
+    if (_hasResponded) return;
 
     _hasResponded = true;
     print('❌ Usuário rejeitou corrida ${widget.orderModel.id}');
@@ -136,7 +152,8 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
 
   @override
   Widget build(BuildContext context) {
-    final themeChange = Provider.of<DarkThemeProvider>(context);
+    // CORREÇÃO: listen: false para evitar rebuilds desnecessários
+    final themeChange = Provider.of<DarkThemeProvider>(context, listen: false);
 
     return Material(
       color: Colors.transparent,
@@ -153,9 +170,15 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: themeChange.getThem()
-                        ? AppColors.darkBackground
-                        : AppColors.background,
+                        ? AppColors.darkContainerBackground
+                        : AppColors.containerBackground,
                     borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: themeChange.getThem()
+                          ? AppColors.darkContainerBorder
+                          : AppColors.containerBorder,
+                      width: 2,
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.3),
@@ -167,16 +190,32 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      // Header
                       _buildHeader(themeChange),
+
                       const SizedBox(height: 20),
-                      _buildCountdownTimer(themeChange),
+
+                      // Countdown Timer SEM REBUILD
+                      _buildCountdownTimerFixed(themeChange),
+
                       const SizedBox(height: 20),
+
+                      // Ride Info
                       _buildRideInfo(themeChange),
-                      const SizedBox(height: 20),
+
+                      const SizedBox(height: 15),
+
+                      // User Info
                       _buildUserInfo(),
-                      const SizedBox(height: 20),
+
+                      const SizedBox(height: 15),
+
+                      // Location Info
                       _buildLocationInfo(),
+
                       const SizedBox(height: 25),
+
+                      // Action Buttons
                       _buildActionButtons(themeChange),
                     ],
                   ),
@@ -191,47 +230,34 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
 
   Widget _buildHeader(DarkThemeProvider themeChange) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.2),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Icon(
-            Icons.directions_car,
-            color: AppColors.primary,
-            size: 24,
-          ),
-        ),
-        const SizedBox(width: 15),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Nova Corrida Disponível',
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: themeChange.getThem() ? Colors.white : Colors.black,
-                ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Nova Corrida',
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: themeChange.getThem() ? Colors.white : Colors.black,
               ),
-              Text(
-                'Corrida ID: #${widget.orderModel.id?.substring(0, 8) ?? 'N/A'}',
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
+            ),
+            Text(
+              'Corrida ID: #${widget.orderModel.id?.substring(0, 8) ?? 'N/A'}',
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                color: Colors.grey,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _buildCountdownTimer(DarkThemeProvider themeChange) {
+  /// WIDGET CORRIGIDO: Timer que NÃO causa rebuild do widget pai
+  Widget _buildCountdownTimerFixed(DarkThemeProvider themeChange) {
     return Column(
       children: [
         Stack(
@@ -243,36 +269,58 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
               child: AnimatedBuilder(
                 animation: _progressController,
                 builder: (context, child) {
-                  return CircularProgressIndicator(
-                    value: 1.0 - _progressController.value,
-                    strokeWidth: 6,
-                    backgroundColor: Colors.grey.withOpacity(0.3),
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      _secondsRemaining <= 5 ? Colors.red : AppColors.primary,
-                    ),
+                  return ValueListenableBuilder<bool>(
+                    valueListenable: _isUrgentNotifier,
+                    builder: (context, isUrgent, child) {
+                      return CircularProgressIndicator(
+                        value: 1.0 - _progressController.value,
+                        strokeWidth: 6,
+                        backgroundColor: Colors.grey.withOpacity(0.3),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          isUrgent ? Colors.red : AppColors.primary,
+                        ),
+                      );
+                    },
                   );
                 },
               ),
             ),
-            Text(
-              '$_secondsRemaining',
-              style: GoogleFonts.poppins(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: _secondsRemaining <= 5 ? Colors.red : AppColors.primary,
-              ),
+            // CORREÇÃO CRÍTICA: ValueListenableBuilder evita rebuild do widget inteiro
+            ValueListenableBuilder<int>(
+              valueListenable: _secondsNotifier,
+              builder: (context, seconds, child) {
+                return ValueListenableBuilder<bool>(
+                  valueListenable: _isUrgentNotifier,
+                  builder: (context, isUrgent, child) {
+                    return Text(
+                      '$seconds',
+                      style: GoogleFonts.poppins(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: isUrgent ? Colors.red : AppColors.primary,
+                      ),
+                    );
+                  },
+                );
+              },
             ),
           ],
         ),
 
         const SizedBox(height: 10),
 
-        Text(
-          'Responda em $_secondsRemaining segundos',
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            color: Colors.grey,
-          ),
+        // CORREÇÃO: Texto do countdown também usando ValueListenableBuilder
+        ValueListenableBuilder<int>(
+          valueListenable: _secondsNotifier,
+          builder: (context, seconds, child) {
+            return Text(
+              'Responda em $seconds segundos',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: Colors.grey,
+              ),
+            );
+          },
         ),
       ],
     );
@@ -393,9 +441,9 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.close,
-                    color: Colors.red,
+                    color: _hasResponded ? Colors.grey : Colors.red,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
@@ -404,7 +452,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.red,
+                      color: _hasResponded ? Colors.grey : Colors.red,
                     ),
                   ),
                 ],
@@ -417,14 +465,38 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
 
         // Botão Aceitar
         Expanded(
-          child: Opacity(
-            opacity: _hasResponded ? 0.5 : 1.0,
-            child: ButtonThem.buildButton(
-              context,
-              title: 'Aceitar',
-              btnHeight: 50,
-              onPress: _hasResponded ? () {} : _handleAccept,
-              btnWidthRatio: 1.0,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.green,
+            ),
+            child: TextButton(
+              onPressed: _hasResponded ? null : _handleAccept,
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.check,
+                    color: Colors.white,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Aceitar',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -432,15 +504,14 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
     );
   }
 
-  String _calculateEstimatedTime() {
-    // Cálculo simples baseado na distância
-    // Assumindo velocidade média de 30 km/h no trânsito urbano
+  int _calculateEstimatedTime() {
+    // Cálculo estimativo simples baseado na distância
     try {
       double distance = double.parse(widget.orderModel.distance ?? '0');
-      double estimatedMinutes = (distance / 30) * 60; // km/h para minutos
-      return estimatedMinutes.round().toString();
+      // Assumindo velocidade média de 30 km/h no trânsito urbano
+      return (distance * 2).round(); // Multiplicado por 2 para considerar trânsito
     } catch (e) {
-      return '15'; // Valor padrão
+      return 15; // Valor padrão
     }
   }
 }
