@@ -1,5 +1,7 @@
 // lib/widget/rating_dialog.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:driver/constant/constant.dart';
+import 'package:driver/constant/send_notification.dart';
 import 'package:driver/constant/show_toast_dialog.dart';
 import 'package:driver/model/order_model.dart';
 import 'package:driver/model/review_model.dart';
@@ -67,6 +69,69 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
     }
   }
 
+  /// Finaliza a corrida (tanto para pular quanto para após avaliar)
+  Future<void> _completeRide() async {
+    try {
+      // Atualizar status da corrida
+      widget.orderModel.status = Constant.rideComplete;
+      widget.orderModel.paymentStatus = true;
+
+      // Enviar notificação para o passageiro
+      await FireStoreUtils.getCustomer(widget.orderModel.userId.toString()).then((value) async {
+        if (value != null) {
+          if (value.fcmToken != null) {
+            Map<String, dynamic> playLoad = <String, dynamic>{
+              "type": "city_order_complete",
+              "orderId": widget.orderModel.id
+            };
+
+            await SendNotification.sendOneNotification(
+              token: value.fcmToken.toString(),
+              title: 'Ride complete!'.tr,
+              body: 'Ride Complete successfully.'.tr,
+              payload: playLoad,
+            );
+          }
+        }
+      });
+
+      // Salvar ordem no Firebase
+      await FireStoreUtils.setOrder(widget.orderModel).then((value) {
+        if (value == true) {
+          ShowToastDialog.showToast("Ride Complete successfully".tr);
+          // Chamar callback se fornecido
+          widget.onComplete?.call();
+        }
+      });
+
+    } catch (error) {
+      ShowToastDialog.showToast("Erro ao finalizar corrida: $error");
+    }
+  }
+
+  /// Pular avaliação (finaliza a corrida sem avaliar)
+  Future<void> _skipRating() async {
+    if (_isLoading) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      await _completeRide();
+      Get.back();
+    } catch (error) {
+      ShowToastDialog.showToast("Erro ao finalizar corrida: $error");
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  /// Submeter avaliação e finalizar corrida
   Future<void> _submitRating() async {
     if (_isLoading) return;
 
@@ -86,9 +151,9 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
       reviewModel.date = Timestamp.now();
 
       // Salvar review no Firestore
-      bool? success = await FireStoreUtils.setReview(reviewModel);
+      bool? reviewSuccess = await FireStoreUtils.setReview(reviewModel);
 
-      if (success == true) {
+      if (reviewSuccess == true) {
         // Atualizar as estatísticas do passageiro
         if (_customer != null) {
           UserModel updatedCustomer = _customer!;
@@ -104,8 +169,11 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
         }
 
         ShowToastDialog.showToast("Review submit successfully".tr);
+
+        // Finalizar corrida após avaliar com sucesso
+        await _completeRide();
         Get.back();
-        widget.onComplete?.call();
+
       } else {
         throw Exception("Falha ao salvar avaliação");
       }
@@ -375,7 +443,7 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
   Widget _buildActionButtons(BuildContext context, DarkThemeProvider themeChange) {
     return Row(
       children: [
-        // Botão Cancelar
+        // Botão Pular (que agora finaliza a corrida)
         Expanded(
           child: Container(
             height: Responsive.height(6, context),
@@ -387,8 +455,17 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
               ),
             ),
             child: TextButton(
-              onPressed: () => Get.back(),
-              child: Text(
+              onPressed: _isLoading ? null : _skipRating,
+              child: _isLoading
+                  ? SizedBox(
+                width: Responsive.width(4, context),
+                height: Responsive.width(4, context),
+                child: const CircularProgressIndicator(
+                  color: AppColors.subTitleColor,
+                  strokeWidth: 2,
+                ),
+              )
+                  : Text(
                 'Pular',
                 style: GoogleFonts.poppins(
                   fontSize: Responsive.width(4, context),
@@ -400,7 +477,7 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
           ),
         ),
         SizedBox(width: Responsive.width(3, context)),
-        // Botão Enviar
+        // Botão Avaliar (que avalia E finaliza a corrida)
         Expanded(
           flex: 2,
           child: Container(
