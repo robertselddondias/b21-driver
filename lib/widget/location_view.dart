@@ -1,3 +1,4 @@
+// lib/widget/location_view.dart - Versão com cores temáticas corretas
 import 'package:driver/themes/app_colors.dart';
 import 'package:driver/themes/responsive.dart';
 import 'package:driver/utils/DarkThemeProvider.dart';
@@ -16,31 +17,153 @@ class LocationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeChange = Provider.of<DarkThemeProvider>(context);
+    final isDarkMode = themeChange.getThem();
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Coluna com ícones e linha tracejada
         Column(
           children: [
-            SvgPicture.asset(themeChange.getThem() ? 'assets/icons/ic_source_dark.svg' : 'assets/icons/ic_source.svg', width: 18),
-            Dash(direction: Axis.vertical, length: Responsive.height(6, context), dashLength: 12, dashColor: AppColors.dottedDivider),
-            SvgPicture.asset(themeChange.getThem() ? 'assets/icons/ic_destination_dark.svg' : 'assets/icons/ic_destination.svg', width: 20),
+            // Ícone de origem
+            Container(
+              padding: EdgeInsets.all(Responsive.width(2, context)),
+              decoration: BoxDecoration(
+                color: AppColors.getPrimaryColor(isDarkMode).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(
+                Icons.my_location,
+                color: AppColors.getPrimaryColor(isDarkMode),
+                size: Responsive.width(4, context),
+              ),
+            ),
+
+            // Linha tracejada
+            Container(
+              margin: EdgeInsets.symmetric(vertical: Responsive.height(0.5, context)),
+              child: Dash(
+                direction: Axis.vertical,
+                length: Responsive.height(6, context),
+                dashLength: 6,
+                dashGap: 3,
+                dashColor: isDarkMode
+                    ? Colors.white.withOpacity(0.4)
+                    : AppColors.dottedDivider,
+                dashThickness: 2,
+              ),
+            ),
+
+            // Ícone de destino
+            Container(
+              padding: EdgeInsets.all(Responsive.width(2, context)),
+              decoration: BoxDecoration(
+                color: AppColors.getErrorColor(isDarkMode).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(
+                Icons.location_on,
+                color: AppColors.getErrorColor(isDarkMode),
+                size: Responsive.width(4, context),
+              ),
+            ),
           ],
         ),
-        const SizedBox(
-          width: 10,
-        ),
+
+        SizedBox(width: Responsive.width(3, context)),
+
+        // Coluna com os textos das localizações
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(sourceLocation.toString(), maxLines: 2, style: GoogleFonts.poppins()),
-              SizedBox(height: sourceLocation!.length > 35 ? Responsive.height(1, context) : Responsive.height(3, context)),
-              Text(
-                destinationLocation.toString(),
-                maxLines: 2,
-                style: GoogleFonts.poppins(),
-              )
+              // Localização de origem
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: Responsive.width(3, context),
+                  vertical: Responsive.height(1.2, context),
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.getContainerColor(isDarkMode),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: AppColors.getBorderColor(isDarkMode),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Origem',
+                      style: GoogleFonts.poppins(
+                        fontSize: Responsive.width(2.8, context),
+                        fontWeight: FontWeight.w500,
+                        color: isDarkMode
+                            ? const Color(0xffB0B0B0)
+                            : AppColors.subTitleColor,
+                      ),
+                    ),
+                    SizedBox(height: Responsive.height(0.3, context)),
+                    Text(
+                      sourceLocation?.toString() ?? 'Localização não informada',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        fontSize: Responsive.width(3.5, context),
+                        fontWeight: FontWeight.w400,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: Responsive.height(1.5, context)),
+
+              // Localização de destino
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: Responsive.width(3, context),
+                  vertical: Responsive.height(1.2, context),
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.getContainerColor(isDarkMode),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: AppColors.getBorderColor(isDarkMode),
+                    width: 1,
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Destino',
+                      style: GoogleFonts.poppins(
+                        fontSize: Responsive.width(2.8, context),
+                        fontWeight: FontWeight.w500,
+                        color: isDarkMode
+                            ? const Color(0xffB0B0B0)
+                            : AppColors.subTitleColor,
+                      ),
+                    ),
+                    SizedBox(height: Responsive.height(0.3, context)),
+                    Text(
+                      destinationLocation?.toString() ?? 'Destino não informado',
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        fontSize: Responsive.width(3.5, context),
+                        fontWeight: FontWeight.w400,
+                        color: isDarkMode ? Colors.white : Colors.black,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),

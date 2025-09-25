@@ -54,6 +54,8 @@ const Map<String, String> ptPO = {
   "Offer Rate":"Taxa de Oferta",
   'Error':'Erro',
   "No active rides Found":"Nenhuma corrida ativa encontrada",
+  "Active Ride": "Corrida Ativa",
+  "In Progress": "Em andamento",
   "Complete Ride":"Completar Corrida",
   'Ride complete!':'Corrida completa!',
   'Please complete your payment.':'Por favor, complete seu pagamento.',

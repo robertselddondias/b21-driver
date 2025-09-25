@@ -1,4 +1,4 @@
-// lib/ui/home_screens/home_screen.dart - Versão com temas e responsividade
+// lib/ui/home_screens/home_screen.dart - Versão com cores otimizadas
 
 import 'package:badges/badges.dart' as badges;
 import 'package:driver/controller/home_controller.dart';
@@ -6,6 +6,7 @@ import 'package:driver/themes/app_colors.dart';
 import 'package:driver/themes/responsive.dart';
 import 'package:driver/utils/DarkThemeProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +17,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeChange = Provider.of<DarkThemeProvider>(context);
+    final isDarkMode = themeChange.getThem();
 
     return GetBuilder<HomeController>(
       init: HomeController(),
@@ -27,20 +29,29 @@ class HomeScreen extends StatelessWidget {
           }
 
           return Scaffold(
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.getBackgroundColor(isDarkMode),
+            // CORREÇÃO: AppBar para controlar a cor da status bar
+            appBar: AppBar(
+              backgroundColor: AppColors.primary,
+              elevation: 0,
+              toolbarHeight: 0,
+              systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: AppColors.primary,
+                statusBarIconBrightness: Brightness.light,
+                statusBarBrightness: Brightness.dark,
+              ),
+            ),
             body: Column(
               children: [
                 // Header com status online/offline
-                _buildHeader(context, controller, themeChange),
+                _buildHeader(context, controller, themeChange, isDarkMode),
 
                 // Conteúdo principal
                 Expanded(
                   child: Container(
                     width: Responsive.width(100, context),
                     decoration: BoxDecoration(
-                      color: themeChange.getThem()
-                          ? AppColors.darkBackground
-                          : AppColors.background,
+                      color: AppColors.getBackgroundColor(isDarkMode),
                       borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(25),
                         topRight: Radius.circular(25),
@@ -48,84 +59,38 @@ class HomeScreen extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
+                        // Indicador de arraste
+                        Container(
+                          margin: EdgeInsets.symmetric(
+                            vertical: Responsive.height(1.5, context),
+                          ),
+                          width: Responsive.width(12, context),
+                          height: 4,
+                          decoration: BoxDecoration(
+                            color: isDarkMode
+                                ? Colors.white.withOpacity(0.4)
+                                : Colors.black.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+
                         // Informações do motorista online
-                        _buildDriverStatusCard(context, controller, themeChange),
+                        _buildDriverStatusCard(context, controller, themeChange, isDarkMode),
 
                         // Conteúdo das tabs - CORREÇÃO: usando getter seguro
                         Expanded(
-                          child: controller.currentWidget,
+                          child: Container(
+                            color: AppColors.getBackgroundColor(isDarkMode),
+                            child: controller.currentWidget,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
 
-                // Bottom Navigation simplificado
-                Container(
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, -5),
-                      ),
-                    ],
-                  ),
-                  child: BottomNavigationBar(
-                    items: [
-                      BottomNavigationBarItem(
-                        icon: badges.Badge(
-                          badgeContent: Text(
-                            controller.isActiveValue.value.toString(),
-                            style: GoogleFonts.poppins(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.all(Responsive.width(1.5, context)),
-                            child: Image.asset(
-                              "assets/icons/ic_active.png",
-                              width: Responsive.width(4.5, context),
-                              color: controller.selectedIndex.value == 0
-                                  ? AppColors.darkModePrimary
-                                  : Colors.white,
-                            ),
-                          ),
-                        ),
-                        label: 'Ativo'.tr,
-                      ),
-                      BottomNavigationBarItem(
-                        icon: Padding(
-                          padding: EdgeInsets.all(Responsive.width(1.5, context)),
-                          child: Image.asset(
-                            "assets/icons/ic_completed.png",
-                            width: Responsive.width(4.5, context),
-                            color: controller.selectedIndex.value == 1
-                                ? AppColors.darkModePrimary
-                                : Colors.white,
-                          ),
-                        ),
-                        label: 'Histórico'.tr,
-                      ),
-                    ],
-                    backgroundColor: AppColors.primary,
-                    type: BottomNavigationBarType.fixed,
-                    currentIndex: controller.isValidIndex ? controller.selectedIndex.value : 0,
-                    selectedItemColor: AppColors.darkModePrimary,
-                    unselectedItemColor: Colors.white,
-                    selectedLabelStyle: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    unselectedLabelStyle: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    onTap: controller.onItemTapped,
-                  ),
-                ),
+                // Bottom Navigation corrigido
+                _buildBottomNavigation(context, controller, themeChange, isDarkMode),
               ],
             ),
           );
@@ -134,11 +99,12 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, HomeController controller, DarkThemeProvider themeChange) {
+  Widget _buildHeader(BuildContext context, HomeController controller, DarkThemeProvider themeChange, bool isDarkMode) {
     return Container(
       width: Responsive.width(100, context),
+      color: AppColors.primary,
       padding: EdgeInsets.only(
-        top: Responsive.height(6, context),
+        top: Responsive.height(1, context), // Reduzido já que AppBar controla status bar
         left: Responsive.width(5, context),
         right: Responsive.width(5, context),
         bottom: Responsive.height(2, context),
@@ -165,7 +131,7 @@ class HomeScreen extends StatelessWidget {
                       ? 'Você está online e recebendo corridas'
                       : 'Você está offline',
                   style: GoogleFonts.poppins(
-                    color: Colors.white70,
+                    color: Colors.white.withOpacity(0.8),
                     fontSize: Responsive.width(3.5, context),
                     fontWeight: FontWeight.w400,
                   ),
@@ -177,7 +143,7 @@ class HomeScreen extends StatelessWidget {
 
           SizedBox(width: Responsive.width(2.5, context)),
 
-          // Botão de alternância online/offline (tamanho fixo)
+          // Botão de alternância online/offline melhorado
           GestureDetector(
             onTap: controller.toggleOnlineStatus,
             child: Container(
@@ -188,11 +154,19 @@ class HomeScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: controller.autoAssignmentController.isOnline.value
                     ? AppColors.darkModePrimary
-                    : AppColors.subTitleColor,
+                    : Colors.white.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: controller.autoAssignmentController.isOnline.value
+                      ? AppColors.darkModePrimary
+                      : Colors.white.withOpacity(0.6),
+                  width: 1.5,
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: controller.autoAssignmentController.isOnline.value
+                        ? AppColors.darkModePrimary.withOpacity(0.3)
+                        : Colors.black.withOpacity(0.2),
                     blurRadius: 8,
                     offset: const Offset(0, 2),
                   ),
@@ -228,27 +202,25 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDriverStatusCard(BuildContext context, HomeController controller, DarkThemeProvider themeChange) {
+  Widget _buildDriverStatusCard(BuildContext context, HomeController controller, DarkThemeProvider themeChange, bool isDarkMode) {
     return Container(
       margin: EdgeInsets.all(Responsive.width(5, context)),
       padding: EdgeInsets.all(Responsive.width(5, context)),
       width: Responsive.width(90, context),
       decoration: BoxDecoration(
-        color: themeChange.getThem()
-            ? AppColors.darkContainerBackground
-            : AppColors.containerBackground,
+        color: AppColors.getContainerColor(isDarkMode),
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: themeChange.getThem()
-              ? AppColors.darkContainerBorder
-              : AppColors.containerBorder,
-          width: 1,
+          color: AppColors.getBorderColor(isDarkMode),
+          width: 1.5,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.4)
+                : Colors.black.withOpacity(0.08),
+            blurRadius: isDarkMode ? 15 : 10,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
@@ -263,7 +235,7 @@ class HomeScreen extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   fontSize: Responsive.width(4, context),
                   fontWeight: FontWeight.w600,
-                  color: themeChange.getThem() ? Colors.white : Colors.black,
+                  color: AppColors.getTextColor(isDarkMode),
                 ),
               ),
               Container(
@@ -273,14 +245,14 @@ class HomeScreen extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: controller.autoAssignmentController.isOnline.value
-                      ? AppColors.darkModePrimary.withOpacity(0.1)
-                      : AppColors.subTitleColor.withOpacity(0.1),
+                      ? AppColors.getSuccessColor(isDarkMode).withOpacity(isDarkMode ? 0.25 : 0.1)
+                      : AppColors.getSecondaryTextColor(isDarkMode).withOpacity(0.15),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: controller.autoAssignmentController.isOnline.value
-                        ? AppColors.darkModePrimary
-                        : AppColors.subTitleColor,
-                    width: 1,
+                        ? AppColors.getSuccessColor(isDarkMode)
+                        : AppColors.getSecondaryTextColor(isDarkMode),
+                    width: 1.5,
                   ),
                 ),
                 child: Text(
@@ -291,8 +263,8 @@ class HomeScreen extends StatelessWidget {
                     fontSize: Responsive.width(3, context),
                     fontWeight: FontWeight.w600,
                     color: controller.autoAssignmentController.isOnline.value
-                        ? AppColors.darkModePrimary
-                        : AppColors.subTitleColor,
+                        ? AppColors.getSuccessColor(isDarkMode)
+                        : AppColors.getSecondaryTextColor(isDarkMode),
                   ),
                 ),
               ),
@@ -306,7 +278,7 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Icon(
                   Icons.search,
-                  color: AppColors.primary,
+                  color: AppColors.getPrimaryColor(isDarkMode),
                   size: Responsive.width(5, context),
                 ),
                 SizedBox(width: Responsive.width(2.5, context)),
@@ -314,7 +286,7 @@ class HomeScreen extends StatelessWidget {
                   'Procurando corridas próximas...',
                   style: GoogleFonts.poppins(
                     fontSize: Responsive.width(3.5, context),
-                    color: AppColors.subTitleColor,
+                    color: AppColors.getSecondaryTextColor(isDarkMode),
                     fontWeight: FontWeight.w400,
                   ),
                 ),
@@ -324,16 +296,20 @@ class HomeScreen extends StatelessWidget {
             SizedBox(height: Responsive.height(1.5, context)),
 
             LinearProgressIndicator(
-              backgroundColor: AppColors.subTitleColor.withOpacity(0.2),
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-              minHeight: 3,
+              backgroundColor: isDarkMode
+                  ? Colors.white.withOpacity(0.2)
+                  : AppColors.subTitleColor.withOpacity(0.2),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                  AppColors.getPrimaryColor(isDarkMode)
+              ),
+              minHeight: 4,
             ),
           ] else ...[
             Row(
               children: [
                 Icon(
                   Icons.pause_circle,
-                  color: AppColors.subTitleColor,
+                  color: AppColors.getSecondaryTextColor(isDarkMode),
                   size: Responsive.width(5, context),
                 ),
                 SizedBox(width: Responsive.width(2.5, context)),
@@ -342,7 +318,7 @@ class HomeScreen extends StatelessWidget {
                     'Vá para online para receber corridas',
                     style: GoogleFonts.poppins(
                       fontSize: Responsive.width(3.5, context),
-                      color: AppColors.subTitleColor,
+                      color: AppColors.getSecondaryTextColor(isDarkMode),
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -362,15 +338,17 @@ class HomeScreen extends StatelessWidget {
                 'Corridas Ativas',
                 controller.isActiveValue.value.toString(),
                 Icons.directions_car,
-                AppColors.primary,
+                AppColors.getPrimaryColor(isDarkMode),
                 themeChange,
+                isDarkMode,
               ),
               Container(
-                width: 1,
+                width: 2,
                 height: Responsive.height(6, context),
-                color: themeChange.getThem()
-                    ? AppColors.darkContainerBorder
-                    : AppColors.containerBorder,
+                decoration: BoxDecoration(
+                  color: AppColors.getBorderColor(isDarkMode),
+                  borderRadius: BorderRadius.circular(1),
+                ),
               ),
               _buildStatItem(
                 context,
@@ -379,6 +357,7 @@ class HomeScreen extends StatelessWidget {
                 Icons.account_balance_wallet,
                 AppColors.darkModePrimary,
                 themeChange,
+                isDarkMode,
               ),
             ],
           ),
@@ -393,17 +372,22 @@ class HomeScreen extends StatelessWidget {
       String value,
       IconData icon,
       Color color,
-      DarkThemeProvider themeChange
+      DarkThemeProvider themeChange,
+      bool isDarkMode
       ) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: Responsive.height(1, context)),
       child: Column(
         children: [
           Container(
-            padding: EdgeInsets.all(Responsive.width(2, context)),
+            padding: EdgeInsets.all(Responsive.width(2.5, context)),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
+              color: color.withOpacity(isDarkMode ? 0.25 : 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: color.withOpacity(isDarkMode ? 0.5 : 0.3),
+                width: 1,
+              ),
             ),
             child: Icon(
               icon,
@@ -417,19 +401,101 @@ class HomeScreen extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontSize: Responsive.width(4, context),
               fontWeight: FontWeight.w700,
-              color: themeChange.getThem() ? Colors.white : Colors.black,
+              color: AppColors.getTextColor(isDarkMode),
             ),
           ),
           Text(
             label,
             style: GoogleFonts.poppins(
               fontSize: Responsive.width(3, context),
-              color: AppColors.subTitleColor,
+              color: AppColors.getSecondaryTextColor(isDarkMode),
               fontWeight: FontWeight.w400,
             ),
             textAlign: TextAlign.center,
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigation(BuildContext context, HomeController controller, DarkThemeProvider themeChange, bool isDarkMode) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.getContainerColor(isDarkMode),
+        border: Border(
+          top: BorderSide(
+            color: AppColors.getBorderColor(isDarkMode),
+            width: 1,
+          ),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDarkMode
+                ? Colors.black.withOpacity(0.3)
+                : Colors.black.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: BottomNavigationBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        items: [
+          BottomNavigationBarItem(
+            icon: badges.Badge(
+              badgeContent: Text(
+                controller.isActiveValue.value.toString(),
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              badgeStyle: badges.BadgeStyle(
+                badgeColor: AppColors.primary,
+                padding: const EdgeInsets.all(6),
+              ),
+              child: Container(
+                padding: EdgeInsets.all(Responsive.width(1.5, context)),
+                child: Image.asset(
+                  "assets/icons/ic_active.png",
+                  width: Responsive.width(5, context),
+                  color: controller.selectedIndex.value == 0
+                      ? AppColors.getPrimaryColor(isDarkMode)
+                      : AppColors.getSecondaryTextColor(isDarkMode),
+                ),
+              ),
+            ),
+            label: 'Ativo'.tr,
+          ),
+          BottomNavigationBarItem(
+            icon: Container(
+              padding: EdgeInsets.all(Responsive.width(1.5, context)),
+              child: Image.asset(
+                "assets/icons/ic_completed.png",
+                width: Responsive.width(5, context),
+                color: controller.selectedIndex.value == 1
+                    ? AppColors.getPrimaryColor(isDarkMode)
+                    : AppColors.getSecondaryTextColor(isDarkMode),
+              ),
+            ),
+            label: 'Histórico'.tr,
+          ),
+        ],
+        type: BottomNavigationBarType.fixed,
+        currentIndex: controller.isValidIndex ? controller.selectedIndex.value : 0,
+        selectedItemColor: AppColors.getPrimaryColor(isDarkMode),
+        unselectedItemColor: AppColors.getSecondaryTextColor(isDarkMode),
+        selectedLabelStyle: GoogleFonts.poppins(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: GoogleFonts.poppins(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+        ),
+        onTap: controller.onItemTapped,
       ),
     );
   }
