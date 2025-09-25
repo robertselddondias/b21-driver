@@ -34,7 +34,7 @@ class Constant {
   static const String appleLoginType = "apple";
   static LocationLatLng? currentLocation;
 
-  static String mapAPIKey = "AIzaSyDLCabJEb_o9HbXRKdq9UBUfxI0V2ck9cE";
+  static String mapAPIKey = "AIzaSyBc-skUf3h_wpDYasvnrcar9ZIuoDqL7Q0";
   static String senderId = '';
   static String jsonNotificationFileURL = '';
   static String radius = "";

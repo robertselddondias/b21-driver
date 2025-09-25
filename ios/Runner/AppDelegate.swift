@@ -9,7 +9,7 @@ import GoogleMaps
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-      GMSServices.provideAPIKey("AIzaSyDLCabJEb_o9HbXRKdq9UBUfxI0V2ck9cE")
+      GMSServices.provideAPIKey("AIzaSyBc-skUf3h_wpDYasvnrcar9ZIuoDqL7Q0")
       FlutterLocalNotificationsPlugin.setPluginRegistrantCallback { (registry) in
             GeneratedPluginRegistrant.register(with: registry)
       }

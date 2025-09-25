@@ -52,7 +52,7 @@
 
         <meta-data
                 android:name="com.google.android.geo.API_KEY"
-                android:value="AIzaSyDLCabJEb_o9HbXRKdq9UBUfxI0V2ck9cE" />
+                android:value="AIzaSyBc-skUf3h_wpDYasvnrcar9ZIuoDqL7Q0" />
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
