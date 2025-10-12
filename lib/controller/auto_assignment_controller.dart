@@ -1,4 +1,4 @@
-// lib/controller/auto_assignment_controller.dart - VERSÃO DEBUG SIMPLIFICADA
+// lib/controller/auto_assignment_controller.dart - VERSÃO COMPLETA COM BLOQUEIO
 import 'dart:async';
 import 'dart:math';
 
@@ -26,6 +26,7 @@ class AutoAssignmentController extends GetxController {
   Timer? assignmentTimer;
   Timer? responseTimer;
   StreamSubscription? orderStreamSubscription;
+  StreamSubscription? activeRideMonitoringSubscription;
 
   // Variáveis da corrida atual
   Rx<OrderModel?> currentAssignedRide = Rx<OrderModel?>(null);
@@ -39,7 +40,7 @@ class AutoAssignmentController extends GetxController {
 
   // Configurações
   static const int ASSIGNMENT_TIMEOUT = 60;
-  static const double MAX_ASSIGNMENT_RADIUS = 50.0; // AUMENTADO para debug
+  static const double MAX_ASSIGNMENT_RADIUS = 50.0;
 
   @override
   void onInit() {
@@ -55,8 +56,69 @@ class AutoAssignmentController extends GetxController {
     orderStreamSubscription?.cancel();
     passengerResponseListener?.cancel();
     passengerResponseTimeout?.cancel();
+    activeRideMonitoringSubscription?.cancel();
     super.onClose();
   }
+
+  /// ====================================================================
+  /// VERIFICAÇÃO DE CORRIDA ATIVA - NOVO RECURSO
+  /// ====================================================================
+
+  /// Verifica se o motorista tem uma corrida ativa
+  Future<bool> hasActiveRide() async {
+    try {
+      final snapshot = await FireStoreUtils.fireStore
+          .collection(CollectionName.orders)
+          .where('driverId', isEqualTo: FireStoreUtils.getCurrentUid())
+          .where('status', whereIn: [
+        Constant.rideActive,
+        Constant.rideInProgress,
+      ])
+          .limit(1)
+          .get();
+
+      bool hasActive = snapshot.docs.isNotEmpty;
+      print('🚗 Motorista ${hasActive ? "TEM" : "NÃO TEM"} corrida ativa');
+      return hasActive;
+    } catch (e) {
+      print('❌ Erro ao verificar corrida ativa: $e');
+      return false;
+    }
+  }
+
+  /// Monitora mudanças em tempo real de corridas ativas
+  void startActiveRideMonitoring() {
+    print('👀 Iniciando monitoramento de corridas ativas');
+
+    activeRideMonitoringSubscription?.cancel();
+
+    activeRideMonitoringSubscription = FireStoreUtils.fireStore
+        .collection(CollectionName.orders)
+        .where('driverId', isEqualTo: FireStoreUtils.getCurrentUid())
+        .where('status', whereIn: [
+      Constant.rideActive,
+      Constant.rideInProgress,
+    ])
+        .snapshots()
+        .listen((snapshot) {
+
+      if (snapshot.docs.isNotEmpty) {
+        print('🚗 CORRIDA ATIVA DETECTADA - Bloqueando novas ofertas');
+
+        // Se tem corrida ativa, limpa qualquer atribuição pendente
+        if (isShowingModal.value || currentAssignedRide.value != null) {
+          print('🧹 Limpando ofertas pendentes devido a corrida ativa');
+          _clearCurrentAssignment();
+        }
+      } else {
+        print('✅ Nenhuma corrida ativa - Sistema liberado para novas ofertas');
+      }
+    });
+  }
+
+  /// ====================================================================
+  /// INICIALIZAÇÃO DO MOTORISTA
+  /// ====================================================================
 
   /// Inicializa informações do motorista
   void initializeDriver() async {
@@ -74,280 +136,195 @@ class AutoAssignmentController extends GetxController {
         isOnline.value = driverModel.value.isOnline ?? false;
 
         print('🔧 Status motorista: ${isOnline.value ? "ONLINE" : "OFFLINE"}');
-        print('🔧 Localização disponível: ${driverModel.value.location != null}');
-        print('🔧 Service ID: ${driverModel.value.serviceId}');
 
-        if (!wasOnline && isOnline.value && driverModel.value.location != null) {
-          print('🟢 Motorista ficou ONLINE - iniciando listener');
-          startRealTimeOrderListener();
-        } else if (!isOnline.value) {
-          print('🔴 Motorista ficou OFFLINE - parando listener');
+        if (isOnline.value && !wasOnline) {
+          // Ficou online agora
+          print('🟢 MOTORISTA FICOU ONLINE');
+
+          // Inicia monitoramento de corridas ativas
+          startActiveRideMonitoring();
+
+          // Inicia listener apenas se não tiver corrida ativa
+          hasActiveRide().then((hasActive) {
+            if (!hasActive && driverModel.value.location != null) {
+              startRealTimeOrderListener();
+            } else if (hasActive) {
+              print('🚫 Não iniciando listener: motorista já tem corrida ativa');
+            }
+          });
+
+        } else if (!isOnline.value && wasOnline) {
+          // Ficou offline agora
+          print('🔴 MOTORISTA FICOU OFFLINE');
           stopOrderListener();
+          forceCleanState();
         }
-      } else {
-        print('❌ Documento do motorista não encontrado');
       }
+    });
+  }
+
+  /// ====================================================================
+  /// LISTENER DE CORRIDAS DISPONÍVEIS (COM BLOQUEIO)
+  /// ====================================================================
+
+  /// Inicia listener em tempo real para corridas disponíveis
+  void startRealTimeOrderListener() {
+    print('🎯 INICIANDO LISTENER DE PEDIDOS...');
+
+    if (driverModel.value.location == null) {
+      print('   ❌ Localização não disponível');
+      return;
+    }
+
+    if (driverModel.value.serviceId == null || driverModel.value.serviceId!.isEmpty) {
+      print('   ❌ ServiceId não configurado');
+      return;
+    }
+
+    stopOrderListener();
+
+    print('   ✅ Listener configurado para serviceId: ${driverModel.value.serviceId}');
+
+    orderStreamSubscription = FireStoreUtils.fireStore
+        .collection(CollectionName.orders)
+        .where('serviceId', isEqualTo: driverModel.value.serviceId)
+        .where('status', isEqualTo: Constant.ridePlaced)
+        .snapshots()
+        .listen((snapshot) async {
+
+      // ⚠️ VERIFICAÇÃO CRÍTICA #1: Bloqueia se já tem corrida ativa
+      bool activeRide = await hasActiveRide();
+      if (activeRide) {
+        print('🚫 BLOQUEADO: Motorista já tem corrida ativa. Ignorando novas ofertas.');
+        return;
+      }
+
+      if (isProcessingOrder.value || isShowingModal.value) {
+        print('🚫 BLOQUEADO: Já processando outra corrida');
+        return;
+      }
+
+      if (currentAssignedRide.value != null) {
+        print('🚫 BLOQUEADO: Já tem corrida atribuída');
+        return;
+      }
+
+      print('📥 ${snapshot.docs.length} pedidos disponíveis');
+
+      for (var doc in snapshot.docs) {
+        try {
+          // ⚠️ VERIFICAÇÃO CRÍTICA #2: Verifica novamente durante o loop
+          activeRide = await hasActiveRide();
+          if (activeRide) {
+            print('🚫 Corrida ativa detectada durante processamento. Parando.');
+            return;
+          }
+
+          OrderModel order = OrderModel.fromJson(doc.data());
+
+          if (order.id == null || order.sourceLocationLAtLng == null) {
+            continue;
+          }
+
+          // Verifica se já foi rejeitada por este motorista
+          if (order.rejectedDriverId != null &&
+              order.rejectedDriverId!.contains(FireStoreUtils.getCurrentUid())) {
+            continue;
+          }
+
+          // Calcula distância do motorista até o ponto de partida
+          double distance = _calculateDistance(
+            driverModel.value.location!.latitude!,
+            driverModel.value.location!.longitude!,
+            order.sourceLocationLAtLng!.latitude!,
+            order.sourceLocationLAtLng!.longitude!,
+          );
+
+          print('📍 Corrida ${order.id!.substring(0, 8)}: ${distance.toStringAsFixed(2)}km');
+
+          if (distance <= MAX_ASSIGNMENT_RADIUS) {
+            print('✅ CORRIDA ENCONTRADA DENTRO DO RAIO!');
+
+            // ⚠️ VERIFICAÇÃO CRÍTICA #3: Última verificação antes do modal
+            activeRide = await hasActiveRide();
+            if (activeRide) {
+              print('🚫 Corrida ativa detectada antes de mostrar modal. Cancelando.');
+              return;
+            }
+
+            _assignRideToDriver(order);
+            return;
+          }
+        } catch (e) {
+          print('❌ Erro ao processar pedido: $e');
+        }
+      }
+    }, onError: (error) {
+      print('❌ Erro no listener: $error');
     });
   }
 
   /// Para o listener de corridas
   void stopOrderListener() {
+    print('⏹️ Parando listener de pedidos');
     orderStreamSubscription?.cancel();
     orderStreamSubscription = null;
-    print('🛑 Listener de corridas PARADO');
   }
 
-  /// VERSÃO SUPER SIMPLIFICADA - SEM MUITAS VERIFICAÇÕES
-  void startRealTimeOrderListener() {
-    print('🔄 Iniciando listener SIMPLIFICADO...');
+  /// ====================================================================
+  /// ATRIBUIÇÃO DE CORRIDA
+  /// ====================================================================
 
-    if (driverModel.value.location == null) {
-      print('❌ Sem localização - não pode iniciar listener');
-      return;
-    }
+  /// Atribui corrida ao motorista e mostra modal
+  void _assignRideToDriver(OrderModel order) async {
+    print('📲 ATRIBUINDO CORRIDA: ${order.id}');
 
-    // Cancela listener anterior
-    stopOrderListener();
-
-    // VERSÃO SIMPLIFICADA: MENOS FILTROS, MAIS LOGS
-    orderStreamSubscription = FireStoreUtils.fireStore
-        .collection(CollectionName.orders)
-        .where('status', isEqualTo: Constant.ridePlaced)
-    // REMOVIDO: .where('serviceId', isEqualTo: driverModel.value.serviceId) // PARA DEBUG
-        .snapshots()
-        .listen((snapshot) {
-
-      print('📦 Snapshot recebido com ${snapshot.docs.length} documentos');
-
-      // LOGS DETALHADOS
-      for (var doc in snapshot.docs) {
-        var data = doc.data();
-        print('📄 Corrida: ${doc.id}');
-        print('   Status: ${data['status']}');
-        print('   ServiceId: ${data['serviceId']}');
-        print('   AssignedDriverId: ${data['assignedDriverId']}');
-      }
-
-      // VERIFICAÇÕES BÁSICAS APENAS
-      if (!isOnline.value) {
-        print('📴 OFFLINE - ignorando');
-        return;
-      }
-
-      // PROCESSA TODAS AS CORRIDAS (PARA DEBUG)
-      for (var docChange in snapshot.docChanges) {
-        if (docChange.type == DocumentChangeType.added) {
-          try {
-            var data = docChange.doc.data() as Map<String, dynamic>;
-            OrderModel newOrder = OrderModel.fromJson(data);
-
-            print('🆕 Nova corrida adicionada: ${newOrder.id}');
-            print('   Status: ${newOrder.status}');
-            print('   AssignedDriverId: ${newOrder.assignedDriverId}');
-            print('   ServiceId: ${newOrder.serviceId}');
-            print('   SourceLocation: ${newOrder.sourceLocationName}');
-            print('   Distance: ${newOrder.distance}');
-
-            // VERIFICA SE É ELEGÍVEL COM LOGS DETALHADOS
-            if (_isOrderEligibleForDriverDebug(newOrder)) {
-              print('✅ CORRIDA ELEGÍVEL - Processando: ${newOrder.id}');
-              _processNewOrderSimplified(newOrder);
-              break;
-            } else {
-              print('❌ CORRIDA NÃO ELEGÍVEL: ${newOrder.id}');
-            }
-          } catch (e) {
-            print('❌ Erro ao processar corrida: $e');
-          }
-        }
-      }
-    });
-
-    print('✅ Listener iniciado com sucesso');
-  }
-
-  /// VERSÃO DEBUG: Verifica elegibilidade com logs detalhados
-  bool _isOrderEligibleForDriverDebug(OrderModel order) {
-    print('🔍 Verificando elegibilidade para corrida: ${order.id}');
-
-    // 1. Verifica se já foi atribuída
-    if (order.assignedDriverId != null) {
-      print('   ❌ Já atribuída para: ${order.assignedDriverId}');
-      return false;
-    }
-    print('   ✅ Não está atribuída');
-
-    // 2. Verifica se o motorista já rejeitou
-    String currentDriverId = FireStoreUtils.getCurrentUid();
-    if (order.rejectedDriverIds?.contains(currentDriverId) ?? false) {
-      print('   ❌ Motorista já rejeitou esta corrida');
-      return false;
-    }
-    print('   ✅ Motorista não rejeitou');
-
-    // 3. Verifica ServiceId (OPCIONAL PARA DEBUG)
-    if (order.serviceId != driverModel.value.serviceId) {
-      print('   ⚠️ ServiceId diferente: ${order.serviceId} vs ${driverModel.value.serviceId}');
-      // return false; // COMENTADO PARA DEBUG
-    }
-    print('   ✅ ServiceId OK (ou ignorado)');
-
-    // 4. Verifica localização
-    if (order.sourceLocationLAtLng == null) {
-      print('   ❌ Sem localização de origem');
-      return false;
-    }
-
-    if (driverModel.value.location == null) {
-      print('   ❌ Motorista sem localização');
-      return false;
-    }
-    print('   ✅ Ambos têm localização');
-
-    // 5. Calcula distância
-    try {
-      double distance = _calculateDistance(
-        driverModel.value.location!.latitude!,
-        driverModel.value.location!.longitude!,
-        order.sourceLocationLAtLng!.latitude!,
-        order.sourceLocationLAtLng!.longitude!,
-      );
-
-      print('   📏 Distância calculada: ${distance.toStringAsFixed(2)}km');
-      print('   📏 Máximo permitido: ${MAX_ASSIGNMENT_RADIUS}km');
-
-      if (distance > MAX_ASSIGNMENT_RADIUS) {
-        print('   ❌ Muito distante');
-        return false;
-      }
-      print('   ✅ Distância OK');
-
-    } catch (e) {
-      print('   ❌ Erro ao calcular distância: $e');
-      return false;
-    }
-
-    // 6. Verifica estados do controller
-    if (isShowingModal.value) {
-      print('   ❌ Modal já sendo exibido');
-      return false;
-    }
-
-    if (currentAssignedRide.value != null) {
-      print('   ❌ Já tem corrida atual');
-      return false;
-    }
-
-    if (isProcessingOrder.value) {
-      print('   ❌ Já processando outra corrida');
-      return false;
-    }
-
-    print('   🎯 CORRIDA TOTALMENTE ELEGÍVEL!');
-    return true;
-  }
-
-  /// VERSÃO SIMPLIFICADA: Processa corrida
-  Future<void> _processNewOrderSimplified(OrderModel order) async {
-    print('⚙️ PROCESSANDO CORRIDA: ${order.id}');
-
-    if (isProcessingOrder.value) {
-      print('   ⚠️ Já processando outra - cancelando');
+    if (isShowingModal.value || isProcessingOrder.value) {
+      print('   ❌ Já está processando/exibindo');
       return;
     }
 
     isProcessingOrder.value = true;
+    currentAssignedRide.value = order;
 
-    try {
-      // Pequeno delay
-      await Future.delayed(const Duration(milliseconds: 100));
+    await Future.delayed(const Duration(milliseconds: 300));
 
-      // MOSTRA O DIALOG DIRETAMENTE (SEM MUITAS VERIFICAÇÕES)
-      print('   📱 Chamando showRideAssignmentModal...');
-      showRideAssignmentModalSimplified(order);
-
-    } catch (e) {
-      print('   ❌ Erro: $e');
-    } finally {
-      // Não libera imediatamente para evitar conflitos
-      Future.delayed(const Duration(seconds: 1), () {
-        if (isProcessingOrder.value && currentAssignedRide.value == null) {
-          isProcessingOrder.value = false;
-          print('   🔓 Processamento liberado');
-        }
-      });
-    }
-  }
-
-  /// VERSÃO SUPER SIMPLIFICADA: Mostra modal
-  void showRideAssignmentModalSimplified(OrderModel ride) {
-    print('📱 TENTANDO MOSTRAR MODAL para: ${ride.id}');
-
-    // Verificações mínimas
-    if (Get.isDialogOpen == true) {
-      print('   ❌ Já existe dialog aberto');
-      return;
-    }
-
-    if (isShowingModal.value) {
-      print('   ❌ isShowingModal já é true');
-      return;
-    }
-
-    // Define estados
-    currentAssignedRide.value = ride;
     isShowingModal.value = true;
+    isProcessingOrder.value = false;
 
-    print('   ✅ Estados definidos, abrindo dialog...');
+    startResponseTimer();
 
-    // ABRE O DIALOG
     Get.dialog(
-      WillPopScope(
-        onWillPop: () async => false,
-        child: RideAssignmentModal(
-          orderModel: ride,
-          onAccept: () {
-            print('🟢 ACCEPT pressionado');
-            acceptAssignedRide();
-          },
-          onReject: () {
-            print('🔴 REJECT pressionado');
-            rejectAssignedRide();
-          },
-        ),
+      RideAssignmentModal(
+        orderModel: order,
+        onAccept: acceptAssignedRide,
+        onReject: rejectAssignedRide,
       ),
       barrierDismissible: false,
-      barrierColor: Colors.black.withOpacity(0.8),
-    ).then((_) {
-      print('📱 Dialog fechado para corrida ${ride.id}');
-      isShowingModal.value = false;
-      if (currentAssignedRide.value == null) {
-        isProcessingOrder.value = false;
-      }
-    });
+    );
 
-    // Timer de timeout
-    startResponseTimer();
-    print('   ✅ MODAL ABERTO COM SUCESSO!');
+    print('✅ Modal exibido');
   }
 
-  /// Timer de timeout
-  void startResponseTimer() {
-    responseTimer?.cancel();
-    responseTimer = Timer(const Duration(seconds: ASSIGNMENT_TIMEOUT), () {
-      print('⏰ TIMEOUT - rejeitando automaticamente');
-      if (isShowingModal.value && currentAssignedRide.value != null) {
-        rejectAssignedRide();
-      }
-    });
-  }
+  /// ====================================================================
+  /// ACEITAR/REJEITAR CORRIDA
+  /// ====================================================================
 
-  /// Aceita corrida
+  /// Aceita corrida atribuída
   Future<void> acceptAssignedRide() async {
     print('✅ ACEITANDO CORRIDA...');
 
     if (currentAssignedRide.value == null) {
       print('   ❌ Nenhuma corrida para aceitar');
+      return;
+    }
+
+    // ⚠️ VERIFICAÇÃO CRÍTICA #4: Confirma que não tem corrida ativa
+    bool activeRide = await hasActiveRide();
+    if (activeRide) {
+      print('🚫 BLOQUEADO: Já existe uma corrida ativa. Cancelando aceitação.');
+      ShowToastDialog.showToast("Você já possui uma corrida ativa");
+      _clearCurrentAssignment();
       return;
     }
 
@@ -382,7 +359,7 @@ class AutoAssignmentController extends GetxController {
         }
       });
 
-      // Cria registro
+      // Cria registro de aceitação
       DriverIdAcceptReject driverIdAcceptReject = DriverIdAcceptReject(
           driverId: FireStoreUtils.getCurrentUid(),
           acceptedRejectTime: Timestamp.now(),
@@ -407,7 +384,7 @@ class AutoAssignmentController extends GetxController {
     }
   }
 
-  /// Rejeita corrida
+  /// Rejeita corrida atribuída
   Future<void> rejectAssignedRide() async {
     print('❌ REJEITANDO CORRIDA...');
 
@@ -419,132 +396,91 @@ class AutoAssignmentController extends GetxController {
     try {
       OrderModel ride = currentAssignedRide.value!;
 
+      // Adiciona motorista na lista de rejeitados
+      List<dynamic> rejectedList = ride.rejectedDriverId ?? [];
+      rejectedList.add(FireStoreUtils.getCurrentUid());
+
       await FireStoreUtils.fireStore
           .collection(CollectionName.orders)
           .doc(ride.id)
-          .update({
-        'assignedDriverId': FieldValue.delete(),
-        'rejectedDriverIds': FieldValue.arrayUnion([FireStoreUtils.getCurrentUid()]),
-      });
+          .update({'rejectedDriverId': rejectedList});
 
-      print('✅ CORRIDA REJEITADA COM SUCESSO');
-      _clearCurrentAssignment();
+      print('✅ Corrida rejeitada');
+      ShowToastDialog.showToast("Corrida rejeitada".tr);
 
     } catch (e) {
       print('❌ Erro ao rejeitar: $e');
+    } finally {
       _clearCurrentAssignment();
     }
   }
 
-  /// Limpa estado atual
-  void _clearCurrentAssignment() {
-    print('🧹 LIMPANDO ESTADO ATUAL');
+  /// ====================================================================
+  /// MONITORAMENTO DE RESPOSTA DO PASSAGEIRO
+  /// ====================================================================
 
-    responseTimer?.cancel();
-    passengerResponseTimeout?.cancel();
-    passengerResponseListener?.cancel();
-
-    currentAssignedRide.value = null;
-    isWaitingPassengerResponse.value = false;
-    isShowingModal.value = false;
-
-    if (Get.isDialogOpen == true) {
-      try {
-        Get.back();
-      } catch (e) {
-        print('⚠️ Erro ao fechar dialog: $e');
-      }
-    }
-
-    Future.delayed(const Duration(milliseconds: 500), () {
-      isProcessingOrder.value = false;
-      print('🧹 ESTADO LIMPO - PRONTO PARA NOVA CORRIDA');
-    });
-  }
-
-  /// Limpa apenas modal
-  void _clearModalOnly() {
-    print('📱 FECHANDO MODAL');
-
-    responseTimer?.cancel();
-    isShowingModal.value = false;
-
-    if (Get.isDialogOpen == true) {
-      try {
-        Get.back();
-      } catch (e) {
-        print('⚠️ Erro ao fechar dialog: $e');
-      }
-    }
-
-    Future.delayed(const Duration(milliseconds: 500), () {
-      isProcessingOrder.value = false;
-    });
-  }
-
-  /// Monitoramento de resposta do passageiro
+  /// Monitora resposta do passageiro após aceitação
   void _startPassengerResponseMonitoring(OrderModel order) {
-    print('👀 INICIANDO MONITORAMENTO DE RESPOSTA');
+    print('👂 MONITORANDO RESPOSTA DO PASSAGEIRO...');
 
     isWaitingPassengerResponse.value = true;
-    _showWaitingPassengerDialog(order);
 
+    // Timeout de 60 segundos
+    passengerResponseTimeout = Timer(const Duration(seconds: 60), () {
+      print('⏰ TIMEOUT - Passageiro não respondeu');
+      _handlePassengerResponse('TIMEOUT', order, 'O passageiro não respondeu a tempo');
+    });
+
+    // Listener para mudanças na corrida
     passengerResponseListener = FireStoreUtils.fireStore
         .collection(CollectionName.orders)
         .doc(order.id)
         .snapshots()
         .listen((snapshot) {
-
-      if (!snapshot.exists) {
-        _handlePassengerResponse('CANCELLED', order, 'Corrida cancelada');
-        return;
-      }
+      if (!snapshot.exists) return;
 
       OrderModel updatedOrder = OrderModel.fromJson(snapshot.data()!);
 
-      if (updatedOrder.driverId == FireStoreUtils.getCurrentUid()) {
-        _handlePassengerResponse('ACCEPTED', updatedOrder, 'Passageiro aceitou!');
-      } else if (updatedOrder.acceptedDriverId?.contains(FireStoreUtils.getCurrentUid()) == false) {
-        _handlePassengerResponse('REJECTED', updatedOrder, 'Passageiro rejeitou');
-      } else if (updatedOrder.driverId != null && updatedOrder.driverId != FireStoreUtils.getCurrentUid()) {
+      // Passageiro aceitou
+      if (updatedOrder.status == Constant.rideActive) {
+        print('✅ PASSAGEIRO ACEITOU!');
+        _handlePassengerResponse('ACCEPTED', updatedOrder, 'Passageiro aceitou! Indo buscar...');
+      }
+      // Passageiro rejeitou
+      else if (updatedOrder.rejectedDriverId != null &&
+          updatedOrder.rejectedDriverId!.contains(FireStoreUtils.getCurrentUid())) {
+        print('❌ PASSAGEIRO REJEITOU');
         _handlePassengerResponse('REJECTED', updatedOrder, 'Passageiro escolheu outro motorista');
       }
     });
 
-    passengerResponseTimeout = Timer(const Duration(minutes: 5), () {
-      if (isWaitingPassengerResponse.value) {
-        _handlePassengerResponse('TIMEOUT', order, 'Tempo esgotado');
-      }
-    });
-  }
-
-  /// Dialog de espera
-  void _showWaitingPassengerDialog(OrderModel order) {
-    if (Get.isDialogOpen == true) return;
-
+    // Mostra dialog de aguardo
     Get.dialog(
       WillPopScope(
         onWillPop: () async => false,
-        child: AlertDialog(
-          title: Row(
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(width: 15),
-              Expanded(
-                child: Text(
-                  'Aguardando Pagamento',
-                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-                ),
+        child: Center(
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              margin: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(15),
               ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('Finalizando o pagamento do passageiro.', style: GoogleFonts.poppins()),
-              const SizedBox(height: 10),
-              Text('Aguarde...', style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14)),
-            ],
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 15),
+                  Text('Aguardando resposta do passageiro...',
+                      style: GoogleFonts.poppins(fontSize: 16)),
+                  const SizedBox(height: 10),
+                  Text('Aguarde...',
+                      style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14)),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -552,7 +488,7 @@ class AutoAssignmentController extends GetxController {
     );
   }
 
-  /// Resposta do passageiro
+  /// Trata resposta do passageiro
   void _handlePassengerResponse(String responseType, OrderModel order, String message) {
     if (!isWaitingPassengerResponse.value) return;
 
@@ -575,7 +511,91 @@ class AutoAssignmentController extends GetxController {
     _clearCurrentAssignment();
   }
 
-  /// Calcula distância
+  /// ====================================================================
+  /// CONTROLE DE STATUS ONLINE/OFFLINE
+  /// ====================================================================
+
+  /// Alterna status online/offline
+  Future<void> toggleOnlineStatus() async {
+    try {
+      bool newStatus = !isOnline.value;
+
+      // ⚠️ VERIFICAÇÃO CRÍTICA #5: Se tentando ficar online, verifica corrida ativa
+      if (newStatus) {
+        bool activeRide = await hasActiveRide();
+        if (activeRide) {
+          ShowToastDialog.showToast(
+              "Complete sua corrida ativa antes de ficar online novamente"
+          );
+          return;
+        }
+      }
+
+      await FireStoreUtils.fireStore
+          .collection(CollectionName.driverUsers)
+          .doc(FireStoreUtils.getCurrentUid())
+          .update({'isOnline': newStatus});
+
+      print('🔄 STATUS ALTERADO PARA: ${newStatus ? "ONLINE" : "OFFLINE"}');
+
+      if (!newStatus) {
+        forceCleanState();
+      } else {
+        // Inicia monitoramento ao ficar online
+        startActiveRideMonitoring();
+      }
+
+    } catch (e) {
+      print('❌ Erro ao alterar status: $e');
+      ShowToastDialog.showToast("Erro ao alterar status");
+    }
+  }
+
+  /// ====================================================================
+  /// UTILITÁRIOS E LIMPEZA
+  /// ====================================================================
+
+  /// Limpa estado atual (modal + atribuição)
+  void _clearCurrentAssignment() {
+    print('🧹 Limpando atribuição atual');
+
+    responseTimer?.cancel();
+
+    if (Get.isDialogOpen == true) {
+      Get.back();
+    }
+
+    currentAssignedRide.value = null;
+    isShowingModal.value = false;
+    isProcessingOrder.value = false;
+  }
+
+  /// Limpa apenas o modal (mantém atribuição)
+  void _clearModalOnly() {
+    print('🧹 Fechando modal (mantendo atribuição)');
+
+    responseTimer?.cancel();
+
+    if (Get.isDialogOpen == true) {
+      Get.back();
+    }
+
+    isShowingModal.value = false;
+    isProcessingOrder.value = false;
+  }
+
+  /// Timer de timeout da oferta
+  void startResponseTimer() {
+    responseTimer?.cancel();
+    responseTimer = Timer(const Duration(seconds: ASSIGNMENT_TIMEOUT), () {
+      print('⏰ TIMEOUT - rejeitando automaticamente');
+      if (isShowingModal.value && currentAssignedRide.value != null) {
+        rejectAssignedRide();
+      }
+    });
+  }
+
+  /// Calcula distância entre dois pontos (Haversine)
   double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
     const double radiusOfEarth = 6371.0;
     double dLat = _toRadians(lat2 - lat1);
@@ -588,31 +608,50 @@ class AutoAssignmentController extends GetxController {
 
   double _toRadians(double degrees) => degrees * (pi / 180);
 
+  /// ====================================================================
   /// MÉTODOS DE DEBUG E COMPATIBILIDADE
+  /// ====================================================================
+
+  /// Verifica corridas disponíveis manualmente
   void checkForAvailableRides() {
     print('🔍 VERIFICAÇÃO MANUAL SOLICITADA');
-    // Stream já está ativo
+    // Stream já está ativo, não precisa fazer nada
   }
 
+  /// Verifica se tem corrida atribuída no momento
   bool get hasCurrentRide => currentAssignedRide.value != null;
+
+  /// Retorna a corrida atual se houver
   OrderModel? get getCurrentRide => currentAssignedRide.value;
 
+  /// Limpa tudo e reseta o estado
   void forceCleanState() {
-    print('🔧 LIMPEZA FORÇADA');
+    print('🔧 LIMPEZA FORÇADA DE ESTADO');
     _clearCurrentAssignment();
     stopOrderListener();
+    activeRideMonitoringSubscription?.cancel();
+    passengerResponseListener?.cancel();
+    passengerResponseTimeout?.cancel();
+    isWaitingPassengerResponse.value = false;
   }
 
+  /// Reinicia o sistema completamente
   void restartSystem() {
-    print('🔄 REINICIANDO SISTEMA');
+    print('🔄 REINICIANDO SISTEMA COMPLETO');
     forceCleanState();
     Future.delayed(const Duration(seconds: 2), () {
       if (isOnline.value && driverModel.value.location != null) {
-        startRealTimeOrderListener();
+        startActiveRideMonitoring();
+        hasActiveRide().then((hasActive) {
+          if (!hasActive) {
+            startRealTimeOrderListener();
+          }
+        });
       }
     });
   }
 
+  /// Retorna status completo do sistema
   Map<String, dynamic> getSystemStatus() {
     var status = {
       'isOnline': isOnline.value,
@@ -620,8 +659,10 @@ class AutoAssignmentController extends GetxController {
       'isProcessingOrder': isProcessingOrder.value,
       'hasCurrentRide': hasCurrentRide,
       'currentRideId': currentAssignedRide.value?.id,
+      'isWaitingPassengerResponse': isWaitingPassengerResponse.value,
       'hasActiveTimer': responseTimer?.isActive ?? false,
       'hasActiveListener': orderStreamSubscription != null,
+      'hasActiveRideMonitor': activeRideMonitoringSubscription != null,
       'driverLocation': driverModel.value.location != null,
       'driverServiceId': driverModel.value.serviceId,
     };
@@ -630,34 +671,18 @@ class AutoAssignmentController extends GetxController {
     return status;
   }
 
-  // Métodos de compatibilidade
+  /// Métodos de compatibilidade com código antigo
   void initDriver() => initializeDriver();
   void stopAutoAssignment() => stopOrderListener();
   void startAutoAssignment() {
     if (isOnline.value && driverModel.value.location != null) {
-      startRealTimeOrderListener();
+      startActiveRideMonitoring();
+      hasActiveRide().then((hasActive) {
+        if (!hasActive) {
+          startRealTimeOrderListener();
+        }
+      });
     }
   }
   OrderModel? getCurrentAssignedRide() => currentAssignedRide.value;
-
-  Future<void> toggleOnlineStatus() async {
-    try {
-      bool newStatus = !isOnline.value;
-
-      await FireStoreUtils.fireStore
-          .collection(CollectionName.driverUsers)
-          .doc(FireStoreUtils.getCurrentUid())
-          .update({'isOnline': newStatus});
-
-      print('🔄 STATUS ALTERADO PARA: ${newStatus ? "ONLINE" : "OFFLINE"}');
-
-      if (!newStatus) {
-        forceCleanState();
-      }
-
-    } catch (e) {
-      print('❌ Erro ao alterar status: $e');
-      ShowToastDialog.showToast("Erro ao alterar status");
-    }
-  }
 }

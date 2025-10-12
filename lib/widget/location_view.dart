@@ -1,4 +1,4 @@
-// lib/widget/location_view.dart - Versão com cores temáticas corretas
+// lib/widget/location_view.dart - Versão com largura total e bordas consistentes
 import 'package:driver/themes/app_colors.dart';
 import 'package:driver/themes/responsive.dart';
 import 'package:driver/utils/DarkThemeProvider.dart';
@@ -17,6 +17,9 @@ class LocationView extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeChange = Provider.of<DarkThemeProvider>(context);
     final isDarkMode = themeChange.getThem();
+
+    // Define uma largura de borda consistente
+    const double consistentBorderWidth = 1.5;
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,11 +76,15 @@ class LocationView extends StatelessWidget {
 
         // Coluna com os textos das localizações
         Expanded(
+          // CORREÇÃO AUXILIAR: Garantir que a Column ocupe o espaço total,
+          // embora os Containers com 'width: double.infinity' já resolvam.
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Localização de origem
               Container(
+                // CORREÇÃO CRÍTICA: Faz o container usar toda a largura do Expanded
+                width: double.infinity,
                 padding: EdgeInsets.symmetric(
                   horizontal: Responsive.width(3, context),
                   vertical: Responsive.height(1.2, context),
@@ -87,7 +94,7 @@ class LocationView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: AppColors.getBorderColor(isDarkMode),
-                    width: 1,
+                    width: consistentBorderWidth,
                   ),
                 ),
                 child: Column(
@@ -123,6 +130,8 @@ class LocationView extends StatelessWidget {
 
               // Localização de destino
               Container(
+                // CORREÇÃO CRÍTICA: Faz o container usar toda a largura do Expanded
+                width: double.infinity,
                 padding: EdgeInsets.symmetric(
                   horizontal: Responsive.width(3, context),
                   vertical: Responsive.height(1.2, context),
@@ -132,7 +141,7 @@ class LocationView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: AppColors.getBorderColor(isDarkMode),
-                    width: 1,
+                    width: consistentBorderWidth,
                   ),
                 ),
                 child: Column(

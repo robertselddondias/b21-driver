@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:driver/constant/constant.dart';
 import 'package:driver/model/order_model.dart';
 import 'package:driver/themes/app_colors.dart';
@@ -92,7 +91,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
     super.dispose();
   }
 
-  /// MÉTODO CORRIGIDO: Countdown que NÃO causa rebuild
+  /// MÉTODO: Countdown que NÃO causa rebuild
   void _startCountdownWithoutRebuild() {
     int secondsRemaining = 60;
 
@@ -149,6 +148,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
   Widget build(BuildContext context) {
     // CORREÇÃO: listen: false para evitar rebuilds desnecessários
     final themeChange = Provider.of<DarkThemeProvider>(context, listen: false);
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Material(
       color: Colors.transparent,
@@ -161,6 +161,8 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
               scale: _scaleAnimation,
               child: Center(
                 child: Container(
+                  // RESPONSIVIDADE: Largura máxima para telas grandes e 90% para celulares
+                  width: screenWidth > 500 ? 500 : screenWidth * 0.9,
                   margin: const EdgeInsets.all(20),
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -182,37 +184,39 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                       ),
                     ],
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Header
-                      _buildHeader(themeChange),
 
-                      const SizedBox(height: 20),
+                  // CORREÇÃO DE OVERFLOW: Permite rolagem em telas pequenas
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
 
-                      // Countdown Timer SEM REBUILD
-                      _buildCountdownTimerFixed(themeChange),
+                        const SizedBox(height: 20),
 
-                      const SizedBox(height: 20),
+                        // Countdown Timer SEM REBUILD
+                        _buildCountdownTimerFixed(themeChange),
 
-                      // Ride Info
-                      _buildRideInfo(themeChange),
+                        const SizedBox(height: 20),
 
-                      const SizedBox(height: 15),
+                        // Ride Info (Otimizada para responsividade horizontal)
+                        _buildRideInfo(themeChange),
 
-                      // User Info
-                      _buildUserInfo(),
+                        const SizedBox(height: 15),
 
-                      const SizedBox(height: 15),
+                        // User Info
+                        _buildUserInfo(),
 
-                      // Location Info
-                      _buildLocationInfo(),
+                        const SizedBox(height: 15),
 
-                      const SizedBox(height: 25),
+                        // Location Info
+                        _buildLocationInfo(),
 
-                      // Action Buttons
-                      _buildActionButtons(themeChange),
-                    ],
+                        const SizedBox(height: 25),
+
+                        // Action Buttons
+                        _buildActionButtons(themeChange),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -223,35 +227,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
     );
   }
 
-  Widget _buildHeader(DarkThemeProvider themeChange) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Nova Corrida',
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: themeChange.getThem() ? Colors.white : Colors.black,
-              ),
-            ),
-            Text(
-              'Corrida ID: #${widget.orderModel.id?.substring(0, 8) ?? 'N/A'}',
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  /// WIDGET CORRIGIDO: Timer que NÃO causa rebuild do widget pai
+  /// WIDGET: Timer que NÃO causa rebuild do widget pai
   Widget _buildCountdownTimerFixed(DarkThemeProvider themeChange) {
     return Column(
       children: [
@@ -280,7 +256,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                 },
               ),
             ),
-            // CORREÇÃO CRÍTICA: ValueListenableBuilder evita rebuild do widget inteiro
+            // ValueListenableBuilder evita rebuild do widget inteiro
             ValueListenableBuilder<int>(
               valueListenable: _secondsNotifier,
               builder: (context, seconds, child) {
@@ -304,7 +280,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
 
         const SizedBox(height: 10),
 
-        // CORREÇÃO: Texto do countdown também usando ValueListenableBuilder
+        // Texto do countdown
         ValueListenableBuilder<int>(
           valueListenable: _secondsNotifier,
           builder: (context, seconds, child) {
@@ -332,6 +308,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
           width: 1,
         ),
       ),
+      // Mantenho a Row e uso Flexible nos itens para dividir o espaço
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -369,30 +346,38 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
   }
 
   Widget _buildInfoItem(String label, String value, IconData icon, DarkThemeProvider themeChange) {
-    return Column(
-      children: [
-        Icon(
-          icon,
-          color: AppColors.primary,
-          size: 20,
-        ),
-        const SizedBox(height: 5),
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 12,
-            color: Colors.grey,
+    // RESPONSIVIDADE HORIZONTAL: Flexible para dividir o espaço da Row
+    return Flexible(
+      child: Column(
+        children: [
+          Icon(
+            icon,
+            color: AppColors.primary,
+            size: 20,
           ),
-        ),
-        Text(
-          value,
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: themeChange.getThem() ? Colors.white : Colors.black,
+          const SizedBox(height: 5),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
           ),
-        ),
-      ],
+          // RESPONSIVIDADE: FittedBox garante que o texto não cause overflow horizontal
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              textAlign: TextAlign.center, // Centraliza o texto
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: themeChange.getThem() ? Colors.white : Colors.black,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -406,6 +391,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
   }
 
   Widget _buildLocationInfo() {
+    // Certifique-se de que LocationView é responsivo internamente (usa Flexible/Expanded em textos)
     return LocationView(
       sourceLocation: widget.orderModel.sourceLocationName ?? 'Local de origem',
       destinationLocation: widget.orderModel.destinationLocationName ?? 'Destino',
@@ -413,6 +399,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
   }
 
   Widget _buildActionButtons(DarkThemeProvider themeChange) {
+    // Os botões já estão responsivos horizontalmente graças aos Expanded
     return Row(
       children: [
         // Botão Rejeitar
@@ -500,11 +487,10 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
   }
 
   int _calculateEstimatedTime() {
-    // Cálculo estimativo simples baseado na distância
     try {
       double distance = double.parse(widget.orderModel.distance ?? '0');
-      // Assumindo velocidade média de 30 km/h no trânsito urbano
-      return (distance * 2).round(); // Multiplicado por 2 para considerar trânsito
+      // Cálculo: 2 minutos por km (incluindo trânsito/paradas)
+      return (distance * 2).round();
     } catch (e) {
       return 60; // Valor padrão
     }
