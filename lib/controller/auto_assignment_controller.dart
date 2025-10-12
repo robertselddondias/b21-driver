@@ -38,7 +38,7 @@ class AutoAssignmentController extends GetxController {
   Timer? passengerResponseTimeout;
 
   // Configurações
-  static const int ASSIGNMENT_TIMEOUT = 15;
+  static const int ASSIGNMENT_TIMEOUT = 60;
   static const double MAX_ASSIGNMENT_RADIUS = 50.0; // AUMENTADO para debug
 
   @override
