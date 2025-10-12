@@ -318,19 +318,12 @@ class DetailsUploadScreen extends StatelessWidget {
       label: 'Número do ${controller.documentModel.value.title}',
       icon: Icons.numbers,
       themeChange: themeChange,
-      child: controller.formatter.value != null
-          ? TextFieldThem.buildTextMask(
+      child: TextFieldThem.buildTextMask(
         context,
         inputMaskFormatter: controller.cnhMaskFormatter,
         hintText: controller.documentModel.value.title.toString(),
         controller: controller.documentNumberController.value,
         keyBoardType: TextInputType.number,
-      )
-          : TextFieldThem.buildTextFiled(
-        context,
-        hintText: "${controller.documentModel.value.title.toString()} número",
-        controller: controller.documentNumberController.value,
-        keyBoardType: TextInputType.text,
       ),
     );
   }

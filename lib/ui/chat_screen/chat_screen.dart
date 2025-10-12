@@ -330,11 +330,11 @@ class _ChatScreensState extends State<ChatScreens> {
                             tag: data.url!.url,
                             child: CachedNetworkImage(
                               imageUrl: data.url!.url,
-                              placeholder: (context, url) => Container(
+                              placeholder: (context, url) => SizedBox(
                                 height: Responsive.height(20, context),
                                 child: Center(child: Constant.loader(context)),
                               ),
-                              errorWidget: (context, url, error) => Container(
+                              errorWidget: (context, url, error) => SizedBox(
                                 height: Responsive.height(20, context),
                                 child: const Icon(Icons.error, color: Colors.red),
                               ),
@@ -439,11 +439,11 @@ class _ChatScreensState extends State<ChatScreens> {
                               tag: data.url!.url,
                               child: CachedNetworkImage(
                                 imageUrl: data.url!.url,
-                                placeholder: (context, url) => Container(
+                                placeholder: (context, url) => SizedBox(
                                   height: Responsive.height(20, context),
                                   child: Center(child: Constant.loader(context)),
                                 ),
-                                errorWidget: (context, url, error) => Container(
+                                errorWidget: (context, url, error) => SizedBox(
                                   height: Responsive.height(20, context),
                                   child: const Icon(Icons.error, color: Colors.red),
                                 ),

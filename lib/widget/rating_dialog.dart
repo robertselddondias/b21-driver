@@ -1,4 +1,3 @@
-// lib/widget/rating_dialog.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:driver/constant/constant.dart';
 import 'package:driver/constant/send_notification.dart';
@@ -72,11 +71,9 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
   /// Finaliza a corrida (tanto para pular quanto para após avaliar)
   Future<void> _completeRide() async {
     try {
-      // Atualizar status da corrida
       widget.orderModel.status = Constant.rideComplete;
       widget.orderModel.paymentStatus = true;
 
-      // Enviar notificação para o passageiro
       await FireStoreUtils.getCustomer(widget.orderModel.userId.toString()).then((value) async {
         if (value != null) {
           if (value.fcmToken != null) {
@@ -95,21 +92,18 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
         }
       });
 
-      // Salvar ordem no Firebase
       await FireStoreUtils.setOrder(widget.orderModel).then((value) {
         if (value == true) {
           ShowToastDialog.showToast("Ride Complete successfully".tr);
-          // Chamar callback se fornecido
           widget.onComplete?.call();
         }
       });
-
     } catch (error) {
       ShowToastDialog.showToast("Erro ao finalizar corrida: $error");
     }
   }
 
-  /// Pular avaliação (finaliza a corrida sem avaliar)
+  /// Pular avaliação
   Future<void> _skipRating() async {
     if (_isLoading) return;
 
@@ -131,7 +125,7 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
     }
   }
 
-  /// Submeter avaliação e finalizar corrida
+  /// Submeter avaliação
   Future<void> _submitRating() async {
     if (_isLoading) return;
 
@@ -140,9 +134,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
     });
 
     try {
-      // Criar modelo de review
       ReviewModel reviewModel = ReviewModel();
-      reviewModel.id = widget.orderModel.id; // Usar o ID da corrida como ID da review
+      reviewModel.id = widget.orderModel.id;
       reviewModel.customerId = widget.orderModel.userId;
       reviewModel.driverId = FireStoreUtils.getCurrentUid();
       reviewModel.rating = _rating.toString();
@@ -150,30 +143,21 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
       reviewModel.type = "customer";
       reviewModel.date = Timestamp.now();
 
-      // Salvar review no Firestore
       bool? reviewSuccess = await FireStoreUtils.setReview(reviewModel);
 
       if (reviewSuccess == true) {
-        // Atualizar as estatísticas do passageiro
         if (_customer != null) {
           UserModel updatedCustomer = _customer!;
-
-          // Recalcular média de avaliações
           double currentSum = double.parse(updatedCustomer.reviewsSum ?? '0.0');
           double currentCount = double.parse(updatedCustomer.reviewsCount ?? '0.0');
-
           updatedCustomer.reviewsSum = (currentSum + _rating).toString();
           updatedCustomer.reviewsCount = (currentCount + 1).toString();
-
           await FireStoreUtils.updateUser(updatedCustomer);
         }
 
         ShowToastDialog.showToast("Review submit successfully".tr);
-
-        // Finalizar corrida após avaliar com sucesso
         await _completeRide();
         Get.back();
-
       } else {
         throw Exception("Falha ao salvar avaliação");
       }
@@ -191,6 +175,12 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     final themeChange = Provider.of<DarkThemeProvider>(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Adaptação de tamanhos baseada na largura da tela
+    final bool isSmallScreen = screenWidth < 360;
+    final bool isLargeScreen = screenWidth > 600;
 
     return ScaleTransition(
       scale: _scaleAnimation,
@@ -199,64 +189,106 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
             ? AppColors.darkContainerBackground
             : AppColors.containerBackground,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(isSmallScreen ? 16 : 20),
         ),
         contentPadding: EdgeInsets.zero,
-        content: Container(
-          width: Responsive.width(85, context),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Header
-              _buildHeader(context, themeChange),
+        insetPadding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen
+              ? Responsive.width(4, context)
+              : Responsive.width(8, context),
+          vertical: isSmallScreen
+              ? Responsive.height(2, context)
+              : Responsive.height(4, context),
+        ),
+        content: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: isLargeScreen ? 500 : screenWidth * 0.92,
+            maxHeight: screenHeight * (isSmallScreen ? 0.85 : 0.80),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Header
+                _buildHeader(context, themeChange, isSmallScreen, isLargeScreen),
 
-              // Conteúdo
-              Padding(
-                padding: EdgeInsets.all(Responsive.width(5, context)),
-                child: Column(
-                  children: [
-                    // Info do passageiro
-                    _buildCustomerInfo(context, themeChange),
+                // Conteúdo
+                Padding(
+                  padding: EdgeInsets.all(
+                    isSmallScreen
+                        ? Responsive.width(4, context)
+                        : Responsive.width(5, context),
+                  ),
+                  child: Column(
+                    children: [
+                      // Info do passageiro
+                      _buildCustomerInfo(context, themeChange, isSmallScreen, isLargeScreen),
 
-                    SizedBox(height: Responsive.height(2, context)),
+                      SizedBox(
+                        height: isSmallScreen
+                            ? Responsive.height(1.5, context)
+                            : Responsive.height(2, context),
+                      ),
 
-                    // Rating
-                    _buildRatingSection(context, themeChange),
+                      // Rating
+                      _buildRatingSection(context, themeChange, isSmallScreen, isLargeScreen),
 
-                    SizedBox(height: Responsive.height(2.5, context)),
+                      SizedBox(
+                        height: isSmallScreen
+                            ? Responsive.height(2, context)
+                            : Responsive.height(2.5, context),
+                      ),
 
-                    // Campo de comentário
-                    _buildCommentField(context, themeChange),
+                      // Campo de comentário
+                      _buildCommentField(context, themeChange, isSmallScreen, isLargeScreen),
 
-                    SizedBox(height: Responsive.height(3, context)),
+                      SizedBox(
+                        height: isSmallScreen
+                            ? Responsive.height(2, context)
+                            : Responsive.height(3, context),
+                      ),
 
-                    // Botões
-                    _buildActionButtons(context, themeChange),
-                  ],
+                      // Botões
+                      _buildActionButtons(context, themeChange, isSmallScreen, isLargeScreen),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildHeader(
+      BuildContext context,
+      DarkThemeProvider themeChange,
+      bool isSmallScreen,
+      bool isLargeScreen,
+      ) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(Responsive.width(5, context)),
+      padding: EdgeInsets.all(
+        isSmallScreen
+            ? Responsive.width(4, context)
+            : Responsive.width(5, context),
+      ),
       decoration: BoxDecoration(
         color: AppColors.primary,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(isSmallScreen ? 16 : 20),
+          topRight: Radius.circular(isSmallScreen ? 16 : 20),
         ),
       ),
       child: Column(
         children: [
           Container(
-            padding: EdgeInsets.all(Responsive.width(3, context)),
+            padding: EdgeInsets.all(
+              isSmallScreen
+                  ? Responsive.width(2.5, context)
+                  : Responsive.width(3, context),
+            ),
             decoration: const BoxDecoration(
               color: Colors.white,
               shape: BoxShape.circle,
@@ -264,22 +296,39 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
             child: Icon(
               Icons.star,
               color: AppColors.primary,
-              size: Responsive.width(8, context),
+              size: isSmallScreen
+                  ? Responsive.width(7, context)
+                  : (isLargeScreen
+                  ? Responsive.width(6, context)
+                  : Responsive.width(8, context)),
             ),
           ),
-          SizedBox(height: Responsive.height(1, context)),
+          SizedBox(
+            height: isSmallScreen
+                ? Responsive.height(0.8, context)
+                : Responsive.height(1, context),
+          ),
           Text(
             'Avaliar Passageiro',
             style: GoogleFonts.poppins(
-              fontSize: Responsive.width(5, context),
+              fontSize: isSmallScreen
+                  ? Responsive.width(4.5, context)
+                  : (isLargeScreen
+                  ? Responsive.width(4, context)
+                  : Responsive.width(5, context)),
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),
+          SizedBox(height: Responsive.height(0.5, context)),
           Text(
             'Como foi sua experiência?',
             style: GoogleFonts.poppins(
-              fontSize: Responsive.width(3.5, context),
+              fontSize: isSmallScreen
+                  ? Responsive.width(3, context)
+                  : (isLargeScreen
+                  ? Responsive.width(2.8, context)
+                  : Responsive.width(3.5, context)),
               color: Colors.white70,
             ),
           ),
@@ -288,9 +337,24 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
     );
   }
 
-  Widget _buildCustomerInfo(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildCustomerInfo(
+      BuildContext context,
+      DarkThemeProvider themeChange,
+      bool isSmallScreen,
+      bool isLargeScreen,
+      ) {
+    final avatarSize = isSmallScreen
+        ? Responsive.width(11, context)
+        : (isLargeScreen
+        ? Responsive.width(10, context)
+        : Responsive.width(12, context));
+
     return Container(
-      padding: EdgeInsets.all(Responsive.width(4, context)),
+      padding: EdgeInsets.all(
+        isSmallScreen
+            ? Responsive.width(3, context)
+            : Responsive.width(4, context),
+      ),
       decoration: BoxDecoration(
         color: themeChange.getThem()
             ? AppColors.darkTextField
@@ -306,8 +370,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
       child: Row(
         children: [
           Container(
-            width: Responsive.width(12, context),
-            height: Responsive.width(12, context),
+            width: avatarSize,
+            height: avatarSize,
             decoration: BoxDecoration(
               color: AppColors.primary.withOpacity(0.1),
               shape: BoxShape.circle,
@@ -319,10 +383,16 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
             child: Icon(
               Icons.person,
               color: AppColors.primary,
-              size: Responsive.width(6, context),
+              size: isSmallScreen
+                  ? Responsive.width(5.5, context)
+                  : Responsive.width(6, context),
             ),
           ),
-          SizedBox(width: Responsive.width(3, context)),
+          SizedBox(
+            width: isSmallScreen
+                ? Responsive.width(2.5, context)
+                : Responsive.width(3, context),
+          ),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -330,15 +400,26 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
                 Text(
                   _customer?.fullName ?? 'Passageiro',
                   style: GoogleFonts.poppins(
-                    fontSize: Responsive.width(4, context),
+                    fontSize: isSmallScreen
+                        ? Responsive.width(3.5, context)
+                        : (isLargeScreen
+                        ? Responsive.width(3.2, context)
+                        : Responsive.width(4, context)),
                     fontWeight: FontWeight.w600,
                     color: themeChange.getThem() ? Colors.white : Colors.black,
                   ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
+                SizedBox(height: Responsive.height(0.3, context)),
                 Text(
                   'ID: ${widget.orderModel.id?.substring(0, 8) ?? ''}...',
                   style: GoogleFonts.poppins(
-                    fontSize: Responsive.width(3, context),
+                    fontSize: isSmallScreen
+                        ? Responsive.width(2.6, context)
+                        : (isLargeScreen
+                        ? Responsive.width(2.4, context)
+                        : Responsive.width(3, context)),
                     color: AppColors.subTitleColor,
                   ),
                 ),
@@ -350,25 +431,47 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
     );
   }
 
-  Widget _buildRatingSection(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildRatingSection(
+      BuildContext context,
+      DarkThemeProvider themeChange,
+      bool isSmallScreen,
+      bool isLargeScreen,
+      ) {
+    final starSize = isSmallScreen
+        ? Responsive.width(8.5, context)
+        : (isLargeScreen
+        ? Responsive.width(7, context)
+        : Responsive.width(10, context));
+
     return Column(
       children: [
         Text(
           'Dê sua avaliação',
           style: GoogleFonts.poppins(
-            fontSize: Responsive.width(4, context),
+            fontSize: isSmallScreen
+                ? Responsive.width(3.5, context)
+                : (isLargeScreen
+                ? Responsive.width(3.2, context)
+                : Responsive.width(4, context)),
             fontWeight: FontWeight.w600,
             color: themeChange.getThem() ? Colors.white : Colors.black,
           ),
         ),
-        SizedBox(height: Responsive.height(1.5, context)),
+        SizedBox(
+          height: isSmallScreen
+              ? Responsive.height(1.2, context)
+              : Responsive.height(1.5, context),
+        ),
         RatingBar.builder(
           initialRating: _rating,
           minRating: 1,
           direction: Axis.horizontal,
           allowHalfRating: false,
           itemCount: 5,
-          itemSize: Responsive.width(10, context),
+          itemSize: starSize,
+          itemPadding: EdgeInsets.symmetric(
+            horizontal: isSmallScreen ? 2.0 : 4.0,
+          ),
           itemBuilder: (context, _) => const Icon(
             Icons.star,
             color: AppColors.ratingColour,
@@ -379,11 +482,19 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
             });
           },
         ),
-        SizedBox(height: Responsive.height(1, context)),
+        SizedBox(
+          height: isSmallScreen
+              ? Responsive.height(0.8, context)
+              : Responsive.height(1, context),
+        ),
         Text(
           _getRatingText(_rating),
           style: GoogleFonts.poppins(
-            fontSize: Responsive.width(3.5, context),
+            fontSize: isSmallScreen
+                ? Responsive.width(3, context)
+                : (isLargeScreen
+                ? Responsive.width(2.8, context)
+                : Responsive.width(3.5, context)),
             color: AppColors.subTitleColor,
             fontWeight: FontWeight.w500,
           ),
@@ -392,19 +503,32 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
     );
   }
 
-  Widget _buildCommentField(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildCommentField(
+      BuildContext context,
+      DarkThemeProvider themeChange,
+      bool isSmallScreen,
+      bool isLargeScreen,
+      ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Comentário (opcional)',
           style: GoogleFonts.poppins(
-            fontSize: Responsive.width(4, context),
+            fontSize: isSmallScreen
+                ? Responsive.width(3.5, context)
+                : (isLargeScreen
+                ? Responsive.width(3.2, context)
+                : Responsive.width(4, context)),
             fontWeight: FontWeight.w600,
             color: themeChange.getThem() ? Colors.white : Colors.black,
           ),
         ),
-        SizedBox(height: Responsive.height(1, context)),
+        SizedBox(
+          height: isSmallScreen
+              ? Responsive.height(0.8, context)
+              : Responsive.height(1, context),
+        ),
         Container(
           decoration: BoxDecoration(
             color: themeChange.getThem()
@@ -420,19 +544,38 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
           ),
           child: TextField(
             controller: _commentController,
-            maxLines: 3,
+            maxLines: isSmallScreen ? 2 : 3,
+            maxLength: 200,
             decoration: InputDecoration(
               hintText: "Como foi sua experiência com o passageiro?",
               hintStyle: GoogleFonts.poppins(
                 color: AppColors.subTitleColor,
-                fontSize: Responsive.width(3.5, context),
+                fontSize: isSmallScreen
+                    ? Responsive.width(3, context)
+                    : (isLargeScreen
+                    ? Responsive.width(2.8, context)
+                    : Responsive.width(3.5, context)),
               ),
               border: InputBorder.none,
-              contentPadding: EdgeInsets.all(Responsive.width(4, context)),
+              contentPadding: EdgeInsets.all(
+                isSmallScreen
+                    ? Responsive.width(3, context)
+                    : Responsive.width(4, context),
+              ),
+              counterStyle: GoogleFonts.poppins(
+                fontSize: isSmallScreen
+                    ? Responsive.width(2.5, context)
+                    : Responsive.width(2.8, context),
+                color: AppColors.subTitleColor,
+              ),
             ),
             style: GoogleFonts.poppins(
               color: themeChange.getThem() ? Colors.white : Colors.black,
-              fontSize: Responsive.width(3.8, context),
+              fontSize: isSmallScreen
+                  ? Responsive.width(3.2, context)
+                  : (isLargeScreen
+                  ? Responsive.width(3, context)
+                  : Responsive.width(3.8, context)),
             ),
           ),
         ),
@@ -440,26 +583,45 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildActionButtons(
+      BuildContext context,
+      DarkThemeProvider themeChange,
+      bool isSmallScreen,
+      bool isLargeScreen,
+      ) {
+    final buttonHeight = isSmallScreen
+        ? Responsive.height(5.5, context)
+        : Responsive.height(6, context);
+
+    final fontSize = isSmallScreen
+        ? Responsive.width(3.5, context)
+        : (isLargeScreen
+        ? Responsive.width(3.2, context)
+        : Responsive.width(4, context));
+
     return Row(
       children: [
-        // Botão Pular (que agora finaliza a corrida)
+        // Botão Pular
         Expanded(
           child: Container(
-            height: Responsive.height(6, context),
+            height: buttonHeight,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: AppColors.subTitleColor,
-                width: 1,
+                width: 1.5,
               ),
             ),
             child: TextButton(
               onPressed: _isLoading ? null : _skipRating,
               child: _isLoading
                   ? SizedBox(
-                width: Responsive.width(4, context),
-                height: Responsive.width(4, context),
+                width: isSmallScreen
+                    ? Responsive.width(3.5, context)
+                    : Responsive.width(4, context),
+                height: isSmallScreen
+                    ? Responsive.width(3.5, context)
+                    : Responsive.width(4, context),
                 child: const CircularProgressIndicator(
                   color: AppColors.subTitleColor,
                   strokeWidth: 2,
@@ -468,7 +630,7 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
                   : Text(
                 'Pular',
                 style: GoogleFonts.poppins(
-                  fontSize: Responsive.width(4, context),
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w600,
                   color: AppColors.subTitleColor,
                 ),
@@ -476,12 +638,16 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
             ),
           ),
         ),
-        SizedBox(width: Responsive.width(3, context)),
-        // Botão Avaliar (que avalia E finaliza a corrida)
+        SizedBox(
+          width: isSmallScreen
+              ? Responsive.width(2.5, context)
+              : Responsive.width(3, context),
+        ),
+        // Botão Avaliar
         Expanded(
           flex: 2,
           child: Container(
-            height: Responsive.height(6, context),
+            height: buttonHeight,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               gradient: const LinearGradient(
@@ -499,8 +665,12 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
               onPressed: _isLoading ? null : _submitRating,
               child: _isLoading
                   ? SizedBox(
-                width: Responsive.width(5, context),
-                height: Responsive.width(5, context),
+                width: isSmallScreen
+                    ? Responsive.width(4, context)
+                    : Responsive.width(5, context),
+                height: isSmallScreen
+                    ? Responsive.width(4, context)
+                    : Responsive.width(5, context),
                 child: const CircularProgressIndicator(
                   color: Colors.white,
                   strokeWidth: 2,
@@ -509,7 +679,7 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
                   : Text(
                 'Avaliar',
                 style: GoogleFonts.poppins(
-                  fontSize: Responsive.width(4, context),
+                  fontSize: fontSize,
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
                 ),

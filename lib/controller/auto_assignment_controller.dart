@@ -121,7 +121,7 @@ class AutoAssignmentController extends GetxController {
 
       // LOGS DETALHADOS
       for (var doc in snapshot.docs) {
-        var data = doc.data() as Map<String, dynamic>;
+        var data = doc.data();
         print('📄 Corrida: ${doc.id}');
         print('   Status: ${data['status']}');
         print('   ServiceId: ${data['serviceId']}');

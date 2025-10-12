@@ -6,13 +6,11 @@ import 'package:driver/constant/constant.dart';
 import 'package:driver/constant/send_notification.dart';
 import 'package:driver/constant/show_toast_dialog.dart';
 import 'package:driver/controller/active_order_controller.dart';
-import 'package:driver/model/driver_user_model.dart';
 import 'package:driver/model/order_model.dart';
 import 'package:driver/model/user_model.dart';
 import 'package:driver/themes/app_colors.dart';
 import 'package:driver/themes/responsive.dart';
 import 'package:driver/ui/chat_screen/chat_screen.dart';
-import 'package:driver/ui/home_screens/live_tracking_screen.dart';
 import 'package:driver/utils/DarkThemeProvider.dart';
 import 'package:driver/utils/fire_store_utils.dart';
 import 'package:driver/utils/utils.dart';
@@ -403,7 +401,7 @@ class ActiveOrderScreen extends StatelessWidget {
                   child: Text(
                     orderModel.status == Constant.rideInProgress
                         ? "Finalizar Corrida"
-                        : "Buscar Passageiro",
+                        : "Embarque Passageiro",
                     style: GoogleFonts.poppins(
                       fontSize: Responsive.width(3.8, context),
                       fontWeight: FontWeight.w600,
@@ -438,33 +436,6 @@ class ActiveOrderScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
                 child: Icon(
                   Icons.chat,
-                  color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
-                  size: Responsive.width(5, context),
-                ),
-              ),
-            ),
-          ),
-
-          SizedBox(width: Responsive.width(2, context)),
-
-          // Botão Call
-          Container(
-            width: Responsive.width(12, context),
-            height: Responsive.height(6, context),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
-                width: 1.5,
-              ),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: InkWell(
-                onTap: () => _makeCall(orderModel),
-                borderRadius: BorderRadius.circular(8),
-                child: Icon(
-                  Icons.call,
                   color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
                   size: Responsive.width(5, context),
                 ),

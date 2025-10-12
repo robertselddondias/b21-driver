@@ -376,7 +376,7 @@ class VehicleInformationScreen extends StatelessWidget {
                           fit: BoxFit.contain,
                           height: Responsive.height(6, context),
                           width: Responsive.width(12, context),
-                          placeholder: (context, url) => Container(
+                          placeholder: (context, url) => SizedBox(
                             width: Responsive.width(12, context),
                             height: Responsive.height(6, context),
                             child: Center(
@@ -473,7 +473,7 @@ class VehicleInformationScreen extends StatelessWidget {
       dropdownColor: themeChange.getThem()
           ? AppColors.darkContainerBackground
           : AppColors.containerBackground,
-      value: value,
+      initialValue: value,
       onChanged: onChanged,
       hint: Text(
         hint,

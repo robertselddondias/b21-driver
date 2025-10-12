@@ -480,7 +480,7 @@ class CompleteOrderScreen extends StatelessWidget {
                   ),
                   _buildDivider(context, themeChange),
                 ],
-              )).toList(),
+              )),
             ],
 
             // Desconto

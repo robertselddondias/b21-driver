@@ -215,7 +215,7 @@ class WalletScreen extends StatelessWidget {
                                                     ),
                                                   ),
                                                   Text(
-                                                    "${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? "(-" : "+"}${Constant.amountShow(amount: safeString(walletTransactionModel.amount?.toString()?.replaceAll("-", ""), defaultValue: "0"))}${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? ")" : ""}",
+                                                    "${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? "(-" : "+"}${Constant.amountShow(amount: safeString(walletTransactionModel.amount?.toString().replaceAll("-", ""), defaultValue: "0"))}${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? ")" : ""}",
                                                     style: GoogleFonts.poppins(
                                                         fontWeight: FontWeight.w600,
                                                         fontSize: Responsive.width(3.5, context),
@@ -558,7 +558,7 @@ class WalletScreen extends StatelessWidget {
                                 height: Responsive.height(0.6, context),
                               ),
                               Text(
-                                "${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? "(-" : "+"}${Constant.amountShow(amount: safeString(walletTransactionModel.amount?.toString()?.replaceAll("-", ""), defaultValue: "0"))}${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? ")" : ""}",
+                                "${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? "(-" : "+"}${Constant.amountShow(amount: safeString(walletTransactionModel.amount?.toString().replaceAll("-", ""), defaultValue: "0"))}${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? ")" : ""}",
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w600,
                                   fontSize: Responsive.width(3.8, context),

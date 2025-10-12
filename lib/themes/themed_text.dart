@@ -19,7 +19,7 @@ class ThemedText extends StatelessWidget {
 
   const ThemedText(
       this.text, {
-        Key? key,
+        super.key,
         this.fontSize,
         this.fontWeight,
         this.color,
@@ -28,7 +28,7 @@ class ThemedText extends StatelessWidget {
         this.maxLines,
         this.overflow,
         this.style,
-      }) : super(key: key);
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -68,11 +68,11 @@ class ThemedHeading extends StatelessWidget {
 
   const ThemedHeading(
       this.text, {
-        Key? key,
+        super.key,
         this.fontSize = 18,
         this.textAlign,
         this.maxLines,
-      }) : super(key: key);
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -94,11 +94,11 @@ class ThemedSubtitle extends StatelessWidget {
 
   const ThemedSubtitle(
       this.text, {
-        Key? key,
+        super.key,
         this.fontSize = 14,
         this.textAlign,
         this.maxLines,
-      }) : super(key: key);
+      });
 
   @override
   Widget build(BuildContext context) {
@@ -123,13 +123,13 @@ class ThemedBody extends StatelessWidget {
 
   const ThemedBody(
       this.text, {
-        Key? key,
+        super.key,
         this.fontSize = 16,
         this.fontWeight = FontWeight.w400,
         this.textAlign,
         this.maxLines,
         this.overflow,
-      }) : super(key: key);
+      });
 
   @override
   Widget build(BuildContext context) {
