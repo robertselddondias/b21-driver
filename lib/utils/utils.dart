@@ -73,8 +73,8 @@ class Utils {
   }
 
 
-  static redirectMap({required String name, required double latitude, required double longLatitude}) async {
-    if (Constant.mapType == "google") {
+  static redirectMap({required String mapType, required String name, required double latitude, required double longLatitude}) async {
+    if (mapType == "google") {
       bool? isAvailable = await MapLauncher.isMapAvailable(MapType.google);
       if (isAvailable == true) {
         await MapLauncher.showDirections(
@@ -86,7 +86,7 @@ class Utils {
       } else {
         ShowToastDialog.showToast("Google map is not installed");
       }
-    } else if (Constant.mapType == "googleGo") {
+    } else if (mapType == "googleGo") {
       bool? isAvailable = await MapLauncher.isMapAvailable(MapType.googleGo);
       if (isAvailable == true) {
         await MapLauncher.showDirections(
@@ -98,7 +98,7 @@ class Utils {
       } else {
         ShowToastDialog.showToast("Google Go map is not installed");
       }
-    } else if (Constant.mapType == "waze") {
+    } else if (mapType == "waze") {
       bool? isAvailable = await MapLauncher.isMapAvailable(MapType.waze);
       if (isAvailable == true) {
         await MapLauncher.showDirections(
@@ -110,7 +110,7 @@ class Utils {
       } else {
         ShowToastDialog.showToast("Waze is not installed");
       }
-    } else if (Constant.mapType == "mapswithme") {
+    } else if (mapType == "mapswithme") {
       bool? isAvailable = await MapLauncher.isMapAvailable(MapType.mapswithme);
       if (isAvailable == true) {
         await MapLauncher.showDirections(

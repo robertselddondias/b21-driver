@@ -557,16 +557,29 @@ class ActiveOrderScreen extends StatelessWidget {
                 // Opção Mapa Local
                 _buildMapOption(
                   context,
-                  'Mapa Local',
-                  'Usar navegação integrada no app',
+                  'Google Maps',
+                  'Abrir no Google Maps',
                   Icons.map,
                   themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
                       () {
                     Navigator.pop(context);
-                    Get.to(const LiveTrackingScreen(), arguments: {
-                      "orderModel": orderModel,
-                      "type": "orderModel",
-                    });
+                    if (orderModel.status == Constant.rideInProgress) {
+                      // Se a corrida está em progresso, navegue para o destino
+                      Utils.redirectMap(
+                        mapType: "google",
+                        latitude: orderModel.destinationLocationLAtLng!.latitude!,
+                        longLatitude: orderModel.destinationLocationLAtLng!.longitude!,
+                        name: orderModel.destinationLocationName.toString(),
+                      );
+                    } else {
+                      // Se a corrida está ativa (aguardando), navegue para a origem
+                      Utils.redirectMap(
+                        mapType: "google",
+                        latitude: orderModel.sourceLocationLAtLng!.latitude!,
+                        longLatitude: orderModel.sourceLocationLAtLng!.longitude!,
+                        name: orderModel.sourceLocationName.toString(),
+                      );
+                    }
                   },
                   themeChange,
                 ),
@@ -584,12 +597,14 @@ class ActiveOrderScreen extends StatelessWidget {
                     Navigator.pop(context);
                     if (orderModel.status == Constant.rideInProgress) {
                       Utils.redirectMap(
+                        mapType: "waze",
                         latitude: orderModel.destinationLocationLAtLng!.latitude!,
                         longLatitude: orderModel.destinationLocationLAtLng!.longitude!,
                         name: orderModel.destinationLocationName.toString(),
                       );
                     } else {
                       Utils.redirectMap(
+                        mapType: "waze",
                         latitude: orderModel.sourceLocationLAtLng!.latitude!,
                         longLatitude: orderModel.sourceLocationLAtLng!.longitude!,
                         name: orderModel.sourceLocationName.toString(),

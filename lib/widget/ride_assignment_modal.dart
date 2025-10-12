@@ -1,4 +1,3 @@
-// lib/widget/ride_assignment_modal.dart - VERSÃO SIMPLES E FUNCIONAL
 import 'dart:async';
 
 import 'package:driver/constant/constant.dart';
@@ -38,7 +37,6 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
   Timer? _countdownTimer;
   bool _hasResponded = false;
 
-  // CORREÇÃO CRÍTICA: ValueNotifier para evitar rebuild do widget
   late ValueNotifier<int> _secondsNotifier;
   late ValueNotifier<bool> _isUrgentNotifier;
 
@@ -48,7 +46,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
     print('📱 Inicializando RideAssignmentModal para corrida ${widget.orderModel.id}');
 
     // Inicializa notifiers
-    _secondsNotifier = ValueNotifier<int>(15);
+    _secondsNotifier = ValueNotifier<int>(60);
     _isUrgentNotifier = ValueNotifier<bool>(false);
 
     // Configuração das animações
@@ -58,7 +56,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
     );
 
     _progressController = AnimationController(
-      duration: const Duration(seconds: 15),
+      duration: const Duration(seconds: 60),
       vsync: this,
     );
 
@@ -96,7 +94,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
 
   /// MÉTODO CORRIGIDO: Countdown que NÃO causa rebuild
   void _startCountdownWithoutRebuild() {
-    int secondsRemaining = 15;
+    int secondsRemaining = 60;
 
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_hasResponded) {
@@ -107,11 +105,8 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
       if (secondsRemaining > 0) {
         secondsRemaining--;
 
-        // CORREÇÃO: Atualiza apenas os ValueNotifiers (sem setState)
         _secondsNotifier.value = secondsRemaining;
         _isUrgentNotifier.value = secondsRemaining <= 5;
-
-        // NÃO CHAMA setState() - Esta era a causa do refresh!
 
       } else {
         timer.cancel();
@@ -511,7 +506,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
       // Assumindo velocidade média de 30 km/h no trânsito urbano
       return (distance * 2).round(); // Multiplicado por 2 para considerar trânsito
     } catch (e) {
-      return 15; // Valor padrão
+      return 60; // Valor padrão
     }
   }
 }

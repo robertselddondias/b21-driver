@@ -86,7 +86,7 @@ class UserView extends StatelessWidget {
                           children: [
                             Text(
                                 "Usuário",
-                                style: GoogleFonts.poppins(fontWeight: FontWeight.w600)
+                                style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: Colors.white)
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -95,7 +95,7 @@ class UserView extends StatelessWidget {
                                   flex: 2,
                                   child: Text(
                                     _safeAmountShow(amount),
-                                    style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                                    style: GoogleFonts.poppins(fontWeight: FontWeight.w500, color: Colors.white),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
@@ -113,8 +113,9 @@ class UserView extends StatelessWidget {
                                       Expanded(
                                         child: Text(
                                           _safeDistanceShow(distance, distanceType),
-                                          style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                                          style: GoogleFonts.poppins(fontWeight: FontWeight.w500, color: Colors.white),
                                           overflow: TextOverflow.ellipsis,
+
                                         ),
                                       ),
                                     ],
@@ -178,7 +179,7 @@ class UserView extends StatelessWidget {
                               userModel.fullName?.isNotEmpty == true
                                   ? userModel.fullName!
                                   : "Usuário",
-                              style: GoogleFonts.poppins(fontWeight: FontWeight.w600)
+                              style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: Colors.white)
                           ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -187,7 +188,7 @@ class UserView extends StatelessWidget {
                                 flex: 2,
                                 child: Text(
                                   _safeAmountShow(amount),
-                                  style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                                  style: GoogleFonts.poppins(fontWeight: FontWeight.w500, color: Colors.white),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
@@ -205,7 +206,7 @@ class UserView extends StatelessWidget {
                                     Expanded(
                                       child: Text(
                                         _safeDistanceShow(distance, distanceType),
-                                        style: GoogleFonts.poppins(fontWeight: FontWeight.w500),
+                                        style: GoogleFonts.poppins(fontWeight: FontWeight.w500, color: Colors.white),
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
