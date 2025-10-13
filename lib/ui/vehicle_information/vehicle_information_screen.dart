@@ -95,6 +95,7 @@ class VehicleInformationScreen extends StatelessWidget {
                                 label: 'Placa do Veículo',
                                 child: TextFieldThem.buildTextMask(
                                   context,
+                                  enable: controller.isEditable.value,
                                   hintText: 'Placa do Veículo'.tr,
                                   controller: controller.vehicleNumberController.value,
                                   inputMaskFormatter: controller.maskFormatter,
@@ -110,19 +111,19 @@ class VehicleInformationScreen extends StatelessWidget {
                                 label: 'Data de Registro',
                                 child: InkWell(
                                   onTap: () async {
-                                    await Constant.selectDate(context).then((value) {
+                                    controller.isEditable.value ? await Constant.selectDate(context).then((value) {
                                       if (value != null) {
                                         controller.selectedDate.value = value;
                                         controller.registrationDateController.value.text =
                                             DateFormat("dd/MM/yyyy").format(value);
                                       }
-                                    });
+                                    }) : null;
                                   },
                                   child: TextFieldThem.buildTextFiled(
                                     context,
                                     hintText: 'Registration Date'.tr,
+                                    enable: controller.isEditable.value,
                                     controller: controller.registrationDateController.value,
-                                    enable: false,
                                   ),
                                 ),
                               ),
@@ -142,9 +143,9 @@ class VehicleInformationScreen extends StatelessWidget {
                                       : controller.selectedVehicle.value,
                                   hint: "Select vehicle type".tr,
                                   items: controller.vehicleList,
-                                  onChanged: (value) {
+                                  onChanged: controller.isEditable.value ? (value) {
                                     controller.selectedVehicle.value = value!;
-                                  },
+                                  } : null,
                                   itemBuilder: (item) => Text(item.name.toString()),
                                 ),
                               ),
@@ -164,9 +165,9 @@ class VehicleInformationScreen extends StatelessWidget {
                                       : controller.selectedColor.value,
                                   hint: "Select vehicle color".tr,
                                   items: controller.carColorList,
-                                  onChanged: (value) {
+                                  onChanged: controller.isEditable.value ? (value) {
                                     controller.selectedColor.value = value!;
-                                  },
+                                  } : null,
                                   itemBuilder: (item) => Text(item.toString()),
                                 ),
                               ),
@@ -186,9 +187,9 @@ class VehicleInformationScreen extends StatelessWidget {
                                       : controller.seatsController.value.text,
                                   hint: "How Many Seats".tr,
                                   items: controller.sheetList,
-                                  onChanged: (value) {
+                                  onChanged: controller.isEditable.value ? (value) {
                                     controller.seatsController.value.text = value!;
-                                  },
+                                  } : null,
                                   itemBuilder: (item) => Text(item.toString()),
                                 ),
                               ),
@@ -202,33 +203,33 @@ class VehicleInformationScreen extends StatelessWidget {
                                 label: 'Zona de Atuação',
                                 child: InkWell(
                                   onTap: () {
-                                    _showZoneDialog(context, controller, themeChange);
+                                    controller.isEditable.value ? _showZoneDialog(context, controller, themeChange) : null;
                                   },
                                   child: TextFieldThem.buildTextFiled(
                                     context,
                                     hintText: 'Select Zone'.tr,
                                     controller: controller.zoneNameController.value,
-                                    enable: false,
+                                    enable: controller.isEditable.value,
                                   ),
                                 ),
                               ),
 
                               SizedBox(height: Responsive.height(3, context)),
 
-                              // Driver Rules Section
-                              _buildSectionTitle(context, themeChange, "Select Your Rules".tr),
-                              SizedBox(height: Responsive.height(1, context)),
                               _buildDriverRules(context, controller, themeChange),
 
                               SizedBox(height: Responsive.height(3, context)),
 
                               // Save Button
-                              Center(
-                                child: ButtonThem.buildButton(
-                                  context,
-                                  title: "Save".tr,
-                                  btnWidthRatio: 0.8,
-                                  onPress: () => _handleSave(controller),
+                              Visibility(
+                                visible: controller.isEditable.value,
+                                child: Center(
+                                  child: ButtonThem.buildButton(
+                                    context,
+                                    title: "Save".tr,
+                                    btnWidthRatio: 0.8,
+                                    onPress: () => _handleSave(controller),
+                                  ),
                                 ),
                               ),
 
@@ -428,24 +429,42 @@ class VehicleInformationScreen extends StatelessWidget {
         required T? value,
         required String hint,
         required List<T> items,
-        required void Function(T?) onChanged,
+        required void Function(T?)? onChanged, // Aceita null para desabilitar
         required Widget Function(T) itemBuilder,
       }) {
+
+    // Verifica se o campo está habilitado (onChanged é o controle principal)
+    final bool isEnabled = onChanged != null;
+
+    // Define a cor de fundo: esmaecida se desabilitado
+    final Color fillColor = isEnabled
+        ? (themeChange.getThem() ? AppColors.darkTextField : AppColors.textField)
+        : (themeChange.getThem() ? AppColors.darkTextField.withOpacity(0.5) : AppColors.textField.withOpacity(0.5));
+
+    // Define a cor do texto do valor selecionado: cinza se desabilitado
+    final Color valueTextColor = isEnabled
+        ? (themeChange.getThem() ? Colors.white : Colors.black87)
+        : (themeChange.getThem() ? Colors.white54 : Colors.black54);
+
     return DropdownButtonFormField<T>(
+      // 1. A cor do estilo precisa ser a cor do valor selecionado (valueTextColor)
       style: GoogleFonts.poppins(
         fontSize: Responsive.width(3.5, context),
-        color: themeChange.getThem() ? Colors.white : Colors.black87,
+        color: valueTextColor, // Usa a cor do texto definida
         fontWeight: FontWeight.w500,
       ),
+
+      // 2. A propriedade onChanged controla o estado 'enabled'
+      onChanged: onChanged,
+
       decoration: InputDecoration(
         filled: true,
-        fillColor: themeChange.getThem()
-            ? AppColors.darkTextField
-            : AppColors.textField,
+        fillColor: fillColor, // Usa a cor de fundo definida
         contentPadding: EdgeInsets.symmetric(
           horizontal: Responsive.width(3, context),
           vertical: Responsive.height(1.2, context),
         ),
+        // A propriedade enabledBorder e border são mantidas para o visual padrão
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(
@@ -474,12 +493,13 @@ class VehicleInformationScreen extends StatelessWidget {
           ? AppColors.darkContainerBackground
           : AppColors.containerBackground,
       initialValue: value,
-      onChanged: onChanged,
+
       hint: Text(
         hint,
         style: GoogleFonts.poppins(
           fontSize: Responsive.width(3.5, context),
-          color: AppColors.subTitleColor,
+          // O hintColor geralmente permanece o mesmo ou é ligeiramente esmaecido.
+          color: AppColors.subTitleColor.withOpacity(isEnabled ? 1.0 : 0.6),
           fontWeight: FontWeight.w400,
         ),
       ),
@@ -487,6 +507,7 @@ class VehicleInformationScreen extends StatelessWidget {
         return DropdownMenuItem<T>(
           value: item,
           child: DefaultTextStyle(
+            // O estilo do DropdownMenuItem é sempre ativo
             style: GoogleFonts.poppins(
               fontSize: Responsive.width(3.5, context),
               color: themeChange.getThem() ? Colors.white : Colors.black87,

@@ -90,29 +90,6 @@ class WalletScreen extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Transform.translate(
-                          offset: const Offset(0, -22),
-                          child: MaterialButton(
-                            onPressed: () {
-                              paymentMethodDialog(context, controller);
-                            },
-                            height: Responsive.height(5, context),
-                            elevation: 0.5,
-                            minWidth: Responsive.width(30, context),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                            color: themeChange.getThem() ? AppColors.darkModePrimary : Colors.white,
-                            child: Text(
-                              "Topup Wallet".tr.toUpperCase(),
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.poppins(
-                                fontWeight: FontWeight.w600,
-                                fontSize: Responsive.width(3, context),
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),

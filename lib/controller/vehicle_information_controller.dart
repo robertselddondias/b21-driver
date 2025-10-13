@@ -1,3 +1,4 @@
+
 import 'package:driver/model/driver_rules_model.dart';
 import 'package:driver/model/driver_user_model.dart';
 import 'package:driver/model/service_model.dart';
@@ -17,6 +18,7 @@ class VehicleInformationController extends GetxController {
   Rx<TextEditingController> driverRulesController = TextEditingController().obs;
   Rx<TextEditingController> zoneNameController = TextEditingController().obs;
   Rx<DateTime?> selectedDate = DateTime.now().obs;
+  RxBool isEditable = true.obs;
 
   RxBool isLoading = true.obs;
 
@@ -74,10 +76,11 @@ class VehicleInformationController extends GetxController {
         registrationDateController.value.text = DateFormat("dd/MM/yyyy").format(selectedDate.value!);
         selectedColor.value = driverModel.value.vehicleInformation!.vehicleColor.toString();
         seatsController.value.text = driverModel.value.vehicleInformation!.seats ?? "2";
+      } else {
+        isEditable.value = false;
       }
 
       if(driverModel.value.zoneIds != null){
-        print("==========>");
         print(driverModel.value.zoneIds.toString());
         for (var element in driverModel.value.zoneIds!) {
           List list = zoneList.where((p0) => p0.id == element).toList();

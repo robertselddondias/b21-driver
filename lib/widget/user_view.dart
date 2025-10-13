@@ -291,7 +291,7 @@ class UserView extends StatelessWidget {
                       imageUrl: profilePic,
                       fit: BoxFit.cover,
                       placeholder: (context, url) => Container(
-                        color: theme.colorScheme.surfaceVariant,
+                        color: theme.colorScheme.surfaceContainerHighest,
                         child: Center(
                           child: SizedBox(
                             width: 20,
@@ -304,7 +304,7 @@ class UserView extends StatelessWidget {
                         ),
                       ),
                       errorWidget: (context, url, error) => Container(
-                        color: theme.colorScheme.surfaceVariant,
+                        color: theme.colorScheme.surfaceContainerHighest,
                         child: Icon(
                           Icons.person,
                           size: avatarSize * 0.5,

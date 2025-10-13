@@ -473,11 +473,9 @@ class AutoAssignmentController extends GetxController {
                 children: [
                   const CircularProgressIndicator(),
                   const SizedBox(height: 15),
-                  Text('Aguardando resposta do passageiro...',
-                      style: GoogleFonts.poppins(fontSize: 16)),
                   const SizedBox(height: 10),
                   Text('Aguarde...',
-                      style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14)),
+                      style: GoogleFonts.poppins(color: Colors.white24, fontSize: 14)),
                 ],
               ),
             ),
