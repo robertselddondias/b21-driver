@@ -1,3 +1,4 @@
+// lib/ui/online_registration/details_upload_screen.dart - VERSÃO CORRIGIDA
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -31,7 +32,7 @@ class DetailsUploadScreen extends StatelessWidget {
           appBar: _buildAppBar(context, controller, themeChange),
           body: Column(
             children: [
-              SizedBox(height: Responsive.height(3, context)),
+              SizedBox(height: Responsive.height(2, context)),
               Expanded(
                 child: _buildMainContent(context, controller, themeChange),
               ),
@@ -42,8 +43,13 @@ class DetailsUploadScreen extends StatelessWidget {
     );
   }
 
-  /// AppBar responsiva e temática
-  PreferredSizeWidget _buildAppBar(BuildContext context, DetailsUploadController controller, DarkThemeProvider themeChange) {
+  /// ============================================================================
+  /// APP BAR
+  /// ============================================================================
+  PreferredSizeWidget _buildAppBar(
+      BuildContext context,
+      DetailsUploadController controller,
+      DarkThemeProvider themeChange) {
     return AppBar(
       backgroundColor: AppColors.primary,
       elevation: 0,
@@ -104,7 +110,9 @@ class DetailsUploadScreen extends StatelessWidget {
               ),
               SizedBox(width: Responsive.width(1, context)),
               Text(
-                controller.documents.value.verified == true ? 'Verificado' : 'Pendente',
+                controller.documents.value.verified == true
+                    ? 'Verificado'
+                    : 'Pendente',
                 style: GoogleFonts.poppins(
                   color: controller.documents.value.verified == true
                       ? Colors.green
@@ -120,25 +128,32 @@ class DetailsUploadScreen extends StatelessWidget {
     );
   }
 
-  /// Conteúdo principal
-  Widget _buildMainContent(BuildContext context, DetailsUploadController controller, DarkThemeProvider themeChange) {
+  /// ============================================================================
+  /// CONTEÚDO PRINCIPAL
+  /// ============================================================================
+  Widget _buildMainContent(
+      BuildContext context,
+      DetailsUploadController controller,
+      DarkThemeProvider themeChange) {
     return Container(
       decoration: BoxDecoration(
-        color: themeChange.getThem() ? AppColors.darkBackground : AppColors.background,
+        color: themeChange.getThem()
+            ? AppColors.darkBackground
+            : AppColors.background,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(25),
           topRight: Radius.circular(25),
         ),
       ),
       child: controller.isLoading.value
-          ? Constant.loader(context)
+          ? Center(child: Constant.loader(context))
           : SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         padding: EdgeInsets.all(Responsive.width(5, context)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header com informações
+            // Header
             _buildDocumentHeader(context, controller, themeChange),
 
             SizedBox(height: Responsive.height(3, context)),
@@ -148,10 +163,10 @@ class DetailsUploadScreen extends StatelessWidget {
 
             SizedBox(height: Responsive.height(3, context)),
 
-            // Campo do número do documento
+            // Campo número do documento
             _buildDocumentNumberField(context, controller, themeChange),
 
-            // Campo de data de expiração (se necessário)
+            // Data de expiração (se necessário)
             if (controller.documentModel.value.expireAt == true) ...[
               SizedBox(height: Responsive.height(2, context)),
               _buildExpirationDateField(context, controller, themeChange),
@@ -164,7 +179,7 @@ class DetailsUploadScreen extends StatelessWidget {
 
             SizedBox(height: Responsive.height(4, context)),
 
-            // Botão de envio
+            // Botão enviar
             if (controller.documents.value.verified != true)
               _buildSubmitButton(context, controller),
 
@@ -175,8 +190,13 @@ class DetailsUploadScreen extends StatelessWidget {
     );
   }
 
-  /// Header com informações do documento
-  Widget _buildDocumentHeader(BuildContext context, DetailsUploadController controller, DarkThemeProvider themeChange) {
+  /// ============================================================================
+  /// HEADER DO DOCUMENTO
+  /// ============================================================================
+  Widget _buildDocumentHeader(
+      BuildContext context,
+      DetailsUploadController controller,
+      DarkThemeProvider themeChange) {
     return Column(
       children: [
         // Indicador de arraste
@@ -184,13 +204,16 @@ class DetailsUploadScreen extends StatelessWidget {
           width: Responsive.width(12, context),
           height: Responsive.height(0.6, context),
           decoration: BoxDecoration(
-            color: themeChange.getThem() ? Colors.white24 : Colors.black26,
+            color: themeChange.getThem()
+                ? Colors.white24
+                : Colors.black26,
             borderRadius: BorderRadius.circular(10),
           ),
         ),
+
         SizedBox(height: Responsive.height(2, context)),
 
-        // Header informativo
+        // Informações
         Row(
           children: [
             Container(
@@ -222,7 +245,9 @@ class DetailsUploadScreen extends StatelessWidget {
                     'Envie ${controller.documentModel.value.title}',
                     style: GoogleFonts.poppins(
                       fontSize: Responsive.width(3.5, context),
-                      color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                      color: themeChange.getThem()
+                          ? Colors.white70
+                          : Colors.black54,
                     ),
                   ),
                 ],
@@ -234,8 +259,11 @@ class DetailsUploadScreen extends StatelessWidget {
     );
   }
 
-  /// Indicador de progresso
-  Widget _buildProgressIndicator(BuildContext context, DarkThemeProvider themeChange) {
+  /// ============================================================================
+  /// INDICADOR DE PROGRESSO
+  /// ============================================================================
+  Widget _buildProgressIndicator(
+      BuildContext context, DarkThemeProvider themeChange) {
     return Container(
       padding: EdgeInsets.all(Responsive.width(4, context)),
       decoration: BoxDecoration(
@@ -272,93 +300,83 @@ class DetailsUploadScreen extends StatelessWidget {
             ],
           ),
           SizedBox(height: Responsive.height(1.5, context)),
-          // Barra de progresso
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-              ),
-              SizedBox(width: Responsive.width(1, context)),
-              Expanded(
-                child: Container(
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-              ),
-              SizedBox(width: Responsive.width(1, context)),
-              Expanded(
-                child: Container(
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-              ),
-            ],
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: LinearProgressIndicator(
+              value: 1.0,
+              minHeight: Responsive.height(1, context),
+              backgroundColor: themeChange.getThem()
+                  ? Colors.white12
+                  : Colors.black12,
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+            ),
           ),
         ],
       ),
     );
   }
 
-  /// Campo do número do documento
-  Widget _buildDocumentNumberField(BuildContext context, DetailsUploadController controller, DarkThemeProvider themeChange) {
+  /// ============================================================================
+  /// CAMPO NÚMERO DO DOCUMENTO
+  /// ============================================================================
+  Widget _buildDocumentNumberField(
+      BuildContext context,
+      DetailsUploadController controller,
+      DarkThemeProvider themeChange) {
     return _buildFormField(
       context,
-      label: 'Número do ${controller.documentModel.value.title}',
+      label: 'Número do Documento',
       icon: Icons.numbers,
       themeChange: themeChange,
       child: TextFieldThem.buildTextMask(
         context,
-        inputMaskFormatter: controller.cnhMaskFormatter,
-        hintText: controller.documentModel.value.title.toString(),
+        hintText: 'Digite o número do documento',
         controller: controller.documentNumberController.value,
-        keyBoardType: TextInputType.number,
+        inputMaskFormatter: controller.cnhMaskFormatter,
+        enable: controller.documents.value.verified != true,
       ),
     );
   }
 
-  /// Campo de data de expiração
-  Widget _buildExpirationDateField(BuildContext context, DetailsUploadController controller, DarkThemeProvider themeChange) {
+  /// ============================================================================
+  /// CAMPO DATA DE EXPIRAÇÃO
+  /// ============================================================================
+  Widget _buildExpirationDateField(
+      BuildContext context,
+      DetailsUploadController controller,
+      DarkThemeProvider themeChange) {
     return _buildFormField(
       context,
-      label: 'Data de Expiração',
+      label: 'Data de Validade',
       icon: Icons.calendar_today,
       themeChange: themeChange,
       child: InkWell(
         onTap: () async {
-          final selectedDate = await Constant.selectFetureDate(context);
-          if (selectedDate != null) {
-            controller.selectedDate.value = selectedDate;
-            controller.expireAtController.value.text = DateFormat("dd/MM/yyyy").format(selectedDate);
+          if (controller.documents.value.verified != true) {
+            await Constant.selectDate(context).then((value) {
+              if (value != null) {
+                controller.selectedDate.value = value;
+                controller.expireAtController.value.text =
+                    DateFormat("dd/MM/yyyy").format(value);
+              }
+            });
           }
         },
-        child: TextFieldThem.buildTextFiledWithSuffixIcon(
-          context,
-          hintText: "Informe a data de Expiração".tr,
-          controller: controller.expireAtController.value,
-          enable: false,
-          suffixIcon: Icon(
-            Icons.calendar_month,
-            color: AppColors.primary,
-            size: Responsive.width(5, context),
+        child: AbsorbPointer(
+          child: TextFieldThem.buildTextFiled(
+            context,
+            hintText: 'Selecione a data de validade',
+            controller: controller.expireAtController.value,
+            enable: controller.documents.value.verified != true
           ),
         ),
       ),
     );
   }
 
-  /// Container para campos do formulário
+  /// ============================================================================
+  /// CAMPO AUXILIAR
+  /// ============================================================================
   Widget _buildFormField(
       BuildContext context, {
         required String label,
@@ -400,8 +418,13 @@ class DetailsUploadScreen extends StatelessWidget {
     );
   }
 
-  /// Seção de upload de imagens
-  Widget _buildImageUploadSection(BuildContext context, DetailsUploadController controller, DarkThemeProvider themeChange) {
+  /// ============================================================================
+  /// SEÇÃO DE UPLOAD DE IMAGENS
+  /// ============================================================================
+  Widget _buildImageUploadSection(
+      BuildContext context,
+      DetailsUploadController controller,
+      DarkThemeProvider themeChange) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -424,28 +447,29 @@ class DetailsUploadScreen extends StatelessWidget {
             ),
           ],
         ),
+
         SizedBox(height: Responsive.height(2, context)),
 
-        // Upload da frente (se necessário)
+        // Upload frente
         if (controller.documentModel.value.frontSide == true) ...[
           _buildImageUploadCard(
             context,
             controller,
             themeChange,
-            title: "Frente ${controller.documentModel.value.title}",
+            title: "Frente - ${controller.documentModel.value.title}",
             type: "front",
             imagePath: controller.frontImage.value,
           ),
           SizedBox(height: Responsive.height(2, context)),
         ],
 
-        // Upload do verso (se necessário)
+        // Upload verso
         if (controller.documentModel.value.backSide == true) ...[
           _buildImageUploadCard(
             context,
             controller,
             themeChange,
-            title: "Verso ${controller.documentModel.value.title}",
+            title: "Verso - ${controller.documentModel.value.title}",
             type: "back",
             imagePath: controller.backImage.value,
           ),
@@ -454,7 +478,9 @@ class DetailsUploadScreen extends StatelessWidget {
     );
   }
 
-  /// Card de upload de imagem
+  /// ============================================================================
+  /// CARD DE UPLOAD DE IMAGEM
+  /// ============================================================================
   Widget _buildImageUploadCard(
       BuildContext context,
       DetailsUploadController controller,
@@ -475,7 +501,6 @@ class DetailsUploadScreen extends StatelessWidget {
           ),
         ),
         SizedBox(height: Responsive.height(1, context)),
-
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
@@ -488,14 +513,18 @@ class DetailsUploadScreen extends StatelessWidget {
             ],
           ),
           child: imagePath.isNotEmpty
-              ? _buildImagePreview(context, controller, themeChange, imagePath, type)
-              : _buildImagePlaceholder(context, controller, themeChange, type),
+              ? _buildImagePreview(
+              context, controller, themeChange, imagePath, type)
+              : _buildImagePlaceholder(
+              context, controller, themeChange, type),
         ),
       ],
     );
   }
 
-  /// Preview da imagem selecionada
+  /// ============================================================================
+  /// PREVIEW DA IMAGEM
+  /// ============================================================================
   Widget _buildImagePreview(
       BuildContext context,
       DetailsUploadController controller,
@@ -506,7 +535,7 @@ class DetailsUploadScreen extends StatelessWidget {
     return InkWell(
       onTap: () {
         if (controller.documents.value.verified != true) {
-          _buildBottomSheet(context, controller, type, themeChange);
+          _showImageSourceBottomSheet(context, controller, type, themeChange);
         }
       },
       borderRadius: BorderRadius.circular(15),
@@ -522,6 +551,7 @@ class DetailsUploadScreen extends StatelessWidget {
         ),
         child: Stack(
           children: [
+            // Imagem
             ClipRRect(
               borderRadius: BorderRadius.circular(13),
               child: Constant().hasValidUrl(imagePath) == false
@@ -536,9 +566,15 @@ class DetailsUploadScreen extends StatelessWidget {
                 fit: BoxFit.cover,
                 height: double.infinity,
                 width: double.infinity,
-                placeholder: (context, url) => Constant.loader(context),
+                placeholder: (context, url) => Center(
+                  child: CircularProgressIndicator(
+                    color: AppColors.primary,
+                  ),
+                ),
                 errorWidget: (context, url, error) => Container(
-                  color: Colors.grey[300],
+                  color: themeChange.getThem()
+                      ? Colors.grey[800]
+                      : Colors.grey[300],
                   child: Icon(
                     Icons.error,
                     color: Colors.red,
@@ -548,7 +584,7 @@ class DetailsUploadScreen extends StatelessWidget {
               ),
             ),
 
-            // Overlay de sucesso/edição
+            // Overlay de edição
             if (controller.documents.value.verified != true)
               Positioned(
                 top: Responsive.width(3, context),
@@ -566,13 +602,50 @@ class DetailsUploadScreen extends StatelessWidget {
                   ),
                 ),
               ),
+
+            // Badge de sucesso
+            Positioned(
+              bottom: Responsive.width(3, context),
+              left: Responsive.width(3, context),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: Responsive.width(3, context),
+                  vertical: Responsive.height(0.5, context),
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.9),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.check_circle,
+                      color: Colors.white,
+                      size: Responsive.width(4, context),
+                    ),
+                    SizedBox(width: Responsive.width(1, context)),
+                    Text(
+                      'Foto carregada',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: Responsive.width(3, context),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  /// Placeholder para upload de imagem
+  /// ============================================================================
+  /// PLACEHOLDER PARA UPLOAD
+  /// ============================================================================
   Widget _buildImagePlaceholder(
       BuildContext context,
       DetailsUploadController controller,
@@ -581,7 +654,7 @@ class DetailsUploadScreen extends StatelessWidget {
       ) {
     return InkWell(
       onTap: () {
-        _buildBottomSheet(context, controller, type, themeChange);
+        _showImageSourceBottomSheet(context, controller, type, themeChange);
       },
       borderRadius: BorderRadius.circular(15),
       child: DottedBorder(
@@ -595,8 +668,8 @@ class DetailsUploadScreen extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(
             color: themeChange.getThem()
-                ? AppColors.darkContainerBackground.withOpacity(0.3)
-                : AppColors.containerBackground.withOpacity(0.7),
+                ? AppColors.darkContainerBackground.withOpacity(0.5)
+                : AppColors.containerBackground.withOpacity(0.5),
             borderRadius: BorderRadius.circular(15),
           ),
           child: Column(
@@ -606,29 +679,31 @@ class DetailsUploadScreen extends StatelessWidget {
                 padding: EdgeInsets.all(Responsive.width(4, context)),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(50),
+                  shape: BoxShape.circle,
                 ),
                 child: Icon(
-                  Icons.add_a_photo,
-                  size: Responsive.width(10, context),
+                  Icons.add_photo_alternate,
                   color: AppColors.primary,
+                  size: Responsive.width(12, context),
                 ),
               ),
               SizedBox(height: Responsive.height(2, context)),
               Text(
-                "Adicionar Foto".tr,
+                'Toque para adicionar foto',
                 style: GoogleFonts.poppins(
                   fontSize: Responsive.width(4, context),
                   fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
+                  color: themeChange.getThem() ? Colors.white : Colors.black,
                 ),
               ),
               SizedBox(height: Responsive.height(0.5, context)),
               Text(
-                "Toque para selecionar",
+                'Câmera ou Galeria',
                 style: GoogleFonts.poppins(
                   fontSize: Responsive.width(3, context),
-                  color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                  color: themeChange.getThem()
+                      ? Colors.white70
+                      : Colors.black54,
                 ),
               ),
             ],
@@ -638,8 +713,11 @@ class DetailsUploadScreen extends StatelessWidget {
     );
   }
 
-  /// Botão de envio
-  Widget _buildSubmitButton(BuildContext context, DetailsUploadController controller) {
+  /// ============================================================================
+  /// BOTÃO DE ENVIO
+  /// ============================================================================
+  Widget _buildSubmitButton(
+      BuildContext context, DetailsUploadController controller) {
     return Container(
       width: double.infinity,
       height: Responsive.height(7, context),
@@ -675,7 +753,7 @@ class DetailsUploadScreen extends StatelessWidget {
             ),
             SizedBox(width: Responsive.width(2, context)),
             Text(
-              "Enviar".tr,
+              "Enviar Documento",
               style: GoogleFonts.poppins(
                 fontSize: Responsive.width(4.5, context),
                 fontWeight: FontWeight.w700,
@@ -684,7 +762,7 @@ class DetailsUploadScreen extends StatelessWidget {
             ),
             SizedBox(width: Responsive.width(2, context)),
             Icon(
-              Icons.check,
+              Icons.check_circle,
               color: Colors.white,
               size: Responsive.width(5, context),
             ),
@@ -694,41 +772,52 @@ class DetailsUploadScreen extends StatelessWidget {
     );
   }
 
-  /// Bottom sheet para seleção de imagem
-  void _buildBottomSheet(BuildContext context, DetailsUploadController controller, String type, DarkThemeProvider themeChange) {
+  /// ============================================================================
+  /// BOTTOM SHEET PARA SELEÇÃO DE FONTE DA IMAGEM
+  /// ============================================================================
+  void _showImageSourceBottomSheet(
+      BuildContext context,
+      DetailsUploadController controller,
+      String type,
+      DarkThemeProvider themeChange,
+      ) {
     showModalBottomSheet(
       context: context,
-      backgroundColor: themeChange.getThem()
-          ? AppColors.darkContainerBackground
-          : AppColors.containerBackground,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(25),
-          topRight: Radius.circular(25),
-        ),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (context) {
         return Container(
-          height: Responsive.height(30, context),
+          decoration: BoxDecoration(
+            color: themeChange.getThem()
+                ? AppColors.darkContainerBackground
+                : AppColors.containerBackground,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(25),
+              topRight: Radius.circular(25),
+            ),
+          ),
           padding: EdgeInsets.all(Responsive.width(5, context)),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               // Indicador de arraste
               Container(
                 width: Responsive.width(12, context),
                 height: Responsive.height(0.6, context),
                 decoration: BoxDecoration(
-                  color: themeChange.getThem() ? Colors.white24 : Colors.black26,
+                  color: themeChange.getThem()
+                      ? Colors.white24
+                      : Colors.black26,
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
+
               SizedBox(height: Responsive.height(2, context)),
 
               // Título
               Text(
-                "Selecione uma opção".tr,
+                'Escolha a fonte da imagem',
                 style: GoogleFonts.poppins(
-                  fontSize: Responsive.width(5, context),
+                  fontSize: Responsive.width(4.5, context),
                   fontWeight: FontWeight.w600,
                   color: themeChange.getThem() ? Colors.white : Colors.black,
                 ),
@@ -736,32 +825,50 @@ class DetailsUploadScreen extends StatelessWidget {
 
               SizedBox(height: Responsive.height(3, context)),
 
-              // Opções
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildBottomSheetOption(
-                    context,
-                    icon: Icons.camera_alt,
-                    title: "Câmera".tr,
-                    onTap: () {
-                      controller.pickFile(source: ImageSource.camera, type: type);
-                      Get.back();
-                    },
-                    themeChange: themeChange,
-                  ),
-                  _buildBottomSheetOption(
-                    context,
-                    icon: Icons.photo_library,
-                    title: "Galeria".tr,
-                    onTap: () {
-                      controller.pickFile(source: ImageSource.gallery, type: type);
-                      Get.back();
-                    },
-                    themeChange: themeChange,
-                  ),
-                ],
+              // Opção Câmera
+              _buildSourceOption(
+                context,
+                icon: Icons.camera_alt,
+                title: 'Câmera',
+                subtitle: 'Tirar uma foto',
+                color: Colors.blue,
+                onTap: () {
+                  controller.pickFile(source: ImageSource.camera, type: type);
+                },
+                themeChange: themeChange,
               ),
+
+              SizedBox(height: Responsive.height(2, context)),
+
+              // Opção Galeria
+              _buildSourceOption(
+                context,
+                icon: Icons.photo_library,
+                title: 'Galeria',
+                subtitle: 'Escolher da galeria',
+                color: Colors.green,
+                onTap: () {
+                  controller.pickFile(source: ImageSource.gallery, type: type);
+                },
+                themeChange: themeChange,
+              ),
+
+              SizedBox(height: Responsive.height(2, context)),
+
+              // Botão Cancelar
+              TextButton(
+                onPressed: () => Get.back(),
+                child: Text(
+                  'Cancelar',
+                  style: GoogleFonts.poppins(
+                    fontSize: Responsive.width(4, context),
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+
+              SizedBox(height: Responsive.height(1, context)),
             ],
           ),
         );
@@ -769,11 +876,15 @@ class DetailsUploadScreen extends StatelessWidget {
     );
   }
 
-  /// Opção do bottom sheet
-  Widget _buildBottomSheetOption(
+  /// ============================================================================
+  /// OPÇÃO DE FONTE DE IMAGEM
+  /// ============================================================================
+  Widget _buildSourceOption(
       BuildContext context, {
         required IconData icon,
         required String title,
+        required String subtitle,
+        required Color color,
         required VoidCallback onTap,
         required DarkThemeProvider themeChange,
       }) {
@@ -781,29 +892,60 @@ class DetailsUploadScreen extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(15),
       child: Container(
-        padding: EdgeInsets.all(Responsive.width(6, context)),
+        padding: EdgeInsets.all(Responsive.width(4, context)),
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
+          color: themeChange.getThem()
+              ? AppColors.darkTextField
+              : AppColors.textField,
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
-            color: AppColors.primary.withOpacity(0.3),
+            color: color.withOpacity(0.3),
+            width: 1.5,
           ),
         ),
-        child: Column(
+        child: Row(
           children: [
-            Icon(
-              icon,
-              size: Responsive.width(8, context),
-              color: AppColors.primary,
-            ),
-            SizedBox(height: Responsive.height(1, context)),
-            Text(
-              title,
-              style: GoogleFonts.poppins(
-                fontSize: Responsive.width(3.5, context),
-                fontWeight: FontWeight.w600,
-                color: themeChange.getThem() ? Colors.white : Colors.black,
+            Container(
+              padding: EdgeInsets.all(Responsive.width(3, context)),
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
+              child: Icon(
+                icon,
+                color: color,
+                size: Responsive.width(7, context),
+              ),
+            ),
+            SizedBox(width: Responsive.width(4, context)),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      fontSize: Responsive.width(4.5, context),
+                      fontWeight: FontWeight.w600,
+                      color: themeChange.getThem() ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: GoogleFonts.poppins(
+                      fontSize: Responsive.width(3.2, context),
+                      color: themeChange.getThem()
+                          ? Colors.white70
+                          : Colors.black54,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              color: color,
+              size: Responsive.width(5, context),
             ),
           ],
         ),
@@ -811,24 +953,39 @@ class DetailsUploadScreen extends StatelessWidget {
     );
   }
 
-  /// Manipula o envio do formulário
+  /// ============================================================================
+  /// HANDLE SUBMIT
+  /// ============================================================================
   void _handleSubmit(DetailsUploadController controller) {
+    // Validação do número do documento
     if (controller.documentNumberController.value.text.isEmpty) {
-      ShowToastDialog.showToast("Por favor, insira o número do documento".tr);
+      ShowToastDialog.showToast("Por favor, insira o número do documento");
       return;
     }
 
-    if (controller.documentModel.value.frontSide == true && controller.frontImage.value.isEmpty) {
-      ShowToastDialog.showToast("Por favor, carregue a frente do documento.".tr);
+    // Validação da imagem frontal
+    if (controller.documentModel.value.frontSide == true &&
+        controller.frontImage.value.isEmpty) {
+      ShowToastDialog.showToast("Por favor, faça upload da frente do documento");
       return;
     }
 
-    if (controller.documentModel.value.backSide == true && controller.backImage.value.isEmpty) {
-      ShowToastDialog.showToast("Por favor, carregue o verso do documento.".tr);
+    // Validação da imagem traseira
+    if (controller.documentModel.value.backSide == true &&
+        controller.backImage.value.isEmpty) {
+      ShowToastDialog.showToast("Por favor, faça upload do verso do documento");
       return;
     }
 
-    ShowToastDialog.showLoader("Por favor, aguarde..".tr);
+    // Validação da data de expiração
+    if (controller.documentModel.value.expireAt == true &&
+        controller.expireAtController.value.text.isEmpty) {
+      ShowToastDialog.showToast("Por favor, selecione a data de validade");
+      return;
+    }
+
+    // Upload
+    ShowToastDialog.showLoader("Enviando documento...");
     controller.uploadDocument();
   }
 }

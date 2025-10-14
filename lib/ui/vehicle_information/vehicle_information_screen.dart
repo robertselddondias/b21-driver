@@ -1,4 +1,4 @@
-// lib/ui/vehicle_information/vehicle_information_screen.dart - Versão com temas e responsividade
+// lib/ui/vehicle_information/vehicle_information_screen.dart - CÓDIGO COMPLETO
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:driver/constant/constant.dart';
@@ -7,6 +7,7 @@ import 'package:driver/controller/vehicle_information_controller.dart';
 import 'package:driver/model/driver_user_model.dart';
 import 'package:driver/model/service_model.dart';
 import 'package:driver/model/vehicle_type_model.dart';
+import 'package:driver/model/zone_model.dart';
 import 'package:driver/themes/app_colors.dart';
 import 'package:driver/themes/button_them.dart';
 import 'package:driver/themes/responsive.dart';
@@ -62,11 +63,16 @@ class VehicleInformationScreen extends StatelessWidget {
                           style: GoogleFonts.poppins(
                             fontSize: Responsive.width(5, context),
                             fontWeight: FontWeight.w600,
-                            color: themeChange.getThem() ? Colors.white : Colors.black,
+                            color: themeChange.getThem()
+                                ? Colors.white
+                                : Colors.black,
                           ),
                           textAlign: TextAlign.center,
                         ),
                       ),
+
+                      // BANNER DE STATUS
+                      _buildStatusBanner(context, controller, themeChange),
 
                       // Content
                       Expanded(
@@ -111,19 +117,23 @@ class VehicleInformationScreen extends StatelessWidget {
                                 label: 'Data de Registro',
                                 child: InkWell(
                                   onTap: () async {
-                                    controller.isEditable.value ? await Constant.selectDate(context).then((value) {
-                                      if (value != null) {
-                                        controller.selectedDate.value = value;
-                                        controller.registrationDateController.value.text =
-                                            DateFormat("dd/MM/yyyy").format(value);
-                                      }
-                                    }) : null;
+                                    if (controller.isEditable.value) {
+                                      await Constant.selectDate(context).then((value) {
+                                        if (value != null) {
+                                          controller.selectedDate.value = value;
+                                          controller.registrationDateController.value.text =
+                                              DateFormat("dd/MM/yyyy").format(value);
+                                        }
+                                      });
+                                    }
                                   },
-                                  child: TextFieldThem.buildTextFiled(
-                                    context,
-                                    hintText: 'Registration Date'.tr,
-                                    enable: controller.isEditable.value,
-                                    controller: controller.registrationDateController.value,
+                                  child: AbsorbPointer(
+                                    child: TextFieldThem.buildTextFiled(
+                                      context,
+                                      hintText: 'Registration Date'.tr,
+                                      enable: controller.isEditable.value,
+                                      controller: controller.registrationDateController.value,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -143,9 +153,11 @@ class VehicleInformationScreen extends StatelessWidget {
                                       : controller.selectedVehicle.value,
                                   hint: "Select vehicle type".tr,
                                   items: controller.vehicleList,
-                                  onChanged: controller.isEditable.value ? (value) {
+                                  onChanged: controller.isEditable.value
+                                      ? (value) {
                                     controller.selectedVehicle.value = value!;
-                                  } : null,
+                                  }
+                                      : null,
                                   itemBuilder: (item) => Text(item.name.toString()),
                                 ),
                               ),
@@ -165,9 +177,11 @@ class VehicleInformationScreen extends StatelessWidget {
                                       : controller.selectedColor.value,
                                   hint: "Select vehicle color".tr,
                                   items: controller.carColorList,
-                                  onChanged: controller.isEditable.value ? (value) {
+                                  onChanged: controller.isEditable.value
+                                      ? (value) {
                                     controller.selectedColor.value = value!;
-                                  } : null,
+                                  }
+                                      : null,
                                   itemBuilder: (item) => Text(item.toString()),
                                 ),
                               ),
@@ -187,9 +201,11 @@ class VehicleInformationScreen extends StatelessWidget {
                                       : controller.seatsController.value.text,
                                   hint: "How Many Seats".tr,
                                   items: controller.sheetList,
-                                  onChanged: controller.isEditable.value ? (value) {
+                                  onChanged: controller.isEditable.value
+                                      ? (value) {
                                     controller.seatsController.value.text = value!;
-                                  } : null,
+                                  }
+                                      : null,
                                   itemBuilder: (item) => Text(item.toString()),
                                 ),
                               ),
@@ -203,13 +219,17 @@ class VehicleInformationScreen extends StatelessWidget {
                                 label: 'Zona de Atuação',
                                 child: InkWell(
                                   onTap: () {
-                                    controller.isEditable.value ? _showZoneDialog(context, controller, themeChange) : null;
+                                    if (controller.isEditable.value) {
+                                      _showZoneDialog(context, controller, themeChange);
+                                    }
                                   },
-                                  child: TextFieldThem.buildTextFiled(
-                                    context,
-                                    hintText: 'Select Zone'.tr,
-                                    controller: controller.zoneNameController.value,
-                                    enable: controller.isEditable.value,
+                                  child: AbsorbPointer(
+                                    child: TextFieldThem.buildTextFiled(
+                                      context,
+                                      hintText: 'Select Zone'.tr,
+                                      controller: controller.zoneNameController.value,
+                                      enable: controller.isEditable.value,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -219,21 +239,6 @@ class VehicleInformationScreen extends StatelessWidget {
                               _buildDriverRules(context, controller, themeChange),
 
                               SizedBox(height: Responsive.height(3, context)),
-
-                              // Save Button
-                              Visibility(
-                                visible: controller.isEditable.value,
-                                child: Center(
-                                  child: ButtonThem.buildButton(
-                                    context,
-                                    title: "Save".tr,
-                                    btnWidthRatio: 0.8,
-                                    onPress: () => _handleSave(controller),
-                                  ),
-                                ),
-                              ),
-
-                              SizedBox(height: Responsive.height(2, context)),
 
                               // Warning Text
                               Container(
@@ -275,6 +280,12 @@ class VehicleInformationScreen extends StatelessWidget {
                           ),
                         ),
                       ),
+
+                      // BOTÕES DE AÇÃO
+                      Padding(
+                        padding: EdgeInsets.all(Responsive.width(5, context)),
+                        child: _buildActionButtons(context, controller, themeChange),
+                      ),
                     ],
                   ),
                 ),
@@ -285,6 +296,344 @@ class VehicleInformationScreen extends StatelessWidget {
       },
     );
   }
+
+  /// ============================================================================
+  /// BANNER DE STATUS COM 3 ESTADOS
+  /// ============================================================================
+  Widget _buildStatusBanner(BuildContext context, VehicleInformationController controller, DarkThemeProvider themeChange) {
+    return Obx(() {
+      if (!controller.hasVehicleRegistered.value) {
+        // Estado 1: CADASTRO (primeira vez) - AZUL
+        return Container(
+          margin: EdgeInsets.symmetric(
+            horizontal: Responsive.width(5, context),
+            vertical: Responsive.height(1, context),
+          ),
+          padding: EdgeInsets.all(Responsive.width(3, context)),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.blue.shade400, Colors.blue.shade600],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.blue.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(Responsive.width(2, context)),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.info_outline,
+                  color: Colors.white,
+                  size: Responsive.width(5, context),
+                ),
+              ),
+              SizedBox(width: Responsive.width(3, context)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Cadastro de Veículo',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: Responsive.width(3.8, context),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: Responsive.height(0.3, context)),
+                    Text(
+                      'Preencha os dados do seu veículo para começar',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: Responsive.width(3, context),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      } else if (controller.isEditable.value) {
+        // Estado 2: EDIÇÃO - LARANJA
+        return Container(
+          margin: EdgeInsets.symmetric(
+            horizontal: Responsive.width(5, context),
+            vertical: Responsive.height(1, context),
+          ),
+          padding: EdgeInsets.all(Responsive.width(3, context)),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.orange.shade400, Colors.orange.shade600],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.orange.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(Responsive.width(2, context)),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.edit,
+                  color: Colors.white,
+                  size: Responsive.width(5, context),
+                ),
+              ),
+              SizedBox(width: Responsive.width(3, context)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Modo Edição Ativo',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: Responsive.width(3.8, context),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: Responsive.height(0.3, context)),
+                    Text(
+                      'Você pode modificar as informações do veículo',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: Responsive.width(3, context),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      } else {
+        // Estado 3: VISUALIZAÇÃO - VERDE
+        return Container(
+          margin: EdgeInsets.symmetric(
+            horizontal: Responsive.width(5, context),
+            vertical: Responsive.height(1, context),
+          ),
+          padding: EdgeInsets.all(Responsive.width(3, context)),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.green.shade400, Colors.green.shade600],
+            ),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.green.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: EdgeInsets.all(Responsive.width(2, context)),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.check_circle_outline,
+                  color: Colors.white,
+                  size: Responsive.width(5, context),
+                ),
+              ),
+              SizedBox(width: Responsive.width(3, context)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Veículo Cadastrado',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: Responsive.width(3.8, context),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: Responsive.height(0.3, context)),
+                    Text(
+                      'Visualizando informações do seu veículo',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white.withOpacity(0.9),
+                        fontSize: Responsive.width(3, context),
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Botão Editar
+              InkWell(
+                onTap: () => controller.toggleEditMode(),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: Responsive.width(3, context),
+                    vertical: Responsive.height(0.8, context),
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.edit,
+                        color: Colors.green.shade600,
+                        size: Responsive.width(3.5, context),
+                      ),
+                      SizedBox(width: Responsive.width(1, context)),
+                      Text(
+                        'Editar',
+                        style: GoogleFonts.poppins(
+                          color: Colors.green.shade600,
+                          fontSize: Responsive.width(3, context),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+    });
+  }
+
+  /// ============================================================================
+  /// BOTÕES DE AÇÃO CONDICIONAIS
+  /// ============================================================================
+  Widget _buildActionButtons(BuildContext context, VehicleInformationController controller, DarkThemeProvider themeChange) {
+    return Obx(() {
+      if (!controller.hasVehicleRegistered.value) {
+        // Primeira vez - apenas botão CADASTRAR
+        return Center(
+          child: ButtonThem.buildButton(
+            context,
+            title: "Cadastrar Veículo".tr,
+            btnWidthRatio: 0.8,
+            onPress: () => _handleSave(controller),
+          ),
+        );
+      } else if (controller.isEditable.value) {
+        // Modo edição - botões CANCELAR e SALVAR
+        return Row(
+          children: [
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(right: Responsive.width(2, context)),
+                child: OutlinedButton(
+                  onPressed: () => controller.cancelEdit(),
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      vertical: Responsive.height(1.8, context),
+                    ),
+                    side: BorderSide(
+                      color: Colors.grey,
+                      width: 1.5,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.close,
+                        color: Colors.grey.shade700,
+                        size: Responsive.width(4.5, context),
+                      ),
+                      SizedBox(width: Responsive.width(1.5, context)),
+                      Text(
+                        'Cancelar',
+                        style: GoogleFonts.poppins(
+                          fontSize: Responsive.width(3.8, context),
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(left: Responsive.width(2, context)),
+                child: ElevatedButton(
+                  onPressed: () => _handleSave(controller),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: EdgeInsets.symmetric(
+                      vertical: Responsive.height(1.8, context),
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.check,
+                        color: Colors.white,
+                        size: Responsive.width(4.5, context),
+                      ),
+                      SizedBox(width: Responsive.width(1.5, context)),
+                      Text(
+                        'Salvar Alterações',
+                        style: GoogleFonts.poppins(
+                          fontSize: Responsive.width(3.8, context),
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      } else {
+        // Modo visualização - sem botões
+        return const SizedBox.shrink();
+      }
+    });
+  }
+
+  /// ============================================================================
+  /// WIDGETS AUXILIARES
+  /// ============================================================================
 
   Widget _buildSectionTitle(BuildContext context, DarkThemeProvider themeChange, String title) {
     return Text(
@@ -352,55 +701,35 @@ class VehicleInformationScreen extends StatelessWidget {
                           : (themeChange.getThem()
                           ? AppColors.darkContainerBorder
                           : AppColors.containerBorder),
-                      width: 2,
+                      width: 1.5,
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        padding: EdgeInsets.all(Responsive.width(2, context)),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: CachedNetworkImage(
-                          imageUrl: serviceModel.image.toString(),
-                          fit: BoxFit.contain,
-                          height: Responsive.height(6, context),
+                      CachedNetworkImage(
+                        imageUrl: serviceModel.image.toString(),
+                        fit: BoxFit.fill,
+                        width: Responsive.width(12, context),
+                        height: Responsive.width(12, context),
+                        placeholder: (context, url) => Constant.loader(context),
+                        errorWidget: (context, url, error) => Container(
                           width: Responsive.width(12, context),
-                          placeholder: (context, url) => SizedBox(
-                            width: Responsive.width(12, context),
-                            height: Responsive.height(6, context),
-                            child: Center(
-                              child: SizedBox(
-                                width: Responsive.width(4, context),
-                                height: Responsive.width(4, context),
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                                ),
-                              ),
-                            ),
+                          height: Responsive.width(12, context),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
                           ),
-                          errorWidget: (context, url, error) => Icon(
+                          child: Icon(
                             Icons.directions_car,
+                            color: AppColors.primary,
                             size: Responsive.width(8, context),
-                            color: AppColors.subTitleColor,
                           ),
                         ),
                       ),
                       SizedBox(height: Responsive.height(1, context)),
                       Text(
-                        serviceModel.title.toString().toUpperCase(),
+                        serviceModel.title.toString(),
                         style: GoogleFonts.poppins(
                           color: controller.selectedServiceId.value == serviceModel.id
                               ? Colors.white
@@ -429,42 +758,39 @@ class VehicleInformationScreen extends StatelessWidget {
         required T? value,
         required String hint,
         required List<T> items,
-        required void Function(T?)? onChanged, // Aceita null para desabilitar
+        required void Function(T?)? onChanged,
         required Widget Function(T) itemBuilder,
       }) {
-
-    // Verifica se o campo está habilitado (onChanged é o controle principal)
     final bool isEnabled = onChanged != null;
 
-    // Define a cor de fundo: esmaecida se desabilitado
     final Color fillColor = isEnabled
         ? (themeChange.getThem() ? AppColors.darkTextField : AppColors.textField)
         : (themeChange.getThem() ? AppColors.darkTextField.withOpacity(0.5) : AppColors.textField.withOpacity(0.5));
 
-    // Define a cor do texto do valor selecionado: cinza se desabilitado
     final Color valueTextColor = isEnabled
         ? (themeChange.getThem() ? Colors.white : Colors.black87)
         : (themeChange.getThem() ? Colors.white54 : Colors.black54);
 
     return DropdownButtonFormField<T>(
-      // 1. A cor do estilo precisa ser a cor do valor selecionado (valueTextColor)
+      value: value,
       style: GoogleFonts.poppins(
         fontSize: Responsive.width(3.5, context),
-        color: valueTextColor, // Usa a cor do texto definida
+        color: valueTextColor,
         fontWeight: FontWeight.w500,
       ),
-
-      // 2. A propriedade onChanged controla o estado 'enabled'
       onChanged: onChanged,
-
       decoration: InputDecoration(
         filled: true,
-        fillColor: fillColor, // Usa a cor de fundo definida
+        fillColor: fillColor,
+        hintText: hint,
+        hintStyle: GoogleFonts.poppins(
+          fontSize: Responsive.width(3.5, context),
+          color: themeChange.getThem() ? Colors.white54 : Colors.black54,
+        ),
         contentPadding: EdgeInsets.symmetric(
           horizontal: Responsive.width(3, context),
           vertical: Responsive.height(1.2, context),
         ),
-        // A propriedade enabledBorder e border são mantidas para o visual padrão
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(
@@ -485,82 +811,71 @@ class VehicleInformationScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           borderSide: BorderSide(
             color: AppColors.primary,
-            width: 2,
+            width: 1.5,
+          ),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(
+            color: themeChange.getThem()
+                ? AppColors.darkTextFieldBorder.withOpacity(0.5)
+                : AppColors.textFieldBorder.withOpacity(0.5),
           ),
         ),
       ),
-      dropdownColor: themeChange.getThem()
-          ? AppColors.darkContainerBackground
-          : AppColors.containerBackground,
-      initialValue: value,
-
-      hint: Text(
-        hint,
-        style: GoogleFonts.poppins(
-          fontSize: Responsive.width(3.5, context),
-          // O hintColor geralmente permanece o mesmo ou é ligeiramente esmaecido.
-          color: AppColors.subTitleColor.withOpacity(isEnabled ? 1.0 : 0.6),
-          fontWeight: FontWeight.w400,
-        ),
-      ),
-      items: items.map((item) {
+      items: items.map((T item) {
         return DropdownMenuItem<T>(
           value: item,
-          child: DefaultTextStyle(
-            // O estilo do DropdownMenuItem é sempre ativo
-            style: GoogleFonts.poppins(
-              fontSize: Responsive.width(3.5, context),
-              color: themeChange.getThem() ? Colors.white : Colors.black87,
-              fontWeight: FontWeight.w500,
-            ),
-            child: itemBuilder(item),
-          ),
+          child: itemBuilder(item),
         );
       }).toList(),
+      icon: Icon(
+        Icons.keyboard_arrow_down,
+        color: isEnabled
+            ? (themeChange.getThem() ? Colors.white : Colors.black54)
+            : (themeChange.getThem() ? Colors.white30 : Colors.black26),
+      ),
     );
   }
 
   Widget _buildDriverRules(BuildContext context, VehicleInformationController controller, DarkThemeProvider themeChange) {
-    return Container(
-      decoration: BoxDecoration(
-        color: themeChange.getThem()
-            ? AppColors.darkContainerBackground
-            : AppColors.containerBackground,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: themeChange.getThem()
-              ? AppColors.darkContainerBorder
-              : AppColors.containerBorder,
-        ),
-      ),
-      child: Column(
-        children: controller.driverRulesList.map((item) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionTitle(context, themeChange, 'Regras do Motorista'),
+        SizedBox(height: Responsive.height(1, context)),
+        ...controller.driverRulesList.map((item) {
           return Obx(() => CheckboxListTile(
-            checkColor: Colors.white,
-            activeColor: AppColors.primary,
-            value: controller.selectedDriverRulesList
-                .indexWhere((element) => element.id == item.id) !=
-                -1,
+            enabled: controller.isEditable.value,
+            contentPadding: EdgeInsets.zero,
+            controlAffinity: ListTileControlAffinity.leading,
             title: Text(
               item.name.toString(),
               style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w400,
                 fontSize: Responsive.width(3.5, context),
-                color: themeChange.getThem() ? Colors.white : Colors.black87,
+                color: controller.isEditable.value
+                    ? (themeChange.getThem() ? Colors.white : Colors.black87)
+                    : (themeChange.getThem() ? Colors.white54 : Colors.black54),
               ),
             ),
-            onChanged: (value) {
+            value: controller.selectedDriverRulesList
+                .where((element) => element.id == item.id)
+                .isNotEmpty,
+            onChanged: controller.isEditable.value
+                ? (value) {
               if (value == true) {
                 controller.selectedDriverRulesList.add(item);
               } else {
                 controller.selectedDriverRulesList.removeAt(
-                    controller.selectedDriverRulesList
-                        .indexWhere((element) => element.id == item.id));
+                  controller.selectedDriverRulesList
+                      .indexWhere((element) => element.id == item.id),
+                );
               }
-            },
+            }
+                : null,
           ));
         }).toList(),
-      ),
+      ],
     );
   }
 
@@ -581,7 +896,7 @@ class VehicleInformationScreen extends StatelessWidget {
             ),
           ),
           title: Text(
-            'Zone list',
+            'Lista de Zonas',
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.w600,
               fontSize: Responsive.width(4.5, context),
@@ -591,107 +906,79 @@ class VehicleInformationScreen extends StatelessWidget {
           content: SizedBox(
             width: Responsive.width(80, context),
             child: controller.zoneList.isEmpty
-                ? Text(
-              'Nenhuma zona disponível',
-              style: GoogleFonts.poppins(
-                color: AppColors.subTitleColor,
+                ? Center(
+              child: Text(
+                'Nenhuma zona disponível',
+                style: GoogleFonts.poppins(
+                  color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                ),
               ),
             )
-                : Obx(
-                  () => ListView.builder(
-                shrinkWrap: true,
-                itemCount: controller.zoneList.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return Obx(
-                        () => CheckboxListTile(
-                      value: controller.selectedZone
-                          .contains(controller.zoneList[index].id),
-                      onChanged: (value) {
-                        if (controller.selectedZone
-                            .contains(controller.zoneList[index].id)) {
-                          controller.selectedZone
-                              .remove(controller.zoneList[index].id);
-                        } else {
-                          controller.selectedZone
-                              .add(controller.zoneList[index].id);
-                        }
-                      },
-                      activeColor: AppColors.primary,
-                      checkColor: Colors.white,
-                      title: Text(
-                        controller.zoneList[index].name.toString(),
-                        style: GoogleFonts.poppins(
-                          fontSize: Responsive.width(3.5, context),
-                          color: themeChange.getThem()
-                              ? Colors.white
-                              : Colors.black87,
-                        ),
+                : ListView.builder(
+              shrinkWrap: true,
+              itemCount: controller.zoneList.length,
+              itemBuilder: (context, index) {
+                ZoneModel zoneModel = controller.zoneList[index];
+                return Obx(
+                      () => CheckboxListTile(
+                    contentPadding: EdgeInsets.zero,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: Text(
+                      zoneModel.name.toString(),
+                      style: GoogleFonts.poppins(
+                        fontSize: Responsive.width(3.5, context),
+                        color: themeChange.getThem() ? Colors.white : Colors.black87,
                       ),
                     ),
-                  );
-                },
-              ),
+                    value: controller.selectedZone.contains(zoneModel.id),
+                    onChanged: (value) {
+                      if (value == true) {
+                        controller.selectedZone.add(zoneModel.id.toString());
+                      } else {
+                        controller.selectedZone.remove(zoneModel.id.toString());
+                      }
+                    },
+                  ),
+                );
+              },
             ),
           ),
           actions: [
             TextButton(
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(
-                  horizontal: Responsive.width(4, context),
-                  vertical: Responsive.height(1, context),
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  side: BorderSide(color: AppColors.subTitleColor),
-                ),
-              ),
+              onPressed: () => Get.back(),
               child: Text(
-                "Cancel",
+                'Cancelar',
                 style: GoogleFonts.poppins(
-                  color: AppColors.subTitleColor,
+                  color: Colors.grey,
                   fontWeight: FontWeight.w500,
                 ),
               ),
+            ),
+            ElevatedButton(
               onPressed: () {
+                String nameValue = "";
+                for (var element in controller.selectedZone) {
+                  List list = controller.zoneList.where((p0) => p0.id == element).toList();
+                  if (list.isNotEmpty) {
+                    nameValue = "$nameValue${nameValue.isEmpty ? "" : ", "} ${list.first.name}";
+                  }
+                }
+                controller.zoneNameController.value.text = nameValue;
                 Get.back();
               },
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
+              style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                padding: EdgeInsets.symmetric(
-                  horizontal: Responsive.width(4, context),
-                  vertical: Responsive.height(1, context),
-                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
               child: Text(
-                "Continue",
+                'Confirmar',
                 style: GoogleFonts.poppins(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              onPressed: () {
-                if (controller.selectedZone.isEmpty) {
-                  ShowToastDialog.showToast("Please select zone");
-                } else {
-                  String nameValue = "";
-                  for (var element in controller.selectedZone) {
-                    List list = controller.zoneList
-                        .where((p0) => p0.id == element)
-                        .toList();
-                    if (list.isNotEmpty) {
-                      nameValue =
-                      "$nameValue${nameValue.isEmpty ? "" : ","} ${list.first.name}";
-                    }
-                  }
-                  controller.zoneNameController.value.text = nameValue;
-                  Get.back();
-                }
-              },
             ),
           ],
         );
@@ -703,25 +990,33 @@ class VehicleInformationScreen extends StatelessWidget {
     ShowToastDialog.showLoader("Aguarde...".tr);
 
     if (controller.selectedServiceId.value!.isEmpty) {
+      ShowToastDialog.closeLoader();
       ShowToastDialog.showToast("Please select service".tr);
     } else if (controller.vehicleNumberController.value.text.isEmpty) {
+      ShowToastDialog.closeLoader();
       ShowToastDialog.showToast("Please enter Vehicle number".tr);
     } else if (controller.registrationDateController.value.text.isEmpty) {
+      ShowToastDialog.closeLoader();
       ShowToastDialog.showToast("Please select registration date".tr);
     } else if (controller.selectedVehicle.value.id == null ||
         controller.selectedVehicle.value.id!.isEmpty) {
+      ShowToastDialog.closeLoader();
       ShowToastDialog.showToast("Please enter Vehicle type".tr);
     } else if (controller.selectedColor.value.isEmpty) {
+      ShowToastDialog.closeLoader();
       ShowToastDialog.showToast("Please enter Vehicle color".tr);
     } else if (controller.seatsController.value.text.isEmpty) {
+      ShowToastDialog.closeLoader();
       ShowToastDialog.showToast("Please enter seats".tr);
     } else if (controller.selectedZone.isEmpty) {
+      ShowToastDialog.closeLoader();
       ShowToastDialog.showToast("Please select Zone".tr);
     } else {
       if (controller.driverModel.value.serviceId == null) {
         controller.driverModel.value.serviceId = controller.selectedServiceId.value;
         await FireStoreUtils.updateDriverUser(controller.driverModel.value);
       }
+
       controller.driverModel.value.zoneIds = controller.selectedZone;
       controller.driverModel.value.vehicleInformation = VehicleInformation(
         registrationDate: Timestamp.fromDate(controller.selectedDate.value!),
@@ -736,7 +1031,15 @@ class VehicleInformationScreen extends StatelessWidget {
       await FireStoreUtils.updateDriverUser(controller.driverModel.value).then((value) {
         ShowToastDialog.closeLoader();
         if (value == true) {
-          ShowToastDialog.showToast("Information update successfully".tr);
+          bool wasFirstTime = !controller.hasVehicleRegistered.value;
+          controller.hasVehicleRegistered.value = true;
+          controller.isEditable.value = false;
+
+          String message = wasFirstTime
+              ? "Veículo cadastrado com sucesso!".tr
+              : "Alterações salvas com sucesso!".tr;
+
+          ShowToastDialog.showToast(message);
         }
       });
     }
