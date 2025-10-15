@@ -243,13 +243,13 @@ class OrderMapScreen extends StatelessWidget {
                                                   payload: {});
                                             }
                                           });
-                                          DriverIdAcceptReject driverIdAcceptReject = DriverIdAcceptReject(
-                                              driverId: FireStoreUtils.getCurrentUid(), acceptedRejectTime: Timestamp.now(), offerAmount: controller.newAmount.value);
-                                          FireStoreUtils.acceptRide(controller.orderModel.value, driverIdAcceptReject).then((value) {
-                                            ShowToastDialog.closeLoader();
-                                            ShowToastDialog.showToast("Ride Accepted".tr);
-                                            Get.back(result: true);
-                                          });
+                                          // DriverIdAcceptReject driverIdAcceptReject = DriverIdAcceptReject(
+                                          //     driverId: FireStoreUtils.getCurrentUid(), acceptedRejectTime: Timestamp.now(), offerAmount: controller.newAmount.value);
+                                          // FireStoreUtils.(controller.orderModel.value, driverIdAcceptReject).then((value) {
+                                          //   ShowToastDialog.closeLoader();
+                                          //   ShowToastDialog.showToast("Ride Accepted".tr);
+                                          //   Get.back(result: true);
+                                          // });
                                           // } else {
                                           //   ShowToastDialog.showToast(
                                           //       "Você tem um valor mínimo de ${Constant.amountShow(amount: Constant.minimumDepositToRideAccept.toString())} na carteira para aceitar o pedido e fazer um lance"
