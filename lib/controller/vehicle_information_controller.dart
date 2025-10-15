@@ -1,6 +1,4 @@
-// lib/controller/vehicle_information_controller.dart - VERSÃO CORRIGIDA
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+// lib/controller/vehicle_information_controller.dart - VERSÃO COMPLETA SEM EDIÇÃO
 import 'package:driver/model/driver_rules_model.dart';
 import 'package:driver/model/driver_user_model.dart';
 import 'package:driver/model/service_model.dart';
@@ -14,20 +12,28 @@ import 'package:intl/intl.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 class VehicleInformationController extends GetxController {
+  // ============================================================================
+  // CONTROLLERS DE TEXTO
+  // ============================================================================
   Rx<TextEditingController> vehicleNumberController = TextEditingController().obs;
   Rx<TextEditingController> seatsController = TextEditingController().obs;
   Rx<TextEditingController> registrationDateController = TextEditingController().obs;
   Rx<TextEditingController> driverRulesController = TextEditingController().obs;
   Rx<TextEditingController> zoneNameController = TextEditingController().obs;
+
+  // ============================================================================
+  // VARIÁVEIS REATIVAS
+  // ============================================================================
+  RxString selectedColor = "".obs;
   Rx<DateTime?> selectedDate = DateTime.now().obs;
-
-  // CORREÇÃO PRINCIPAL: Controle de edição
-  RxBool isEditable = true.obs; // Começa como editável
-  RxBool hasVehicleRegistered = false.obs; // Novo: indica se já tem veículo cadastrado
-
   RxBool isLoading = true.obs;
 
-  Rx<String> selectedColor = "".obs;
+  // ============================================================================
+  // CONTROLE DE CADASTRO - SEM POSSIBILIDADE DE EDIÇÃO APÓS CADASTRAR
+  // ============================================================================
+  RxBool hasVehicleRegistered = false.obs; // Indica se já tem veículo cadastrado
+  RxBool isEditable = false.obs; // Se false, campos ficam bloqueados
+
   List<String> carColorList = <String>[
     'Vermelho', 'Preto', 'Branco', 'Azul', 'Verde',
     'Laranjado', 'Prata', 'Cinza', 'Amarelo', 'Marron',
@@ -35,27 +41,31 @@ class VehicleInformationController extends GetxController {
   ].obs;
   List<String> sheetList = <String>['1', '2', '3', '4'].obs;
 
+  // ============================================================================
+  // FORMATADORES E SELETORES
+  // ============================================================================
   var maskFormatter = MaskTextInputFormatter(
-      mask: '###-####',
-      filter: { "#": RegExp(r'[A-z0-9]') },
-      type: MaskAutoCompletionType.lazy
+    mask: 'AAA-#X##',
+    filter: {
+      "A": RegExp(r'[A-Za-z]'),
+      "#": RegExp(r'[0-9]'),
+      "X": RegExp(r'[0-9A-Za-z]')
+    },
   );
 
-  @override
-  void onInit() {
-    getVehicleType();
-    super.onInit();
-  }
-
-  List<VehicleTypeModel> vehicleList = <VehicleTypeModel>[].obs;
   Rx<VehicleTypeModel> selectedVehicle = VehicleTypeModel().obs;
+  List<VehicleTypeModel> vehicleList = [];
 
-  var colors = [
+
+  List<Color> vehicleColorList = [
     AppColors.serviceColor1,
     AppColors.serviceColor2,
     AppColors.serviceColor3,
   ];
 
+  // ============================================================================
+  // MODELOS E LISTAS
+  // ============================================================================
   Rx<DriverUserModel> driverModel = DriverUserModel().obs;
   RxList<DriverRulesModel> driverRulesList = <DriverRulesModel>[].obs;
   RxList<DriverRulesModel> selectedDriverRulesList = <DriverRulesModel>[].obs;
@@ -67,7 +77,18 @@ class VehicleInformationController extends GetxController {
   Rx<String?> selectedServiceId = "".obs;
   RxString zoneString = "".obs;
 
-  /// Carrega dados do veículo e configura modo de edição
+  // ============================================================================
+  // INICIALIZAÇÃO
+  // ============================================================================
+  @override
+  void onInit() {
+    getVehicleType();
+    super.onInit();
+  }
+
+  // ============================================================================
+  // CARREGA DADOS DO VEÍCULO E CONFIGURA MODO DE EDIÇÃO
+  // ============================================================================
   getVehicleType() async {
     isLoading.value = true;
 
@@ -84,11 +105,12 @@ class VehicleInformationController extends GetxController {
     });
 
     // Carrega dados do motorista
-    await FireStoreUtils.getDriverProfile(FireStoreUtils.getCurrentUid()).then((value) {
+    await FireStoreUtils.getDriverProfile(FireStoreUtils.getCurrentUid())
+        .then((value) {
       driverModel.value = value!;
 
       // ========================================================================
-      // LÓGICA CORRIGIDA: Verifica se JÁ tem veículo cadastrado
+      // LÓGICA PRINCIPAL: Verifica se JÁ tem veículo cadastrado
       // ========================================================================
       if (driverModel.value.vehicleInformation != null &&
           driverModel.value.vehicleInformation!.vehicleNumber != null &&
@@ -96,9 +118,10 @@ class VehicleInformationController extends GetxController {
 
         // ✅ JÁ TEM VEÍCULO CADASTRADO
         hasVehicleRegistered.value = true;
-        isEditable.value = false; // BLOQUEIA EDIÇÃO
+        isEditable.value = false; // BLOQUEIA PARA SEMPRE
 
-        print('🚗 VEÍCULO JÁ CADASTRADO - Modo VISUALIZAÇÃO');
+        print('🚗 VEÍCULO JÁ CADASTRADO - Modo VISUALIZAÇÃO APENAS');
+        print('🔒 Edição BLOQUEADA permanentemente');
 
         // Preenche os campos com os dados existentes
         vehicleNumberController.value.text =
@@ -115,22 +138,23 @@ class VehicleInformationController extends GetxController {
 
         seatsController.value.text =
             driverModel.value.vehicleInformation!.seats ?? "2";
+
       } else {
         // ✅ NÃO TEM VEÍCULO CADASTRADO
         hasVehicleRegistered.value = false;
-        isEditable.value = true; // LIBERA EDIÇÃO
+        isEditable.value = true; // LIBERA APENAS PARA CADASTRO
 
         print('📝 VEÍCULO NÃO CADASTRADO - Modo CADASTRO');
       }
 
       // Carrega zonas selecionadas
-      if(driverModel.value.zoneIds != null){
-        print(driverModel.value.zoneIds.toString());
+      if (driverModel.value.zoneIds != null) {
         for (var element in driverModel.value.zoneIds!) {
           List list = zoneList.where((p0) => p0.id == element).toList();
-          if(list.isNotEmpty){
+          if (list.isNotEmpty) {
             selectedZone.add(element);
-            zoneString.value = "$zoneString${zoneString.isEmpty ? "" : ","} ${list.first.name}";
+            zoneString.value =
+            "$zoneString${zoneString.isEmpty ? "" : ","} ${list.first.name}";
           }
         }
         zoneNameController.value.text = zoneString.value;
@@ -147,7 +171,8 @@ class VehicleInformationController extends GetxController {
       vehicleList = value!;
       if (driverModel.value.vehicleInformation != null) {
         for (var element in vehicleList) {
-          if (element.id == driverModel.value.vehicleInformation!.vehicleTypeId) {
+          if (element.id ==
+              driverModel.value.vehicleInformation!.vehicleTypeId) {
             selectedVehicle.value = element;
           }
         }
@@ -160,7 +185,8 @@ class VehicleInformationController extends GetxController {
         driverRulesList.value = value;
         if (driverModel.value.vehicleInformation != null) {
           if (driverModel.value.vehicleInformation!.driverRules != null) {
-            for (var element in driverModel.value.vehicleInformation!.driverRules!) {
+            for (var element
+            in driverModel.value.vehicleInformation!.driverRules!) {
               selectedDriverRulesList.add(element);
             }
           }
@@ -172,47 +198,9 @@ class VehicleInformationController extends GetxController {
     update();
   }
 
-  /// Alterna entre modo visualização e edição (NOVO)
-  void toggleEditMode() {
-    if (hasVehicleRegistered.value) {
-      isEditable.value = !isEditable.value;
-      update();
-
-      if (isEditable.value) {
-        print('✏️ Modo EDIÇÃO ativado');
-      } else {
-        print('👁️ Modo VISUALIZAÇÃO ativado');
-      }
-    }
-  }
-
-  /// Cancela edição e restaura valores originais (NOVO)
-  void cancelEdit() {
-    if (hasVehicleRegistered.value && driverModel.value.vehicleInformation != null) {
-      // Restaura valores originais
-      vehicleNumberController.value.text =
-          driverModel.value.vehicleInformation!.vehicleNumber.toString();
-
-      selectedDate.value =
-          driverModel.value.vehicleInformation!.registrationDate!.toDate();
-
-      registrationDateController.value.text =
-          DateFormat("dd/MM/yyyy").format(selectedDate.value!);
-
-      selectedColor.value =
-          driverModel.value.vehicleInformation!.vehicleColor.toString();
-
-      seatsController.value.text =
-          driverModel.value.vehicleInformation!.seats ?? "2";
-
-      // Volta para modo visualização
-      isEditable.value = false;
-      update();
-
-      print('❌ Edição cancelada - valores restaurados');
-    }
-  }
-
+  // ============================================================================
+  // DISPOSE
+  // ============================================================================
   @override
   void onClose() {
     vehicleNumberController.value.dispose();

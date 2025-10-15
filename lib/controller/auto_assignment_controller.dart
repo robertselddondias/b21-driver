@@ -2,22 +2,16 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:driver/constant/collection_name.dart';
 import 'package:driver/constant/constant.dart';
-import 'package:driver/constant/send_notification.dart';
 import 'package:driver/constant/show_toast_dialog.dart';
 import 'package:driver/model/driver_document_model.dart';
 import 'package:driver/model/driver_user_model.dart';
 import 'package:driver/model/document_model.dart';
-import 'package:driver/model/order/driverId_accept_reject.dart';
 import 'package:driver/model/order_model.dart';
-import 'package:driver/model/user_model.dart';
-import 'package:driver/ui/dashboard_screen.dart';
 import 'package:driver/ui/online_registration/online_registartion_screen.dart';
 import 'package:driver/ui/vehicle_information/vehicle_information_screen.dart';
 import 'package:driver/utils/fire_store_utils.dart';
-import 'package:driver/widget/ride_assignment_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';

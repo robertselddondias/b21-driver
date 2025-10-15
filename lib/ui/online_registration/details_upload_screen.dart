@@ -784,92 +784,111 @@ class DetailsUploadScreen extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) {
+      isScrollControlled: true,
+      // IMPORTANTE: Previne que o sheet feche ao tocar fora
+      isDismissible: true,
+      enableDrag: true,
+      builder: (BuildContext sheetContext) {
         return Container(
           decoration: BoxDecoration(
             color: themeChange.getThem()
                 ? AppColors.darkContainerBackground
                 : AppColors.containerBackground,
             borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(25),
-              topRight: Radius.circular(25),
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
             ),
           ),
-          padding: EdgeInsets.all(Responsive.width(5, context)),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Indicador de arraste
-              Container(
-                width: Responsive.width(12, context),
-                height: Responsive.height(0.6, context),
-                decoration: BoxDecoration(
-                  color: themeChange.getThem()
-                      ? Colors.white24
-                      : Colors.black26,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-
-              SizedBox(height: Responsive.height(2, context)),
-
-              // Título
-              Text(
-                'Escolha a fonte da imagem',
-                style: GoogleFonts.poppins(
-                  fontSize: Responsive.width(4.5, context),
-                  fontWeight: FontWeight.w600,
-                  color: themeChange.getThem() ? Colors.white : Colors.black,
-                ),
-              ),
-
-              SizedBox(height: Responsive.height(3, context)),
-
-              // Opção Câmera
-              _buildSourceOption(
-                context,
-                icon: Icons.camera_alt,
-                title: 'Câmera',
-                subtitle: 'Tirar uma foto',
-                color: Colors.blue,
-                onTap: () {
-                  controller.pickFile(source: ImageSource.camera, type: type);
-                },
-                themeChange: themeChange,
-              ),
-
-              SizedBox(height: Responsive.height(2, context)),
-
-              // Opção Galeria
-              _buildSourceOption(
-                context,
-                icon: Icons.photo_library,
-                title: 'Galeria',
-                subtitle: 'Escolher da galeria',
-                color: Colors.green,
-                onTap: () {
-                  controller.pickFile(source: ImageSource.gallery, type: type);
-                },
-                themeChange: themeChange,
-              ),
-
-              SizedBox(height: Responsive.height(2, context)),
-
-              // Botão Cancelar
-              TextButton(
-                onPressed: () => Get.back(),
-                child: Text(
-                  'Cancelar',
-                  style: GoogleFonts.poppins(
-                    fontSize: Responsive.width(4, context),
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w500,
+          child: Padding(
+            padding: EdgeInsets.all(Responsive.width(6, context)),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Indicador de arraste
+                Container(
+                  width: Responsive.width(12, context),
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: themeChange.getThem()
+                        ? Colors.white24
+                        : Colors.black26,
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-              ),
 
-              SizedBox(height: Responsive.height(1, context)),
-            ],
+                SizedBox(height: Responsive.height(2, context)),
+
+                // Título
+                Text(
+                  'Escolha a fonte da imagem',
+                  style: GoogleFonts.poppins(
+                    fontSize: Responsive.width(4.5, context),
+                    fontWeight: FontWeight.w600,
+                    color: themeChange.getThem() ? Colors.white : Colors.black,
+                  ),
+                ),
+
+                SizedBox(height: Responsive.height(3, context)),
+
+                // Opção Câmera
+                _buildSourceOption(
+                  context,
+                  icon: Icons.camera_alt,
+                  title: 'Câmera',
+                  subtitle: 'Tirar uma foto',
+                  color: Colors.blue,
+                  onTap: () async {
+                    print('📷 Botão Câmera pressionado');
+                    // Chama o método pickFile do controller
+                    await controller.pickFile(
+                        source: ImageSource.camera,
+                        type: type
+                    );
+                  },
+                  themeChange: themeChange,
+                ),
+
+                SizedBox(height: Responsive.height(2, context)),
+
+                // Opção Galeria
+                _buildSourceOption(
+                  context,
+                  icon: Icons.photo_library,
+                  title: 'Galeria',
+                  subtitle: 'Escolher da galeria',
+                  color: Colors.green,
+                  onTap: () async {
+                    print('🖼️ Botão Galeria pressionado');
+                    // Chama o método pickFile do controller
+                    await controller.pickFile(
+                        source: ImageSource.gallery,
+                        type: type
+                    );
+                  },
+                  themeChange: themeChange,
+                ),
+
+                SizedBox(height: Responsive.height(2, context)),
+
+                // Botão Cancelar
+                TextButton(
+                  onPressed: () {
+                    print('❌ Cancelar pressionado');
+                    Navigator.pop(sheetContext);
+                  },
+                  child: Text(
+                    'Cancelar',
+                    style: GoogleFonts.poppins(
+                      fontSize: Responsive.width(4, context),
+                      color: Colors.grey,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: Responsive.height(1, context)),
+              ],
+            ),
           ),
         );
       },
@@ -885,22 +904,26 @@ class DetailsUploadScreen extends StatelessWidget {
         required String title,
         required String subtitle,
         required Color color,
-        required VoidCallback onTap,
+        required Future<void> Function() onTap, // Mudado para Future
         required DarkThemeProvider themeChange,
       }) {
     return InkWell(
-      onTap: onTap,
+      onTap: () async {
+        print('🔘 Opção selecionada: $title');
+        await onTap();
+      },
       borderRadius: BorderRadius.circular(15),
       child: Container(
         padding: EdgeInsets.all(Responsive.width(4, context)),
         decoration: BoxDecoration(
           color: themeChange.getThem()
-              ? AppColors.darkTextField
-              : AppColors.textField,
+              ? AppColors.darkContainerBackground
+              : AppColors.containerBackground,
           borderRadius: BorderRadius.circular(15),
           border: Border.all(
-            color: color.withOpacity(0.3),
-            width: 1.5,
+            color: themeChange.getThem()
+                ? AppColors.darkContainerBorder
+                : AppColors.containerBorder,
           ),
         ),
         child: Row(
@@ -925,11 +948,12 @@ class DetailsUploadScreen extends StatelessWidget {
                   Text(
                     title,
                     style: GoogleFonts.poppins(
-                      fontSize: Responsive.width(4.5, context),
+                      fontSize: Responsive.width(4, context),
                       fontWeight: FontWeight.w600,
                       color: themeChange.getThem() ? Colors.white : Colors.black,
                     ),
                   ),
+                  SizedBox(height: Responsive.height(0.3, context)),
                   Text(
                     subtitle,
                     style: GoogleFonts.poppins(
@@ -944,8 +968,8 @@ class DetailsUploadScreen extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward_ios,
-              color: color,
-              size: Responsive.width(5, context),
+              color: themeChange.getThem() ? Colors.white54 : Colors.black54,
+              size: Responsive.width(4, context),
             ),
           ],
         ),

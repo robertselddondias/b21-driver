@@ -1,3 +1,4 @@
+// lib/controller/details_upload_controller.dart - VERSÃO CORRIGIDA
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -30,9 +31,7 @@ class DetailsUploadController extends GetxController {
 
   @override
   void onInit() async{
-    // TODO: implement onInit
     await getArgument();
-
     super.onInit();
   }
 
@@ -71,40 +70,88 @@ class DetailsUploadController extends GetxController {
 
   final ImagePicker _imagePicker = ImagePicker();
 
+  // ============================================================================
+  // MÉTODO CORRIGIDO - pickFile
+  // ============================================================================
   Future pickFile({required ImageSource source, required String type}) async {
     try {
-      XFile? image = await _imagePicker.pickImage(source: source);
-      if (image == null) return;
-      Get.back();
+      print('🎯 Iniciando captura de imagem - Tipo: $type, Source: ${source == ImageSource.camera ? "Camera" : "Gallery"}');
 
+      XFile? image = await _imagePicker.pickImage(
+        source: source,
+        imageQuality: 85, // Adiciona qualidade de imagem
+      );
+
+      // Se nenhuma imagem foi selecionada
+      if (image == null) {
+        print('❌ Nenhuma imagem selecionada');
+        Get.back(); // Fecha o bottom sheet
+        return;
+      }
+
+      print('✅ Imagem capturada: ${image.path}');
+
+      // PRIMEIRO: Atribui a imagem à variável correta
       if (type == "front") {
         frontImage.value = image.path;
+        print('📸 Imagem frontal atribuída: ${frontImage.value}');
       } else {
         backImage.value = image.path;
+        print('📸 Imagem traseira atribuída: ${backImage.value}');
       }
+
+      // DEPOIS: Força atualização do GetX
+      update();
+
+      // POR ÚLTIMO: Fecha o bottom sheet
+      Get.back();
+
+      print('✅ Processo concluído com sucesso');
+
+      // Feedback para o usuário
+      ShowToastDialog.showToast("Foto adicionada com sucesso!");
+
     } on PlatformException catch (e) {
-      ShowToastDialog.showToast("Failed to Pick : \n $e");
+      print('❌ Erro PlatformException: $e');
+      Get.back(); // Fecha o bottom sheet mesmo com erro
+      ShowToastDialog.showToast("Falha ao capturar foto: ${e.message}");
+    } catch (e) {
+      print('❌ Erro desconhecido: $e');
+      Get.back(); // Fecha o bottom sheet mesmo com erro
+      ShowToastDialog.showToast("Erro ao processar imagem");
     }
   }
 
-
+  // ============================================================================
+  // MÉTODO UPLOAD DO DOCUMENTO
+  // ============================================================================
   uploadDocument() async {
     String frontImageFileName = File(frontImage.value).path.split('/').last;
     String backImageFileName = File(backImage.value).path.split('/').last;
 
     if(frontImage.value.isNotEmpty && Constant().hasValidUrl(frontImage.value) == false){
-      frontImage.value = await Constant.uploadUserImageToFireStorage(File(frontImage.value), "driverDocument/${FireStoreUtils.getCurrentUid()}", frontImageFileName);
+      frontImage.value = await Constant.uploadUserImageToFireStorage(
+          File(frontImage.value),
+          "driverDocument/${FireStoreUtils.getCurrentUid()}",
+          frontImageFileName
+      );
     }
 
     if(backImage.value.isNotEmpty && Constant().hasValidUrl(backImage.value) == false){
-      backImage.value = await Constant.uploadUserImageToFireStorage(File(backImage.value), "driverDocument/${FireStoreUtils.getCurrentUid()}", backImageFileName);
+      backImage.value = await Constant.uploadUserImageToFireStorage(
+          File(backImage.value),
+          "driverDocument/${FireStoreUtils.getCurrentUid()}",
+          backImageFileName
+      );
     }
+
     documents.value.frontImage = frontImage.value;
     documents.value.documentId = documentModel.value.id;
     documents.value.formatter = documentModel.value.formatter;
     documents.value.documentNumber = documentNumberController.value.text;
     documents.value.backImage = backImage.value;
     documents.value.verified = false;
+
     if (documentModel.value.expireAt == true) {
       documents.value.expireAt = Timestamp.fromDate(selectedDate.value!);
     }
@@ -112,8 +159,7 @@ class DetailsUploadController extends GetxController {
     await FireStoreUtils.uploadDriverDocument(documents.value).then((value) {
       if (value) {
         ShowToastDialog.closeLoader();
-        ShowToastDialog.showToast("Document upload successfully");
-
+        ShowToastDialog.showToast("Documento enviado com sucesso");
         Get.back();
       }
     });

@@ -1,4 +1,4 @@
-// lib/ui/vehicle_information/vehicle_information_screen.dart - CÓDIGO COMPLETO
+// lib/ui/vehicle_information/vehicle_information_screen.dart - VERSÃO COMPLETA SEM EDIÇÃO
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:driver/constant/constant.dart';
@@ -84,14 +84,17 @@ class VehicleInformationScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Service Selection Section
-                              _buildSectionTitle(context, themeChange, 'Tipo de Serviço'),
+                              _buildSectionTitle(
+                                  context, themeChange, 'Tipo de Serviço'),
                               SizedBox(height: Responsive.height(1, context)),
-                              _buildServiceSelector(context, controller, themeChange),
+                              _buildServiceSelector(
+                                  context, controller, themeChange),
 
                               SizedBox(height: Responsive.height(3, context)),
 
                               // Vehicle Information Section
-                              _buildSectionTitle(context, themeChange, 'Informações do Veículo'),
+                              _buildSectionTitle(context, themeChange,
+                                  'Informações do Veículo'),
                               SizedBox(height: Responsive.height(1.5, context)),
 
                               // Vehicle Number Field
@@ -103,7 +106,8 @@ class VehicleInformationScreen extends StatelessWidget {
                                   context,
                                   enable: controller.isEditable.value,
                                   hintText: 'Placa do Veículo'.tr,
-                                  controller: controller.vehicleNumberController.value,
+                                  controller: controller
+                                      .vehicleNumberController.value,
                                   inputMaskFormatter: controller.maskFormatter,
                                 ),
                               ),
@@ -118,11 +122,14 @@ class VehicleInformationScreen extends StatelessWidget {
                                 child: InkWell(
                                   onTap: () async {
                                     if (controller.isEditable.value) {
-                                      await Constant.selectDate(context).then((value) {
+                                      await Constant.selectDate(context)
+                                          .then((value) {
                                         if (value != null) {
                                           controller.selectedDate.value = value;
-                                          controller.registrationDateController.value.text =
-                                              DateFormat("dd/MM/yyyy").format(value);
+                                          controller.registrationDateController
+                                              .value.text =
+                                              DateFormat("dd/MM/yyyy")
+                                                  .format(value);
                                         }
                                       });
                                     }
@@ -132,7 +139,8 @@ class VehicleInformationScreen extends StatelessWidget {
                                       context,
                                       hintText: 'Registration Date'.tr,
                                       enable: controller.isEditable.value,
-                                      controller: controller.registrationDateController.value,
+                                      controller: controller
+                                          .registrationDateController.value,
                                     ),
                                   ),
                                 ),
@@ -148,17 +156,20 @@ class VehicleInformationScreen extends StatelessWidget {
                                 child: _buildDropdown<VehicleTypeModel>(
                                   context,
                                   themeChange,
-                                  value: controller.selectedVehicle.value.id == null
+                                  value: controller.selectedVehicle.value.id ==
+                                      null
                                       ? null
                                       : controller.selectedVehicle.value,
                                   hint: "Select vehicle type".tr,
                                   items: controller.vehicleList,
                                   onChanged: controller.isEditable.value
                                       ? (value) {
-                                    controller.selectedVehicle.value = value!;
+                                    controller.selectedVehicle.value =
+                                    value!;
                                   }
                                       : null,
-                                  itemBuilder: (item) => Text(item.name.toString()),
+                                  itemBuilder: (item) =>
+                                      Text(item.name ?? 'Tipo'),
                                 ),
                               ),
 
@@ -179,10 +190,12 @@ class VehicleInformationScreen extends StatelessWidget {
                                   items: controller.carColorList,
                                   onChanged: controller.isEditable.value
                                       ? (value) {
-                                    controller.selectedColor.value = value!;
+                                    controller.selectedColor.value =
+                                    value!;
                                   }
                                       : null,
-                                  itemBuilder: (item) => Text(item.toString()),
+                                  itemBuilder: (item) =>
+                                      Text(item.toString()),
                                 ),
                               ),
 
@@ -196,17 +209,20 @@ class VehicleInformationScreen extends StatelessWidget {
                                 child: _buildDropdown<String>(
                                   context,
                                   themeChange,
-                                  value: controller.seatsController.value.text.isEmpty
+                                  value: controller
+                                      .seatsController.value.text.isEmpty
                                       ? null
                                       : controller.seatsController.value.text,
                                   hint: "How Many Seats".tr,
                                   items: controller.sheetList,
                                   onChanged: controller.isEditable.value
                                       ? (value) {
-                                    controller.seatsController.value.text = value!;
+                                    controller.seatsController.value
+                                        .text = value!;
                                   }
                                       : null,
-                                  itemBuilder: (item) => Text(item.toString()),
+                                  itemBuilder: (item) =>
+                                      Text(item.toString()),
                                 ),
                               ),
 
@@ -220,14 +236,16 @@ class VehicleInformationScreen extends StatelessWidget {
                                 child: InkWell(
                                   onTap: () {
                                     if (controller.isEditable.value) {
-                                      _showZoneDialog(context, controller, themeChange);
+                                      _showZoneDialog(
+                                          context, controller, themeChange);
                                     }
                                   },
                                   child: AbsorbPointer(
                                     child: TextFieldThem.buildTextFiled(
                                       context,
                                       hintText: 'Select Zone'.tr,
-                                      controller: controller.zoneNameController.value,
+                                      controller: controller
+                                          .zoneNameController.value,
                                       enable: controller.isEditable.value,
                                     ),
                                   ),
@@ -236,13 +254,15 @@ class VehicleInformationScreen extends StatelessWidget {
 
                               SizedBox(height: Responsive.height(3, context)),
 
-                              _buildDriverRules(context, controller, themeChange),
+                              _buildDriverRules(
+                                  context, controller, themeChange),
 
                               SizedBox(height: Responsive.height(3, context)),
 
                               // Warning Text
                               Container(
-                                padding: EdgeInsets.all(Responsive.width(4, context)),
+                                padding:
+                                EdgeInsets.all(Responsive.width(4, context)),
                                 margin: EdgeInsets.symmetric(
                                   horizontal: Responsive.width(2, context),
                                 ),
@@ -260,12 +280,15 @@ class VehicleInformationScreen extends StatelessWidget {
                                       color: Colors.orange,
                                       size: Responsive.width(5, context),
                                     ),
-                                    SizedBox(width: Responsive.width(3, context)),
+                                    SizedBox(
+                                        width: Responsive.width(3, context)),
                                     Expanded(
                                       child: Text(
-                                        "You can not change once you select one service type if you want to change please contact to administrator ".tr,
+                                        "You can not change once you select one service type if you want to change please contact to administrator "
+                                            .tr,
                                         style: GoogleFonts.poppins(
-                                          fontSize: Responsive.width(3, context),
+                                          fontSize:
+                                          Responsive.width(3, context),
                                           color: Colors.orange.shade700,
                                           height: 1.4,
                                         ),
@@ -284,7 +307,8 @@ class VehicleInformationScreen extends StatelessWidget {
                       // BOTÕES DE AÇÃO
                       Padding(
                         padding: EdgeInsets.all(Responsive.width(5, context)),
-                        child: _buildActionButtons(context, controller, themeChange),
+                        child: _buildActionButtons(
+                            context, controller, themeChange),
                       ),
                     ],
                   ),
@@ -298,12 +322,13 @@ class VehicleInformationScreen extends StatelessWidget {
   }
 
   /// ============================================================================
-  /// BANNER DE STATUS COM 3 ESTADOS
+  /// BANNER DE STATUS - APENAS 2 ESTADOS (SEM EDIÇÃO)
   /// ============================================================================
-  Widget _buildStatusBanner(BuildContext context, VehicleInformationController controller, DarkThemeProvider themeChange) {
+  Widget _buildStatusBanner(BuildContext context,
+      VehicleInformationController controller, DarkThemeProvider themeChange) {
     return Obx(() {
       if (!controller.hasVehicleRegistered.value) {
-        // Estado 1: CADASTRO (primeira vez) - AZUL
+        // Estado 1: CADASTRO INICIAL - AZUL
         return Container(
           margin: EdgeInsets.symmetric(
             horizontal: Responsive.width(5, context),
@@ -365,71 +390,8 @@ class VehicleInformationScreen extends StatelessWidget {
             ],
           ),
         );
-      } else if (controller.isEditable.value) {
-        // Estado 2: EDIÇÃO - LARANJA
-        return Container(
-          margin: EdgeInsets.symmetric(
-            horizontal: Responsive.width(5, context),
-            vertical: Responsive.height(1, context),
-          ),
-          padding: EdgeInsets.all(Responsive.width(3, context)),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.orange.shade400, Colors.orange.shade600],
-            ),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.orange.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(Responsive.width(2, context)),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.edit,
-                  color: Colors.white,
-                  size: Responsive.width(5, context),
-                ),
-              ),
-              SizedBox(width: Responsive.width(3, context)),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Modo Edição Ativo',
-                      style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: Responsive.width(3.8, context),
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    SizedBox(height: Responsive.height(0.3, context)),
-                    Text(
-                      'Você pode modificar as informações do veículo',
-                      style: GoogleFonts.poppins(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: Responsive.width(3, context),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        );
       } else {
-        // Estado 3: VISUALIZAÇÃO - VERDE
+        // Estado 2: VEÍCULO JÁ CADASTRADO - VERDE (SEM BOTÃO EDITAR)
         return Container(
           margin: EdgeInsets.symmetric(
             horizontal: Responsive.width(5, context),
@@ -478,7 +440,7 @@ class VehicleInformationScreen extends StatelessWidget {
                     ),
                     SizedBox(height: Responsive.height(0.3, context)),
                     Text(
-                      'Visualizando informações do seu veículo',
+                      'Informações do veículo registradas com sucesso',
                       style: GoogleFonts.poppins(
                         color: Colors.white.withOpacity(0.9),
                         fontSize: Responsive.width(3, context),
@@ -488,37 +450,17 @@ class VehicleInformationScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              // Botão Editar
-              InkWell(
-                onTap: () => controller.toggleEditMode(),
-                child: Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: Responsive.width(3, context),
-                    vertical: Responsive.height(0.8, context),
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.edit,
-                        color: Colors.green.shade600,
-                        size: Responsive.width(3.5, context),
-                      ),
-                      SizedBox(width: Responsive.width(1, context)),
-                      Text(
-                        'Editar',
-                        style: GoogleFonts.poppins(
-                          color: Colors.green.shade600,
-                          fontSize: Responsive.width(3, context),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
+              // ÍCONE DE BLOQUEIO
+              Container(
+                padding: EdgeInsets.all(Responsive.width(2, context)),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.lock_outline,
+                  color: Colors.white,
+                  size: Responsive.width(4.5, context),
                 ),
               ),
             ],
@@ -529,12 +471,13 @@ class VehicleInformationScreen extends StatelessWidget {
   }
 
   /// ============================================================================
-  /// BOTÕES DE AÇÃO CONDICIONAIS
+  /// BOTÕES DE AÇÃO - APENAS QUANDO NÃO TEM CADASTRO
   /// ============================================================================
-  Widget _buildActionButtons(BuildContext context, VehicleInformationController controller, DarkThemeProvider themeChange) {
+  Widget _buildActionButtons(BuildContext context,
+      VehicleInformationController controller, DarkThemeProvider themeChange) {
     return Obx(() {
       if (!controller.hasVehicleRegistered.value) {
-        // Primeira vez - apenas botão CADASTRAR
+        // Primeira vez - botão cadastrar
         return Center(
           child: ButtonThem.buildButton(
             context,
@@ -543,90 +486,52 @@ class VehicleInformationScreen extends StatelessWidget {
             onPress: () => _handleSave(controller),
           ),
         );
-      } else if (controller.isEditable.value) {
-        // Modo edição - botões CANCELAR e SALVAR
-        return Row(
-          children: [
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(right: Responsive.width(2, context)),
-                child: OutlinedButton(
-                  onPressed: () => controller.cancelEdit(),
-                  style: OutlinedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(
-                      vertical: Responsive.height(1.8, context),
-                    ),
-                    side: BorderSide(
-                      color: Colors.grey,
-                      width: 1.5,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.close,
-                        color: Colors.grey.shade700,
-                        size: Responsive.width(4.5, context),
-                      ),
-                      SizedBox(width: Responsive.width(1.5, context)),
-                      Text(
-                        'Cancelar',
-                        style: GoogleFonts.poppins(
-                          fontSize: Responsive.width(3.8, context),
-                          fontWeight: FontWeight.w600,
-                          color: Colors.grey.shade700,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: EdgeInsets.only(left: Responsive.width(2, context)),
-                child: ElevatedButton(
-                  onPressed: () => _handleSave(controller),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: EdgeInsets.symmetric(
-                      vertical: Responsive.height(1.8, context),
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: Responsive.width(4.5, context),
-                      ),
-                      SizedBox(width: Responsive.width(1.5, context)),
-                      Text(
-                        'Salvar Alterações',
-                        style: GoogleFonts.poppins(
-                          fontSize: Responsive.width(3.8, context),
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        );
       } else {
-        // Modo visualização - sem botões
-        return const SizedBox.shrink();
+        // Já cadastrado - mensagem informativa
+        return Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: Responsive.width(5, context),
+            vertical: Responsive.height(2, context),
+          ),
+          child: Container(
+            padding: EdgeInsets.all(Responsive.width(4, context)),
+            decoration: BoxDecoration(
+              color: themeChange.getThem()
+                  ? Colors.blue.shade900.withOpacity(0.3)
+                  : Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: themeChange.getThem()
+                    ? Colors.blue.shade700
+                    : Colors.blue.shade200,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  color: themeChange.getThem()
+                      ? Colors.blue.shade300
+                      : Colors.blue.shade700,
+                  size: Responsive.width(5, context),
+                ),
+                SizedBox(width: Responsive.width(3, context)),
+                Expanded(
+                  child: Text(
+                    'Para alterar as informações do veículo, entre em contato com o administrador.',
+                    style: GoogleFonts.poppins(
+                      fontSize: Responsive.width(3.3, context),
+                      color: themeChange.getThem()
+                          ? Colors.blue.shade200
+                          : Colors.blue.shade800,
+                      height: 1.4,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
       }
     });
   }
@@ -635,7 +540,8 @@ class VehicleInformationScreen extends StatelessWidget {
   /// WIDGETS AUXILIARES
   /// ============================================================================
 
-  Widget _buildSectionTitle(BuildContext context, DarkThemeProvider themeChange, String title) {
+  Widget _buildSectionTitle(
+      BuildContext context, DarkThemeProvider themeChange, String title) {
     return Text(
       title,
       style: GoogleFonts.poppins(
@@ -646,10 +552,12 @@ class VehicleInformationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildFormField(BuildContext context, DarkThemeProvider themeChange, {
-    required String label,
-    required Widget child,
-  }) {
+  Widget _buildFormField(
+      BuildContext context,
+      DarkThemeProvider themeChange, {
+        required String label,
+        required Widget child,
+      }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -667,7 +575,8 @@ class VehicleInformationScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildServiceSelector(BuildContext context, VehicleInformationController controller, DarkThemeProvider themeChange) {
+  Widget _buildServiceSelector(BuildContext context,
+      VehicleInformationController controller, DarkThemeProvider themeChange) {
     return SizedBox(
       height: Responsive.height(16, context),
       child: ListView.builder(
@@ -682,64 +591,58 @@ class VehicleInformationScreen extends StatelessWidget {
               child: InkWell(
                 onTap: () async {
                   if (controller.driverModel.value.serviceId == null) {
-                    controller.selectedServiceId.value = serviceModel.id;
+                    controller.selectedServiceId.value = serviceModel.id ?? '';
                   }
                 },
                 borderRadius: BorderRadius.circular(15),
                 child: Container(
                   width: Responsive.width(25, context),
                   decoration: BoxDecoration(
-                    color: controller.selectedServiceId.value == serviceModel.id
+                    color: controller.selectedServiceId.value == (serviceModel.id ?? '')
                         ? AppColors.primary
                         : (themeChange.getThem()
                         ? AppColors.darkContainerBackground
                         : AppColors.containerBackground),
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
-                      color: controller.selectedServiceId.value == serviceModel.id
+                      color: controller.selectedServiceId.value == (serviceModel.id ?? '')
                           ? AppColors.primary
                           : (themeChange.getThem()
                           ? AppColors.darkContainerBorder
                           : AppColors.containerBorder),
-                      width: 1.5,
                     ),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CachedNetworkImage(
-                        imageUrl: serviceModel.image.toString(),
-                        fit: BoxFit.fill,
+                        imageUrl: serviceModel.image ?? '',
+                        height: Responsive.height(6, context),
                         width: Responsive.width(12, context),
-                        height: Responsive.width(12, context),
-                        placeholder: (context, url) => Constant.loader(context),
-                        errorWidget: (context, url, error) => Container(
-                          width: Responsive.width(12, context),
-                          height: Responsive.width(12, context),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            Icons.directions_car,
-                            color: AppColors.primary,
-                            size: Responsive.width(8, context),
-                          ),
+                        color: controller.selectedServiceId.value ==
+                            (serviceModel.id ?? '')
+                            ? Colors.white
+                            : null,
+                        errorWidget: (context, url, error) => Icon(
+                          Icons.image_not_supported,
+                          size: Responsive.width(12, context),
                         ),
                       ),
                       SizedBox(height: Responsive.height(1, context)),
                       Text(
-                        serviceModel.title.toString(),
-                        style: GoogleFonts.poppins(
-                          color: controller.selectedServiceId.value == serviceModel.id
-                              ? Colors.white
-                              : (themeChange.getThem() ? Colors.white : Colors.black),
-                          fontWeight: FontWeight.w500,
-                          fontSize: Responsive.width(3, context),
-                        ),
+                        serviceModel.title ?? 'Serviço',
                         textAlign: TextAlign.center,
                         maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: Responsive.width(3, context),
+                          fontWeight: FontWeight.w500,
+                          color: controller.selectedServiceId.value ==
+                              (serviceModel.id ?? '')
+                              ? Colors.white
+                              : (themeChange.getThem()
+                              ? Colors.white
+                              : Colors.black),
+                        ),
                       ),
                     ],
                   ),
@@ -764,15 +667,19 @@ class VehicleInformationScreen extends StatelessWidget {
     final bool isEnabled = onChanged != null;
 
     final Color fillColor = isEnabled
-        ? (themeChange.getThem() ? AppColors.darkTextField : AppColors.textField)
-        : (themeChange.getThem() ? AppColors.darkTextField.withOpacity(0.5) : AppColors.textField.withOpacity(0.5));
+        ? (themeChange.getThem()
+        ? AppColors.darkTextField
+        : AppColors.textField)
+        : (themeChange.getThem()
+        ? AppColors.darkTextField.withOpacity(0.5)
+        : AppColors.textField.withOpacity(0.5));
 
     final Color valueTextColor = isEnabled
         ? (themeChange.getThem() ? Colors.white : Colors.black87)
         : (themeChange.getThem() ? Colors.white54 : Colors.black54);
 
     return DropdownButtonFormField<T>(
-      value: value,
+      initialValue: value,
       style: GoogleFonts.poppins(
         fontSize: Responsive.width(3.5, context),
         color: valueTextColor,
@@ -833,134 +740,145 @@ class VehicleInformationScreen extends StatelessWidget {
         Icons.keyboard_arrow_down,
         color: isEnabled
             ? (themeChange.getThem() ? Colors.white : Colors.black54)
-            : (themeChange.getThem() ? Colors.white30 : Colors.black26),
+            : (themeChange.getThem() ? Colors.white24 : Colors.black26),
       ),
     );
   }
 
-  Widget _buildDriverRules(BuildContext context, VehicleInformationController controller, DarkThemeProvider themeChange) {
+  Widget _buildDriverRules(BuildContext context,
+      VehicleInformationController controller, DarkThemeProvider themeChange) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle(context, themeChange, 'Regras do Motorista'),
-        SizedBox(height: Responsive.height(1, context)),
-        ...controller.driverRulesList.map((item) {
-          return Obx(() => CheckboxListTile(
-            enabled: controller.isEditable.value,
-            contentPadding: EdgeInsets.zero,
-            controlAffinity: ListTileControlAffinity.leading,
-            title: Text(
-              item.name.toString(),
-              style: GoogleFonts.poppins(
-                fontSize: Responsive.width(3.5, context),
-                color: controller.isEditable.value
-                    ? (themeChange.getThem() ? Colors.white : Colors.black87)
-                    : (themeChange.getThem() ? Colors.white54 : Colors.black54),
-              ),
-            ),
-            value: controller.selectedDriverRulesList
-                .where((element) => element.id == item.id)
-                .isNotEmpty,
-            onChanged: controller.isEditable.value
-                ? (value) {
-              if (value == true) {
-                controller.selectedDriverRulesList.add(item);
-              } else {
-                controller.selectedDriverRulesList.removeAt(
-                  controller.selectedDriverRulesList
-                      .indexWhere((element) => element.id == item.id),
-                );
-              }
-            }
-                : null,
-          ));
-        }).toList(),
+        Text(
+          'Regras do Motorista',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.w600,
+            fontSize: Responsive.width(4.2, context),
+            color: themeChange.getThem() ? Colors.white : Colors.black87,
+          ),
+        ),
+        SizedBox(height: Responsive.height(1.5, context)),
+        Obx(
+              () => Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: controller.driverRulesList.map((rule) {
+              bool isSelected = controller.selectedDriverRulesList
+                  .any((selected) => selected.id == rule.id);
+              return InkWell(
+                onTap: () {
+                  if (controller.isEditable.value) {
+                    if (isSelected) {
+                      controller.selectedDriverRulesList
+                          .removeWhere((item) => item.id == rule.id);
+                    } else {
+                      controller.selectedDriverRulesList.add(rule);
+                    }
+                  }
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: Responsive.width(3, context),
+                    vertical: Responsive.height(1, context),
+                  ),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primary
+                        : (themeChange.getThem()
+                        ? AppColors.darkContainerBackground
+                        : AppColors.containerBackground),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.primary
+                          : (themeChange.getThem()
+                          ? AppColors.darkContainerBorder
+                          : AppColors.containerBorder),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (isSelected)
+                        Padding(
+                          padding: EdgeInsets.only(right: Responsive.width(1.5, context)),
+                          child: Icon(
+                            Icons.check,
+                            color: Colors.white,
+                            size: Responsive.width(4, context),
+                          ),
+                        ),
+                      Text(
+                        rule.name ?? 'Regra',
+                        style: GoogleFonts.poppins(
+                          fontSize: Responsive.width(3.3, context),
+                          fontWeight: FontWeight.w500,
+                          color: isSelected
+                              ? Colors.white
+                              : (themeChange.getThem()
+                              ? Colors.white
+                              : Colors.black),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
       ],
     );
   }
 
-  void _showZoneDialog(BuildContext context, VehicleInformationController controller, DarkThemeProvider themeChange) {
+  void _showZoneDialog(BuildContext context,
+      VehicleInformationController controller, DarkThemeProvider themeChange) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (context) {
         return AlertDialog(
-          backgroundColor: themeChange.getThem()
-              ? AppColors.darkContainerBackground
-              : AppColors.containerBackground,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-            side: BorderSide(
-              color: themeChange.getThem()
-                  ? AppColors.darkContainerBorder
-                  : AppColors.containerBorder,
-            ),
-          ),
-          title: Text(
-            'Lista de Zonas',
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
-              fontSize: Responsive.width(4.5, context),
-              color: themeChange.getThem() ? Colors.white : Colors.black,
-            ),
-          ),
+          title: Text('Selecione as Zonas'),
           content: SizedBox(
-            width: Responsive.width(80, context),
-            child: controller.zoneList.isEmpty
-                ? Center(
-              child: Text(
-                'Nenhuma zona disponível',
-                style: GoogleFonts.poppins(
-                  color: themeChange.getThem() ? Colors.white70 : Colors.black54,
-                ),
-              ),
-            )
-                : ListView.builder(
-              shrinkWrap: true,
-              itemCount: controller.zoneList.length,
-              itemBuilder: (context, index) {
-                ZoneModel zoneModel = controller.zoneList[index];
-                return Obx(
-                      () => CheckboxListTile(
-                    contentPadding: EdgeInsets.zero,
-                    controlAffinity: ListTileControlAffinity.leading,
-                    title: Text(
-                      zoneModel.name.toString(),
-                      style: GoogleFonts.poppins(
-                        fontSize: Responsive.width(3.5, context),
-                        color: themeChange.getThem() ? Colors.white : Colors.black87,
-                      ),
-                    ),
-                    value: controller.selectedZone.contains(zoneModel.id),
-                    onChanged: (value) {
+            width: double.maxFinite,
+            child: Obx(
+                  () => ListView.builder(
+                shrinkWrap: true,
+                itemCount: controller.zoneList.length,
+                itemBuilder: (context, index) {
+                  ZoneModel zone = controller.zoneList[index];
+                  bool isSelected =
+                  controller.selectedZone.contains(zone.id.toString());
+                  return CheckboxListTile(
+                    title: Text(zone.name ?? 'Zona'),
+                    value: isSelected,
+                    onChanged: (bool? value) {
                       if (value == true) {
-                        controller.selectedZone.add(zoneModel.id.toString());
+                        controller.selectedZone.add(zone.id.toString());
                       } else {
-                        controller.selectedZone.remove(zoneModel.id.toString());
+                        controller.selectedZone.remove(zone.id.toString());
                       }
                     },
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Get.back(),
-              child: Text(
-                'Cancelar',
-                style: GoogleFonts.poppins(
-                  color: Colors.grey,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+              child: Text('Cancelar'),
             ),
             ElevatedButton(
               onPressed: () {
                 String nameValue = "";
                 for (var element in controller.selectedZone) {
-                  List list = controller.zoneList.where((p0) => p0.id == element).toList();
+                  List list =
+                  controller.zoneList.where((p0) => p0.id == element).toList();
                   if (list.isNotEmpty) {
-                    nameValue = "$nameValue${nameValue.isEmpty ? "" : ", "} ${list.first.name}";
+                    nameValue =
+                    "$nameValue${nameValue.isEmpty ? "" : ", "} ${list.first.name}";
                   }
                 }
                 controller.zoneNameController.value.text = nameValue;
@@ -1013,7 +931,8 @@ class VehicleInformationScreen extends StatelessWidget {
       ShowToastDialog.showToast("Please select Zone".tr);
     } else {
       if (controller.driverModel.value.serviceId == null) {
-        controller.driverModel.value.serviceId = controller.selectedServiceId.value;
+        controller.driverModel.value.serviceId =
+            controller.selectedServiceId.value;
         await FireStoreUtils.updateDriverUser(controller.driverModel.value);
       }
 
@@ -1028,18 +947,17 @@ class VehicleInformationScreen extends StatelessWidget {
         driverRules: controller.selectedDriverRulesList,
       );
 
-      await FireStoreUtils.updateDriverUser(controller.driverModel.value).then((value) {
+      await FireStoreUtils.updateDriverUser(controller.driverModel.value)
+          .then((value) {
         ShowToastDialog.closeLoader();
         if (value == true) {
-          bool wasFirstTime = !controller.hasVehicleRegistered.value;
+          // MARCA COMO CADASTRADO - BLOQUEIA EDIÇÃO PERMANENTEMENTE
           controller.hasVehicleRegistered.value = true;
           controller.isEditable.value = false;
 
-          String message = wasFirstTime
-              ? "Veículo cadastrado com sucesso!".tr
-              : "Alterações salvas com sucesso!".tr;
+          ShowToastDialog.showToast("Veículo cadastrado com sucesso!".tr);
 
-          ShowToastDialog.showToast(message);
+          print('✅ Veículo cadastrado e BLOQUEADO para edição');
         }
       });
     }
