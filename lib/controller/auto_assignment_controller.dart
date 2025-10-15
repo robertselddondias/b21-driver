@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:driver/constant/collection_name.dart';
 import 'package:driver/constant/constant.dart';
 import 'package:driver/constant/show_toast_dialog.dart';
@@ -437,14 +438,332 @@ class AutoAssignmentController extends GetxController {
     });
   }
 
-  // ... [RESTO DO CÓDIGO DO CONTROLLER PERMANECE IGUAL]
-  // Mantenha todos os outros métodos existentes como:
-  // - startRealTimeOrderListener()
-  // - processNewOrder()
-  // - acceptRide()
-  // - rejectRide()
-  // - hasActiveRide()
-  // - etc.
+  /// ====================================================================
+  /// LISTENER DE CORRIDAS DISPONÍVEIS (REAL-TIME)
+  /// ====================================================================
+
+  void startRealTimeOrderListener() {
+    log('🎧 INICIANDO LISTENER REAL-TIME DE CORRIDAS');
+
+    stopOrderListener();
+
+    orderStreamSubscription = FireStoreUtils.fireStore
+        .collection(CollectionName.orders)
+        .where('status', isEqualTo: Constant.ridePlaced)
+        .where('serviceTypeId', isEqualTo: driverModel.value.vehicleInformation?.vehicleType ?? '')
+        .snapshots()
+        .listen((querySnapshot) {
+
+      log('📦 RECEBEU SNAPSHOT: ${querySnapshot.docs.length} corridas disponíveis');
+
+      for (var change in querySnapshot.docChanges) {
+        if (change.type == DocumentChangeType.added) {
+          Map<String, dynamic>? data = change.doc.data() as Map<String, dynamic>?;
+
+          if (data != null) {
+            OrderModel order = OrderModel.fromJson(data);
+            log('🆕 NOVA CORRIDA DETECTADA: ${order.id}');
+
+            // Verifica se já está processando
+            if (!isProcessingOrder.value && currentAssignedRide.value == null) {
+              processNewOrder(order);
+            } else {
+              log('⏸️ Ignorando corrida ${order.id} - já processando outra');
+            }
+          }
+        }
+      }
+    }, onError: (error) {
+      log('❌ ERRO NO LISTENER: $error');
+    });
+  }
+
+  void stopOrderListener() {
+    log('🛑 PARANDO LISTENER DE CORRIDAS');
+    orderStreamSubscription?.cancel();
+    orderStreamSubscription = null;
+  }
+
+  /// ====================================================================
+  /// PROCESSAMENTO DE NOVA CORRIDA
+  /// ====================================================================
+
+  Future<void> processNewOrder(OrderModel order) async {
+    if (isProcessingOrder.value) {
+      log('⏸️ JÁ PROCESSANDO CORRIDA');
+      return;
+    }
+
+    log('⚙️ PROCESSANDO CORRIDA: ${order.id}');
+    isProcessingOrder.value = true;
+    currentAssignedRide.value = order;
+
+    // Mostra modal de aceite
+    showRideAcceptanceModal(order);
+
+    // Inicia timer de auto-rejeição (30 segundos)
+    startAutoRejectTimer(order);
+  }
+
+  /// ====================================================================
+  /// MODAL DE ACEITE DE CORRIDA
+  /// ====================================================================
+
+  void showRideAcceptanceModal(OrderModel order) {
+    if (isShowingModal.value) return;
+
+    isShowingModal.value = true;
+    RxInt countdown = AUTO_REJECT_SECONDS.obs;
+
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      if (countdown.value > 0) {
+        countdown.value--;
+      } else {
+        timer.cancel();
+      }
+    });
+
+    Get.dialog(
+      WillPopScope(
+        onWillPop: () async => false,
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Column(
+            children: [
+              Icon(Icons.local_taxi, size: 50, color: Colors.blue),
+              SizedBox(height: 10),
+              Text(
+                'Nova Corrida Disponível',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildInfoRow(Icons.location_on, 'Origem', order.sourceLocationName ?? 'N/A'),
+              SizedBox(height: 10),
+              _buildInfoRow(Icons.flag, 'Destino', order.destinationLocationName ?? 'N/A'),
+              SizedBox(height: 10),
+              _buildInfoRow(Icons.attach_money, 'Valor', 'R\$ ${order.finalRate ?? '0.00'}'),
+              SizedBox(height: 20),
+              Obx(() => Text(
+                'Auto-rejeitar em: ${countdown.value}s',
+                style: GoogleFonts.poppins(
+                  color: Colors.red,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              )),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => rejectRide(order.id!),
+              child: Text(
+                'Recusar',
+                style: GoogleFonts.poppins(
+                  color: Colors.red,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () => acceptRide(order),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              child: Text(
+                'Aceitar',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String label, String value) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.grey[600]),
+        SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+              Text(
+                value,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// ====================================================================
+  /// TIMER DE AUTO-REJEIÇÃO
+  /// ====================================================================
+
+  void startAutoRejectTimer(OrderModel order) {
+    autoRejectTimer?.cancel();
+
+    autoRejectTimer = Timer(Duration(seconds: AUTO_REJECT_SECONDS), () {
+      log('⏰ TEMPO ESGOTADO - AUTO-REJEITANDO CORRIDA ${order.id}');
+      rejectRide(order.id!);
+    });
+  }
+
+  /// ====================================================================
+  /// ACEITAR CORRIDA
+  /// ====================================================================
+
+  Future<void> acceptRide(OrderModel order) async {
+    try {
+      log('✅ MOTORISTA ACEITOU CORRIDA: ${order.id}');
+
+      autoRejectTimer?.cancel();
+      isShowingModal.value = false;
+      Get.back();
+
+      // Atualiza a corrida no Firebase
+      await FireStoreUtils.fireStore
+          .collection(CollectionName.orders)
+          .doc(order.id)
+          .update({
+        'driverId': FireStoreUtils.getCurrentUid(),
+        'status': Constant.rideActive,
+        'acceptedAt': DateTime.now(),
+      });
+
+      isWaitingPassengerResponse.value = true;
+      startPassengerResponseListener(order);
+
+      ShowToastDialog.showToast('Aguardando confirmação do passageiro...');
+
+    } catch (e) {
+      log('❌ ERRO AO ACEITAR CORRIDA: $e');
+      ShowToastDialog.showToast('Erro ao aceitar corrida: $e');
+      resetState();
+    }
+  }
+
+  /// ====================================================================
+  /// REJEITAR CORRIDA
+  /// ====================================================================
+
+  Future<void> rejectRide(String orderId) async {
+    try {
+      log('❌ REJEITANDO CORRIDA: $orderId');
+
+      autoRejectTimer?.cancel();
+      isShowingModal.value = false;
+
+      if (Get.isDialogOpen == true) {
+        Get.back();
+      }
+
+      resetState();
+      ShowToastDialog.showToast('Corrida recusada');
+
+    } catch (e) {
+      log('❌ ERRO AO REJEITAR: $e');
+      resetState();
+    }
+  }
+
+  /// ====================================================================
+  /// LISTENER DE RESPOSTA DO PASSAGEIRO
+  /// ====================================================================
+
+  void startPassengerResponseListener(OrderModel order) {
+    passengerResponseListener?.cancel();
+
+    passengerResponseListener = FireStoreUtils.fireStore
+        .collection(CollectionName.orders)
+        .doc(order.id)
+        .snapshots()
+        .listen((snapshot) {
+
+      if (!snapshot.exists) return;
+
+      OrderModel updatedOrder = OrderModel.fromJson(snapshot.data()!);
+
+      if (updatedOrder.status == Constant.rideInProgress) {
+        log('✅ PASSAGEIRO CONFIRMOU A CORRIDA');
+        passengerResponseListener?.cancel();
+        passengerResponseTimeout?.cancel();
+        isWaitingPassengerResponse.value = false;
+        ShowToastDialog.showToast('Corrida confirmada! Vá buscar o passageiro');
+
+      } else if (updatedOrder.status == Constant.rideCanceled) {
+        log('❌ PASSAGEIRO CANCELOU A CORRIDA');
+        passengerResponseListener?.cancel();
+        passengerResponseTimeout?.cancel();
+        resetState();
+        ShowToastDialog.showToast('Passageiro cancelou a corrida');
+      }
+    });
+
+    // Timeout de 60 segundos
+    passengerResponseTimeout = Timer(Duration(seconds: PASSENGER_RESPONSE_TIMEOUT), () {
+      log('⏰ TIMEOUT - PASSAGEIRO NÃO RESPONDEU');
+      passengerResponseListener?.cancel();
+      resetState();
+      ShowToastDialog.showToast('Tempo esgotado - passageiro não respondeu');
+    });
+  }
+
+  /// ====================================================================
+  /// MONITORAMENTO DE CORRIDA ATIVA
+  /// ====================================================================
+
+  void startActiveRideMonitoring() {
+    activeRideListener?.cancel();
+
+    activeRideListener = FireStoreUtils.fireStore
+        .collection(CollectionName.orders)
+        .where('driverId', isEqualTo: FireStoreUtils.getCurrentUid())
+        .where('status', whereIn: [Constant.rideActive, Constant.rideInProgress])
+        .snapshots()
+        .listen((snapshot) {
+
+      if (snapshot.docs.isEmpty) {
+        log('✅ NENHUMA CORRIDA ATIVA - PODE RECEBER NOVAS');
+        if (isOnline.value && orderStreamSubscription == null) {
+          startRealTimeOrderListener();
+        }
+      } else {
+        log('🚗 MOTORISTA TEM CORRIDA ATIVA - NÃO RECEBE NOVAS');
+        stopOrderListener();
+      }
+    });
+  }
 
   void stopAllListeners() {
     driverListener?.cancel();
@@ -485,20 +804,31 @@ class AutoAssignmentController extends GetxController {
     }
   }
 
-  void startActiveRideMonitoring() {
-    // Implementação existente
-  }
-
-  void startRealTimeOrderListener() {
-    // Implementação existente
-  }
-
-  void stopOrderListener() {
-    orderStreamSubscription?.cancel();
-    orderStreamSubscription = null;
-  }
-
   void checkForAvailableRides() {
-    // Implementação existente
+    log('🔄 Verificando corridas disponíveis manualmente');
+
+    if (!isOnline.value) {
+      log('⚠️ Motorista offline, não verificando corridas');
+      return;
+    }
+
+    hasActiveRide().then((hasActive) {
+      if (!hasActive) {
+        log('✅ Sem corrida ativa, reiniciando listener');
+        startRealTimeOrderListener();
+      } else {
+        log('⚠️ Tem corrida ativa, não verificando novas');
+      }
+    });
+  }
+
+  void resetState() {
+    isProcessingOrder.value = false;
+    isShowingModal.value = false;
+    isWaitingPassengerResponse.value = false;
+    currentAssignedRide.value = null;
+    autoRejectTimer?.cancel();
+    passengerResponseTimeout?.cancel();
+    passengerResponseListener?.cancel();
   }
 }
