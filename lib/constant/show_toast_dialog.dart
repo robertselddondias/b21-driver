@@ -8,15 +8,15 @@ class ShowToastDialog {
     EasyLoading.instance
       ..loadingStyle = EasyLoadingStyle.custom
       ..backgroundColor = isDarkMode
-          ? AppColors.darkBackground.withOpacity(0.9) // Fundo escuro
-          : AppColors.lightGray.withOpacity(0.9) // Fundo claro
+          ? AppColors.darkBackground.withValues(alpha: 0.9) // Fundo escuro
+          : AppColors.lightGray.withValues(alpha: 0.9) // Fundo claro
       ..indicatorColor = Colors.transparent // Indicador personalizado
       ..textColor = isDarkMode ? AppColors.darkModePrimary : AppColors.primary
       ..toastPosition = EasyLoadingToastPosition.center
       ..progressColor = Colors.transparent
       ..maskColor = isDarkMode
-          ? AppColors.darkBackground.withOpacity(0.6)
-          : AppColors.lightGray.withOpacity(0.6)
+          ? AppColors.darkBackground.withValues(alpha: 0.6)
+          : AppColors.lightGray.withValues(alpha: 0.6)
       ..maskType = EasyLoadingMaskType.black
       ..animationStyle = EasyLoadingAnimationStyle.opacity
       ..displayDuration = const Duration(milliseconds: 2000)
@@ -24,7 +24,8 @@ class ShowToastDialog {
       ..customAnimation = CustomLoaderAnimation(); // Animação personalizada
   }
 
-  static showToast(String? message, {EasyLoadingToastPosition position = EasyLoadingToastPosition.top}) {
+  static showToast(String? message,
+      {EasyLoadingToastPosition position = EasyLoadingToastPosition.top}) {
     EasyLoading.showToast(
       message!,
       toastPosition: position,
@@ -57,7 +58,8 @@ class CleanGradientIndicator extends StatelessWidget {
         children: [
           CircularProgressIndicator(
             strokeWidth: 4,
-            valueColor: AlwaysStoppedAnimation(AppColors.darkModePrimary), // Cor substituída
+            valueColor: AlwaysStoppedAnimation(
+                AppColors.darkModePrimary), // Cor substituída
             backgroundColor: AppColors.lightGray, // Fundo do indicador
           ),
           Positioned.fill(
@@ -68,7 +70,8 @@ class CleanGradientIndicator extends StatelessWidget {
                 height: 20,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.darkGray, // Um círculo central para equilíbrio
+                  color:
+                      AppColors.darkGray, // Um círculo central para equilíbrio
                 ),
               ),
             ),
@@ -83,10 +86,10 @@ class CleanGradientIndicator extends StatelessWidget {
 class CustomLoaderAnimation extends EasyLoadingAnimation {
   @override
   Widget buildWidget(
-      Widget child,
-      AnimationController controller,
-      AlignmentGeometry alignment,
-      ) {
+    Widget child,
+    AnimationController controller,
+    AlignmentGeometry alignment,
+  ) {
     return FadeTransition(
       opacity: CurvedAnimation(
         parent: controller,

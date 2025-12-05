@@ -10,7 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class WalletController extends GetxController {
-  Rx<TextEditingController> withdrawalAmountController = TextEditingController().obs;
+  Rx<TextEditingController> withdrawalAmountController =
+      TextEditingController().obs;
   Rx<TextEditingController> noteController = TextEditingController().obs;
 
   Rx<TextEditingController> amountController = TextEditingController().obs;
@@ -38,7 +39,8 @@ class WalletController extends GetxController {
   }
 
   getUser() async {
-    await FireStoreUtils.getDriverProfile(FireStoreUtils.getCurrentUid()).then((value) {
+    await FireStoreUtils.getDriverProfile(FireStoreUtils.getCurrentUid())
+        .then((value) {
       if (value != null) {
         driverUserModel.value = value;
       }
@@ -70,9 +72,12 @@ class WalletController extends GetxController {
         userType: "driver",
         note: "Wallet Topup");
 
-    await FireStoreUtils.setWalletTransaction(transactionModel).then((value) async {
+    await FireStoreUtils.setWalletTransaction(transactionModel)
+        .then((value) async {
       if (value == true) {
-        await FireStoreUtils.updatedDriverWallet(amount: amountController.value.text).then((value) {
+        await FireStoreUtils.updatedDriverWallet(
+                amount: amountController.value.text)
+            .then((value) {
           getUser();
           getTraction();
         });
@@ -81,5 +86,4 @@ class WalletController extends GetxController {
 
     ShowToastDialog.showToast("Amount added in your wallet.");
   }
-
 }

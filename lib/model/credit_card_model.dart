@@ -1,5 +1,4 @@
 class CreditCardUserModel {
-
   String? id;
   String? cardName;
   String? customerId;
@@ -17,24 +16,23 @@ class CreditCardUserModel {
   String? flagCard;
   String? cvv;
 
-  CreditCardUserModel({
-    this.id,
-    this.cardName,
-    this.customerId,
-    this.lastFourDigits,
-    this.creditCardToken,
-    this.transationalType,
-    this.cardType,
-    this.expirationMonth,
-    this.expirationYear,
-    this.urlFlag,
-    this.userId,
-    this.cardId,
-    this.flagCard,
-    this.tipoDocumento,
-    this.numeroDocumento,
-    this.cvv
-  });
+  CreditCardUserModel(
+      {this.id,
+      this.cardName,
+      this.customerId,
+      this.lastFourDigits,
+      this.creditCardToken,
+      this.transationalType,
+      this.cardType,
+      this.expirationMonth,
+      this.expirationYear,
+      this.urlFlag,
+      this.userId,
+      this.cardId,
+      this.flagCard,
+      this.tipoDocumento,
+      this.numeroDocumento,
+      this.cvv});
 
   CreditCardUserModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];

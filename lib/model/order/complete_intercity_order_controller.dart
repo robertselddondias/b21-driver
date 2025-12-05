@@ -21,11 +21,18 @@ class CompleteInterCityOrderController extends GetxController {
     if (orderModel.value.taxList != null) {
       for (var element in orderModel.value.taxList!) {
         taxAmount.value = (double.parse(taxAmount.value) +
-                Constant().calculateTax(amount: (double.parse(orderModel.value.finalRate.toString()) - double.parse(couponAmount.value.toString())).toString(), taxModel: element))
+                Constant().calculateTax(
+                    amount:
+                        (double.parse(orderModel.value.finalRate.toString()) -
+                                double.parse(couponAmount.value.toString()))
+                            .toString(),
+                    taxModel: element))
             .toStringAsFixed(Constant.currencyModel!.decimalDigits!);
       }
     }
-    return (double.parse(orderModel.value.finalRate.toString()) - double.parse(couponAmount.value.toString())) + double.parse(taxAmount.value);
+    return (double.parse(orderModel.value.finalRate.toString()) -
+            double.parse(couponAmount.value.toString())) +
+        double.parse(taxAmount.value);
   }
 
   getArgument() async {
@@ -38,7 +45,12 @@ class CompleteInterCityOrderController extends GetxController {
           if (orderModel.value.coupon!.type == "fix") {
             couponAmount.value = orderModel.value.coupon!.amount.toString();
           } else {
-            couponAmount.value = ((double.parse(orderModel.value.finalRate.toString()) * double.parse(orderModel.value.coupon!.amount.toString())) / 100).toString();
+            couponAmount.value =
+                ((double.parse(orderModel.value.finalRate.toString()) *
+                            double.parse(
+                                orderModel.value.coupon!.amount.toString())) /
+                        100)
+                    .toString();
           }
         }
       }

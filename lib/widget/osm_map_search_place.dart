@@ -27,13 +27,17 @@ class OsmSearchPlacesApi extends StatelessWidget {
                 },
                 child: Icon(
                   Icons.arrow_back,
-                  color: themeChange.getThem() ? AppColors.lightGray : AppColors.lightGray,
+                  color: themeChange.getThem()
+                      ? AppColors.lightGray
+                      : AppColors.lightGray,
                 ),
               ),
               title: Text(
                 'Search places Api',
                 style: TextStyle(
-                  color: themeChange.getThem() ? AppColors.lightGray : AppColors.lightGray,
+                  color: themeChange.getThem()
+                      ? AppColors.lightGray
+                      : AppColors.lightGray,
                   fontSize: Responsive.width(4, context),
                 ),
               ),
@@ -46,37 +50,66 @@ class OsmSearchPlacesApi extends StatelessWidget {
               child: Column(
                 children: [
                   TextFormField(
-                      validator: (value) => value != null && value.isNotEmpty ? null : 'Required',
+                      validator: (value) =>
+                          value != null && value.isNotEmpty ? null : 'Required',
                       keyboardType: TextInputType.text,
                       textCapitalization: TextCapitalization.sentences,
                       controller: controller.searchTxtController.value,
                       textAlign: TextAlign.start,
-                      style: GoogleFonts.poppins(color: Colors.black ),
+                      style: GoogleFonts.poppins(color: Colors.black),
                       decoration: InputDecoration(
                           isDense: true,
                           filled: true,
-                          fillColor: themeChange.getThem() ? AppColors.darkTextField : AppColors.textField,
-                          contentPadding: EdgeInsets.symmetric(vertical: Responsive.height(1.5, context)),
+                          fillColor: themeChange.getThem()
+                              ? AppColors.darkTextField
+                              : AppColors.textField,
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: Responsive.height(1.5, context)),
                           prefixIcon: const Icon(Icons.map),
                           disabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(Responsive.width(1, context))),
-                            borderSide: BorderSide(color: themeChange.getThem() ? AppColors.darkTextFieldBorder : AppColors.textFieldBorder, width: 1),
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(Responsive.width(1, context))),
+                            borderSide: BorderSide(
+                                color: themeChange.getThem()
+                                    ? AppColors.darkTextFieldBorder
+                                    : AppColors.textFieldBorder,
+                                width: 1),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(Responsive.width(1, context))),
-                            borderSide: BorderSide(color: themeChange.getThem() ? AppColors.darkTextFieldBorder : AppColors.textFieldBorder, width: 1),
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(Responsive.width(1, context))),
+                            borderSide: BorderSide(
+                                color: themeChange.getThem()
+                                    ? AppColors.darkTextFieldBorder
+                                    : AppColors.textFieldBorder,
+                                width: 1),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(Responsive.width(1, context))),
-                            borderSide: BorderSide(color: themeChange.getThem() ? AppColors.darkTextFieldBorder : AppColors.textFieldBorder, width: 1),
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(Responsive.width(1, context))),
+                            borderSide: BorderSide(
+                                color: themeChange.getThem()
+                                    ? AppColors.darkTextFieldBorder
+                                    : AppColors.textFieldBorder,
+                                width: 1),
                           ),
                           errorBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(Responsive.width(1, context))),
-                            borderSide: BorderSide(color: themeChange.getThem() ? AppColors.darkTextFieldBorder : AppColors.textFieldBorder, width: 1),
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(Responsive.width(1, context))),
+                            borderSide: BorderSide(
+                                color: themeChange.getThem()
+                                    ? AppColors.darkTextFieldBorder
+                                    : AppColors.textFieldBorder,
+                                width: 1),
                           ),
                           border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(Responsive.width(1, context))),
-                            borderSide: BorderSide(color: themeChange.getThem() ? AppColors.darkTextFieldBorder : AppColors.textFieldBorder, width: 1),
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(Responsive.width(1, context))),
+                            borderSide: BorderSide(
+                                color: themeChange.getThem()
+                                    ? AppColors.darkTextFieldBorder
+                                    : AppColors.textFieldBorder,
+                                width: 1),
                           ),
                           suffixIcon: IconButton(
                             icon: const Icon(Icons.cancel),
@@ -92,7 +125,11 @@ class OsmSearchPlacesApi extends StatelessWidget {
                       itemCount: controller.suggestionsList.length,
                       itemBuilder: (context, index) {
                         return ListTile(
-                          title: Text(controller.suggestionsList[index].address.toString(),style: TextStyle(color:  Colors.black),),
+                          title: Text(
+                            controller.suggestionsList[index].address
+                                .toString(),
+                            style: TextStyle(color: Colors.black),
+                          ),
                           onTap: () {
                             Get.back(result: controller.suggestionsList[index]);
                           },

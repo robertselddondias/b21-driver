@@ -94,14 +94,14 @@ class LiveTrackingScreen extends StatelessWidget {
                   controller.toggleFollowMe();
                 },
                 child: Obx(() => Icon(
-                  controller.followMe.value
-                      ? Icons.gps_fixed
-                      : Icons.gps_not_fixed,
-                  color: controller.followMe.value
-                      ? AppColors.primary
-                      : Colors.grey,
-                  size: 28,
-                )),
+                      controller.followMe.value
+                          ? Icons.gps_fixed
+                          : Icons.gps_not_fixed,
+                      color: controller.followMe.value
+                          ? AppColors.primary
+                          : Colors.grey,
+                      size: 28,
+                    )),
               ),
             ),
 
@@ -153,34 +153,35 @@ class NavigationInfoCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
         child: Obx(() => Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Tempo restante
-            _buildInfoColumn(
-              icon: Icons.access_time,
-              label: "Tempo Restante".tr,
-              value: "${controller.etaInMinutes.value} min",
-              iconColor: AppColors.primary,
-            ),
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Tempo restante
+                _buildInfoColumn(
+                  icon: Icons.access_time,
+                  label: "Tempo Restante".tr,
+                  value: "${controller.etaInMinutes.value} min",
+                  iconColor: AppColors.primary,
+                ),
 
-            // Divider vertical
-            Container(
-              height: 50,
-              width: 1,
-              color: themeChange.getThem()
-                  ? AppColors.darkContainerBorder
-                  : AppColors.containerBorder,
-            ),
+                // Divider vertical
+                Container(
+                  height: 50,
+                  width: 1,
+                  color: themeChange.getThem()
+                      ? AppColors.darkContainerBorder
+                      : AppColors.containerBorder,
+                ),
 
-            // Distância
-            _buildInfoColumn(
-              icon: Icons.straighten,
-              label: "Distância".tr,
-              value: "${controller.distanceRemaining.value.toStringAsFixed(1)} km",
-              iconColor: Colors.blue,
-            ),
-          ],
-        )),
+                // Distância
+                _buildInfoColumn(
+                  icon: Icons.straighten,
+                  label: "Distância".tr,
+                  value:
+                      "${controller.distanceRemaining.value.toStringAsFixed(1)} km",
+                  iconColor: Colors.blue,
+                ),
+              ],
+            )),
       ),
     );
   }
@@ -253,82 +254,83 @@ class SpeedDisplayCard extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Obx(() => Row(
-          children: [
-            // Ícone de velocímetro
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                Icons.speed,
-                color: AppColors.primary,
-                size: 28,
-              ),
-            ),
-
-            const SizedBox(width: 12),
-
-            // Velocidade
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "Velocidade Atual".tr,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: themeChange.getThem()
-                        ? Colors.grey.shade400
-                        : Colors.grey.shade600,
+                // Ícone de velocímetro
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    Icons.speed,
+                    color: AppColors.primary,
+                    size: 28,
                   ),
                 ),
-                Text(
-                  "${controller.currentSpeed.value.toStringAsFixed(0)} km/h",
-                  style: GoogleFonts.poppins(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color:
-                    themeChange.getThem() ? Colors.white : Colors.black87,
+
+                const SizedBox(width: 12),
+
+                // Velocidade
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Velocidade Atual".tr,
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: themeChange.getThem()
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
+                      ),
+                    ),
+                    Text(
+                      "${controller.currentSpeed.value.toStringAsFixed(0)} km/h",
+                      style: GoogleFonts.poppins(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: themeChange.getThem()
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const Spacer(),
+
+                // Nome da rua
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Icon(
+                        Icons.place,
+                        color: themeChange.getThem()
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
+                        size: 16,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        controller.streetName.value,
+                        textAlign: TextAlign.end,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: themeChange.getThem()
+                              ? Colors.white
+                              : Colors.black87,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
-            ),
-
-            const Spacer(),
-
-            // Nome da rua
-            Expanded(
-              flex: 2,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Icon(
-                    Icons.place,
-                    color: themeChange.getThem()
-                        ? Colors.grey.shade400
-                        : Colors.grey.shade600,
-                    size: 16,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    controller.streetName.value,
-                    textAlign: TextAlign.end,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.poppins(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                      color: themeChange.getThem()
-                          ? Colors.white
-                          : Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        )),
+            )),
       ),
     );
   }

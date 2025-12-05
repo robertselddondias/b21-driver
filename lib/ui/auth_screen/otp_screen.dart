@@ -89,7 +89,8 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   /// Imagem de cabeçalho responsiva
-  Widget _buildHeaderImage(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildHeaderImage(
+      BuildContext context, DarkThemeProvider themeChange) {
     return Container(
       width: double.infinity,
       height: Responsive.height(32, context),
@@ -99,7 +100,7 @@ class _OtpScreenState extends State<OtpScreen> {
           end: Alignment.bottomCenter,
           colors: [
             AppColors.primary,
-            AppColors.primary.withOpacity(0.8),
+            AppColors.primary.withValues(alpha: 0.8),
           ],
         ),
       ),
@@ -124,8 +125,9 @@ class _OtpScreenState extends State<OtpScreen> {
                   colors: [
                     Colors.transparent,
                     (themeChange.getThem()
-                        ? AppColors.darkBackground
-                        : AppColors.background).withOpacity(0.1),
+                            ? AppColors.darkBackground
+                            : AppColors.background)
+                        .withValues(alpha: 0.1),
                   ],
                 ),
               ),
@@ -142,9 +144,9 @@ class _OtpScreenState extends State<OtpScreen> {
               child: Container(
                 padding: EdgeInsets.all(Responsive.width(2.5, context)),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: Colors.white.withOpacity(0.3)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
                 ),
                 child: Icon(
                   Icons.arrow_back_ios_new,
@@ -165,9 +167,9 @@ class _OtpScreenState extends State<OtpScreen> {
                 Container(
                   padding: EdgeInsets.all(Responsive.width(4, context)),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(50),
-                    border: Border.all(color: Colors.white.withOpacity(0.3)),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
                   ),
                   child: Icon(
                     Icons.verified_user,
@@ -184,7 +186,8 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   /// Conteúdo principal do OTP
-  Widget _buildOtpContent(BuildContext context, OtpController controller, DarkThemeProvider themeChange) {
+  Widget _buildOtpContent(BuildContext context, OtpController controller,
+      DarkThemeProvider themeChange) {
     return Padding(
       padding: EdgeInsets.all(Responsive.width(5, context)),
       child: Column(
@@ -222,7 +225,8 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   /// Seção de cabeçalho com informações
-  Widget _buildHeaderSection(BuildContext context, OtpController controller, DarkThemeProvider themeChange) {
+  Widget _buildHeaderSection(BuildContext context, OtpController controller,
+      DarkThemeProvider themeChange) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -231,7 +235,7 @@ class _OtpScreenState extends State<OtpScreen> {
             Container(
               padding: EdgeInsets.all(Responsive.width(2.5, context)),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -250,7 +254,8 @@ class _OtpScreenState extends State<OtpScreen> {
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w700,
                       fontSize: Responsive.width(6, context),
-                      color: themeChange.getThem() ? Colors.white : Colors.black,
+                      color:
+                          themeChange.getThem() ? Colors.white : Colors.black,
                     ),
                   ),
                   SizedBox(height: Responsive.height(0.5, context)),
@@ -260,12 +265,15 @@ class _OtpScreenState extends State<OtpScreen> {
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w400,
                         fontSize: Responsive.width(3.5, context),
-                        color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                        color: themeChange.getThem()
+                            ? Colors.white70
+                            : Colors.black54,
                         height: 1.4,
                       ),
                       children: [
                         TextSpan(
-                          text: "${controller.countryCode.value}${controller.phoneNumber.value}",
+                          text:
+                              "${controller.countryCode.value}${controller.phoneNumber.value}",
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w600,
                             color: AppColors.primary,
@@ -285,7 +293,8 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   /// Indicador de progresso
-  Widget _buildProgressIndicator(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildProgressIndicator(
+      BuildContext context, DarkThemeProvider themeChange) {
     return Container(
       padding: EdgeInsets.all(Responsive.width(4, context)),
       decoration: BoxDecoration(
@@ -339,7 +348,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 child: Container(
                   height: 6,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -349,7 +358,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 child: Container(
                   height: 6,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -362,7 +371,8 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   /// Campos de PIN responsivos
-  Widget _buildPinCodeFields(BuildContext context, OtpController controller, DarkThemeProvider themeChange) {
+  Widget _buildPinCodeFields(BuildContext context, OtpController controller,
+      DarkThemeProvider themeChange) {
     return Column(
       children: [
         Row(
@@ -384,7 +394,6 @@ class _OtpScreenState extends State<OtpScreen> {
           ],
         ),
         SizedBox(height: Responsive.height(2, context)),
-
         Container(
           padding: EdgeInsets.all(Responsive.width(4, context)),
           decoration: BoxDecoration(
@@ -400,7 +409,7 @@ class _OtpScreenState extends State<OtpScreen> {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -419,16 +428,15 @@ class _OtpScreenState extends State<OtpScreen> {
               fieldHeight: Responsive.width(14, context),
               fieldWidth: Responsive.width(12, context),
               activeColor: AppColors.primary,
-              selectedColor: AppColors.primary.withOpacity(0.5),
-              inactiveColor: themeChange.getThem()
-                  ? Colors.white24
-                  : Colors.black26,
+              selectedColor: AppColors.primary.withValues(alpha: 0.5),
+              inactiveColor:
+                  themeChange.getThem() ? Colors.white24 : Colors.black26,
               activeFillColor: themeChange.getThem()
                   ? AppColors.darkTextField
                   : AppColors.textField,
               inactiveFillColor: themeChange.getThem()
-                  ? AppColors.darkTextField.withOpacity(0.5)
-                  : AppColors.textField.withOpacity(0.5),
+                  ? AppColors.darkTextField.withValues(alpha: 0.5)
+                  : AppColors.textField.withValues(alpha: 0.5),
               selectedFillColor: themeChange.getThem()
                   ? AppColors.darkTextField
                   : AppColors.textField,
@@ -450,14 +458,16 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   /// Seção de reenvio de código
-  Widget _buildResendSection(BuildContext context, OtpController controller, DarkThemeProvider themeChange) {
+  Widget _buildResendSection(BuildContext context, OtpController controller,
+      DarkThemeProvider themeChange) {
     return Container(
       padding: EdgeInsets.all(Responsive.width(4, context)),
       decoration: BoxDecoration(
-        color: (themeChange.getThem() ? Colors.orange : Colors.orange.shade100).withOpacity(0.1),
+        color: (themeChange.getThem() ? Colors.orange : Colors.orange.shade100)
+            .withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: Colors.orange.withOpacity(0.3),
+          color: Colors.orange.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -473,7 +483,9 @@ class _OtpScreenState extends State<OtpScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  _canResend ? "Não recebeu o código?".tr : "Reenviar código em:",
+                  _canResend
+                      ? "Não recebeu o código?".tr
+                      : "Reenviar código em:",
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w500,
                     fontSize: Responsive.width(3.5, context),
@@ -534,7 +546,7 @@ class _OtpScreenState extends State<OtpScreen> {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.4),
+            color: AppColors.primary.withValues(alpha: 0.4),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -600,7 +612,8 @@ class _OtpScreenState extends State<OtpScreen> {
         smsCode: controller.otpController.value.text,
       );
 
-      final authResult = await FirebaseAuth.instance.signInWithCredential(credential);
+      final authResult =
+          await FirebaseAuth.instance.signInWithCredential(credential);
 
       if (authResult.additionalUserInfo!.isNewUser) {
         log("----->new user");
@@ -619,7 +632,8 @@ class _OtpScreenState extends State<OtpScreen> {
         });
       } else {
         log("----->old user");
-        final userExists = await FireStoreUtils.userExitOrNot(authResult.user!.uid);
+        final userExists =
+            await FireStoreUtils.userExitOrNot(authResult.user!.uid);
         ShowToastDialog.closeLoader();
 
         if (userExists == true) {
@@ -647,7 +661,8 @@ class _OtpScreenState extends State<OtpScreen> {
       if (error.toString().contains('invalid-verification-code')) {
         ShowToastDialog.showToast("Código de verificação inválido".tr);
       } else if (error.toString().contains('session-expired')) {
-        ShowToastDialog.showToast("Sessão expirada. Solicite um novo código".tr);
+        ShowToastDialog.showToast(
+            "Sessão expirada. Solicite um novo código".tr);
       } else {
         ShowToastDialog.showToast("Code is Invalid".tr);
       }

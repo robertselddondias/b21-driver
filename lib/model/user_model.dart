@@ -16,7 +16,19 @@ class UserModel {
   Timestamp? createdAt;
 
   UserModel(
-      {this.fullName, this.id, this.email, this.loginType, this.profilePic, this.fcmToken, this.countryCode, this.phoneNumber, this.reviewsCount, this.reviewsSum, this.isActive, this.walletAmount,this.createdAt});
+      {this.fullName,
+      this.id,
+      this.email,
+      this.loginType,
+      this.profilePic,
+      this.fcmToken,
+      this.countryCode,
+      this.phoneNumber,
+      this.reviewsCount,
+      this.reviewsSum,
+      this.isActive,
+      this.walletAmount,
+      this.createdAt});
 
   UserModel.fromJson(Map<String, dynamic> json) {
     fullName = json['fullName'];

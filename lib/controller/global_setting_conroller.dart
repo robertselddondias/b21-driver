@@ -21,7 +21,9 @@ class GlobalSettingController extends GetxController {
   }
 
   getCurrentCurrency() async {
-    if (Preferences.getString(Preferences.languageCodeKey).toString().isNotEmpty) {
+    if (Preferences.getString(Preferences.languageCodeKey)
+        .toString()
+        .isNotEmpty) {
       LanguageModel languageModel = Constant.getLanguage();
       LocalizationService().changeLocale(languageModel.code.toString());
     }
@@ -33,7 +35,14 @@ class GlobalSettingController extends GetxController {
       if (value != null) {
         Constant.currencyModel = value;
       } else {
-        Constant.currencyModel = CurrencyModel(id: "", code: "BRL", decimalDigits: 2, enable: true, name: "Real Brasileiro", symbol: "R\$", symbolAtRight: false);
+        Constant.currencyModel = CurrencyModel(
+            id: "",
+            code: "BRL",
+            decimalDigits: 2,
+            enable: true,
+            name: "Real Brasileiro",
+            symbol: "R\$",
+            symbolAtRight: false);
       }
     });
   }
@@ -46,7 +55,8 @@ class GlobalSettingController extends GetxController {
       log(":::::::TOKEN:::::: $token");
 
       if (FirebaseAuth.instance.currentUser != null) {
-        await FireStoreUtils.getDriverProfile(FireStoreUtils.getCurrentUid()).then((value) {
+        await FireStoreUtils.getDriverProfile(FireStoreUtils.getCurrentUid())
+            .then((value) {
           if (value != null) {
             DriverUserModel driverUserModel = value;
             driverUserModel.fcmToken = token;

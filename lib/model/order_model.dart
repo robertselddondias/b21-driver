@@ -31,9 +31,36 @@ class OrderModel {
   Timestamp? acceptedAt;
   List<dynamic>? rejectedDriverIds;
 
-  // Campos legados (mantidos para compatibilidade)
+  // Campos legados (mantidos apenas para leitura de dados antigos)
+  // DEPRECADO: Use rejectedDriverIds ao invés de rejectedDriverId
   List<dynamic>? acceptedDriverId;
   List<dynamic>? rejectedDriverId;
+
+  /// Retorna lista unificada de motoristas que rejeitaram
+  /// Combina dados novos (rejectedDriverIds) com legados (rejectedDriverId)
+  List<dynamic> get allRejectedDriverIds {
+    final Set<dynamic> rejected = {};
+    if (rejectedDriverIds != null) {
+      rejected.addAll(rejectedDriverIds!);
+    }
+    if (rejectedDriverId != null) {
+      rejected.addAll(rejectedDriverId!);
+    }
+    return rejected.toList();
+  }
+
+  /// Retorna lista unificada de motoristas que aceitaram
+  /// Combina dados novos com legados
+  List<dynamic> get allAcceptedDriverIds {
+    final Set<dynamic> accepted = {};
+    if (assignedDriverId != null) {
+      accepted.add(assignedDriverId!);
+    }
+    if (acceptedDriverId != null) {
+      accepted.addAll(acceptedDriverId!);
+    }
+    return accepted.toList();
+  }
 
   Positions? position;
   Timestamp? createdDate;
@@ -93,9 +120,8 @@ class OrderModel {
     destinationLocationLAtLng = json['destinationLocationLAtLng'] != null
         ? LocationLatLng.fromJson(json['destinationLocationLAtLng'])
         : null;
-    coupon = json['coupon'] != null
-        ? CouponModel.fromJson(json['coupon'])
-        : null;
+    coupon =
+        json['coupon'] != null ? CouponModel.fromJson(json['coupon']) : null;
     someOneElse = json['someOneElse'] != null
         ? ContactModel.fromJson(json['someOneElse'])
         : null;
@@ -122,9 +148,8 @@ class OrderModel {
     acceptedDriverId = json['acceptedDriverId'];
     rejectedDriverId = json['rejectedDriverId'];
 
-    position = json['position'] != null
-        ? Positions.fromJson(json['position'])
-        : null;
+    position =
+        json['position'] != null ? Positions.fromJson(json['position']) : null;
 
     if (json['taxList'] != null) {
       taxList = <TaxModel>[];
@@ -133,15 +158,12 @@ class OrderModel {
       });
     }
 
-    service = json['service'] != null
-        ? ServiceModel.fromJson(json['service'])
-        : null;
+    service =
+        json['service'] != null ? ServiceModel.fromJson(json['service']) : null;
     adminCommission = json['adminCommission'] != null
         ? AdminCommission.fromJson(json['adminCommission'])
         : null;
-    zone = json['zone'] != null
-        ? ZoneModel.fromJson(json['zone'])
-        : null;
+    zone = json['zone'] != null ? ZoneModel.fromJson(json['zone']) : null;
     zoneId = json['zoneId'];
   }
 
@@ -210,12 +232,13 @@ class OrderModel {
   /// Verifica se a corrida foi aceita pelo motorista atribuído
   bool get isAcceptedByAssignedDriver =>
       assignedDriverId != null &&
-          driverId == assignedDriverId &&
-          acceptedAt != null;
+      driverId == assignedDriverId &&
+      acceptedAt != null;
 
   /// Verifica se o motorista rejeitou a corrida
+  /// Usa lista unificada (dados novos + legados)
   bool isRejectedByDriver(String driverId) =>
-      rejectedDriverIds?.contains(driverId) ?? false;
+      allRejectedDriverIds.contains(driverId);
 
   /// Tempo desde a atribuição em minutos
   int get minutesSinceAssignment {

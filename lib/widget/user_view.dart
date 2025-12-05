@@ -158,13 +158,15 @@ class UserView extends StatelessWidget {
             width: avatarSize,
             decoration: BoxDecoration(
               color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(Responsive.width(2.5, context)),
+              borderRadius:
+                  BorderRadius.circular(Responsive.width(2.5, context)),
             ),
             child: Center(
               child: SizedBox(
                 width: Responsive.width(5, context),
                 height: Responsive.width(5, context),
-                child: CircularProgressIndicator(strokeWidth: Responsive.width(0.5, context)),
+                child: CircularProgressIndicator(
+                    strokeWidth: Responsive.width(0.5, context)),
               ),
             ),
           ),
@@ -178,7 +180,8 @@ class UserView extends StatelessWidget {
                   width: Responsive.width(30, context),
                   decoration: BoxDecoration(
                     color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(Responsive.width(1, context)),
+                    borderRadius:
+                        BorderRadius.circular(Responsive.width(1, context)),
                   ),
                 ),
                 SizedBox(height: Responsive.height(1, context)),
@@ -187,7 +190,8 @@ class UserView extends StatelessWidget {
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(Responsive.width(1, context)),
+                    borderRadius:
+                        BorderRadius.circular(Responsive.width(1, context)),
                   ),
                 ),
               ],
@@ -253,13 +257,13 @@ class UserView extends StatelessWidget {
         gradient: LinearGradient(
           colors: isDarkMode
               ? [
-            theme.colorScheme.surface,
-            theme.colorScheme.surface.withOpacity(0.8),
-          ]
+                  theme.colorScheme.surface,
+                  theme.colorScheme.surface.withOpacity(0.8),
+                ]
               : [
-            theme.colorScheme.primaryContainer.withOpacity(0.3),
-            theme.colorScheme.surface,
-          ],
+                  theme.colorScheme.primaryContainer.withOpacity(0.3),
+                  theme.colorScheme.surface,
+                ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -286,7 +290,8 @@ class UserView extends StatelessWidget {
               Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(Responsive.width(3, context)),
+                    borderRadius:
+                        BorderRadius.circular(Responsive.width(3, context)),
                     child: CachedNetworkImage(
                       height: avatarSize,
                       width: avatarSize,
@@ -441,7 +446,8 @@ class UserView extends StatelessWidget {
                 padding: EdgeInsets.all(Responsive.width(1, context)),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(Responsive.width(1.5, context)),
+                  borderRadius:
+                      BorderRadius.circular(Responsive.width(1.5, context)),
                 ),
                 child: Icon(
                   icon,

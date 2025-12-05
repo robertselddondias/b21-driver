@@ -80,13 +80,17 @@ class Constant {
     await launchUrl(launchUri);
   }
 
-  static Future<MapModel?> getDurationDistance(LatLng departureLatLong, LatLng destinationLatLong) async {
+  static Future<MapModel?> getDurationDistance(
+      LatLng departureLatLong, LatLng destinationLatLong) async {
     String url = 'https://maps.googleapis.com/maps/api/distancematrix/json';
-    http.Response restaurantToCustomerTime = await http.get(Uri.parse('$url?units=metric&origins=${departureLatLong.latitude},'
+    http.Response restaurantToCustomerTime = await http.get(Uri.parse(
+        '$url?units=metric&origins=${departureLatLong.latitude},'
         '${departureLatLong.longitude}&destinations=${destinationLatLong.latitude},${destinationLatLong.longitude}&key=${Constant.mapAPIKey}'));
-    MapModel mapModel = MapModel.fromJson(jsonDecode(restaurantToCustomerTime.body));
+    MapModel mapModel =
+        MapModel.fromJson(jsonDecode(restaurantToCustomerTime.body));
 
-    if (mapModel.status == 'OK' && mapModel.rows!.first.elements!.first.status == "OK") {
+    if (mapModel.status == 'OK' &&
+        mapModel.rows!.first.elements!.first.status == "OK") {
       return mapModel;
     } else {
       ShowToastDialog.showToast(mapModel.errorMessage);
@@ -104,7 +108,8 @@ class Constant {
   }
 
   static bool? validateEmail(String? value) {
-    String pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    String pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
     RegExp regex = RegExp(pattern);
     if (!regex.hasMatch(value ?? '')) {
       return false;
@@ -113,15 +118,19 @@ class Constant {
     }
   }
 
-  static Future<String> uploadUserImageToFireStorage(File image, String filePath, String fileName) async {
-    Reference upload = FirebaseStorage.instance.ref().child('$filePath/$fileName');
+  static Future<String> uploadUserImageToFireStorage(
+      File image, String filePath, String fileName) async {
+    Reference upload =
+        FirebaseStorage.instance.ref().child('$filePath/$fileName');
     UploadTask uploadTask = upload.putFile(image);
-    var downloadUrl = await (await uploadTask.whenComplete(() {})).ref.getDownloadURL();
+    var downloadUrl =
+        await (await uploadTask.whenComplete(() {})).ref.getDownloadURL();
     return downloadUrl.toString();
   }
 
   bool hasValidUrl(String value) {
-    String pattern = r'(http|https)://[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?';
+    String pattern =
+        r'(http|https)://[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?';
     RegExp regExp = RegExp(pattern);
     if (value.isEmpty) {
       return false;
@@ -137,14 +146,19 @@ class Constant {
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime(2200),
-
       builder: (context, child) {
         final themeChange = Provider.of<DarkThemeProvider>(context);
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
-            colorScheme: ColorScheme.light(primary: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary),
-            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            primaryColor: themeChange.getThem()
+                ? AppColors.darkModePrimary
+                : AppColors.primary,
+            colorScheme: ColorScheme.light(
+                primary: themeChange.getThem()
+                    ? AppColors.darkModePrimary
+                    : AppColors.primary),
+            buttonTheme:
+                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
           ),
           child: child!,
         );
@@ -166,9 +180,15 @@ class Constant {
         final themeChange = Provider.of<DarkThemeProvider>(context);
         return Theme(
           data: ThemeData.light().copyWith(
-            primaryColor: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
-            colorScheme: ColorScheme.light(primary: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary),
-            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            primaryColor: themeChange.getThem()
+                ? AppColors.darkModePrimary
+                : AppColors.primary,
+            colorScheme: ColorScheme.light(
+                primary: themeChange.getThem()
+                    ? AppColors.darkModePrimary
+                    : AppColors.primary),
+            buttonTheme:
+                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
           ),
           child: child!,
         );
@@ -186,19 +206,24 @@ class Constant {
       if (taxModel.type == "fix") {
         taxAmount = double.parse(taxModel.tax.toString());
       } else {
-        taxAmount = (double.parse(amount.toString()) * double.parse(taxModel.tax!.toString())) / 100;
+        taxAmount = (double.parse(amount.toString()) *
+                double.parse(taxModel.tax!.toString())) /
+            100;
       }
     }
     return taxAmount;
   }
 
-  static double calculateAdminCommission({String? amount, AdminCommission? adminCommission}) {
+  static double calculateAdminCommission(
+      {String? amount, AdminCommission? adminCommission}) {
     double taxAmount = 0.0;
     if (adminCommission != null) {
       if (adminCommission.type == "fix") {
         taxAmount = double.parse(adminCommission.amount.toString());
       } else {
-        taxAmount = (double.parse(amount.toString()) * double.parse(adminCommission.amount!.toString())) / 100;
+        taxAmount = (double.parse(amount.toString()) *
+                double.parse(adminCommission.amount!.toString())) /
+            100;
       }
     }
     return taxAmount;
@@ -227,12 +252,15 @@ class Constant {
     return number < 0;
   }
 
-  static String calculateReview({required String? reviewCount, required String? reviewSum}) {
+  static String calculateReview(
+      {required String? reviewCount, required String? reviewSum}) {
     if (reviewCount == "0.0" && reviewSum == "0.0") {
       return "0.0";
     }
 
-    return (double.parse(reviewSum.toString()) / double.parse(reviewCount.toString())).toStringAsFixed(Constant.currencyModel!.decimalDigits!);
+    return (double.parse(reviewSum.toString()) /
+            double.parse(reviewCount.toString()))
+        .toStringAsFixed(Constant.currencyModel!.decimalDigits!);
   }
 
   static String amountShow({required String? amount}) {
@@ -253,27 +281,34 @@ class Constant {
   Future<Url> uploadChatImageToFireStorage(File image) async {
     ShowToastDialog.showLoader('Enviando imagem...');
     var uniqueID = const Uuid().v4();
-    Reference upload = FirebaseStorage.instance.ref().child('/chat/images/$uniqueID.png');
+    Reference upload =
+        FirebaseStorage.instance.ref().child('/chat/images/$uniqueID.png');
     UploadTask uploadTask = upload.putFile(image);
     var storageRef = (await uploadTask.whenComplete(() {})).ref;
     var downloadUrl = await storageRef.getDownloadURL();
     var metaData = await storageRef.getMetadata();
     ShowToastDialog.closeLoader();
-    return Url(mime: metaData.contentType ?? 'image', url: downloadUrl.toString());
+    return Url(
+        mime: metaData.contentType ?? 'image', url: downloadUrl.toString());
   }
 
   Future<String> uploadVideoThumbnailToFireStorage(File file) async {
     var uniqueID = const Uuid().v4();
-    Reference upload = FirebaseStorage.instance.ref().child('/thumbnails/$uniqueID.png');
+    Reference upload =
+        FirebaseStorage.instance.ref().child('/thumbnails/$uniqueID.png');
     UploadTask uploadTask = upload.putFile(file);
-    var downloadUrl = await (await uploadTask.whenComplete(() {})).ref.getDownloadURL();
+    var downloadUrl =
+        await (await uploadTask.whenComplete(() {})).ref.getDownloadURL();
     return downloadUrl.toString();
   }
 
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
     ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+        targetWidth: width);
     ui.FrameInfo fi = await codec.getNextFrame();
-    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+    return (await fi.image.toByteData(format: ui.ImageByteFormat.png))!
+        .buffer
+        .asUint8List();
   }
 }

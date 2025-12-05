@@ -41,7 +41,8 @@ class CompleteOrderScreen extends StatelessWidget {
   }
 
   /// AppBar responsiva e temática
-  PreferredSizeWidget _buildAppBar(BuildContext context, DarkThemeProvider themeChange) {
+  PreferredSizeWidget _buildAppBar(
+      BuildContext context, DarkThemeProvider themeChange) {
     return AppBar(
       backgroundColor: AppColors.primary,
       elevation: 0,
@@ -59,7 +60,7 @@ class CompleteOrderScreen extends StatelessWidget {
         child: Container(
           margin: EdgeInsets.all(Responsive.width(2, context)),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(25),
           ),
           child: Icon(
@@ -74,10 +75,13 @@ class CompleteOrderScreen extends StatelessWidget {
   }
 
   /// Conteúdo principal com container responsivo
-  Widget _buildMainContent(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+  Widget _buildMainContent(BuildContext context,
+      CompleteOrderController controller, DarkThemeProvider themeChange) {
     return Container(
       decoration: BoxDecoration(
-        color: themeChange.getThem() ? AppColors.darkBackground : AppColors.background,
+        color: themeChange.getThem()
+            ? AppColors.darkBackground
+            : AppColors.background,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(25),
           topRight: Radius.circular(25),
@@ -133,7 +137,8 @@ class CompleteOrderScreen extends StatelessWidget {
   }
 
   /// Header da tela com indicador visual
-  Widget _buildScreenHeader(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildScreenHeader(
+      BuildContext context, DarkThemeProvider themeChange) {
     return Column(
       children: [
         // Indicador de arraste
@@ -153,7 +158,7 @@ class CompleteOrderScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(Responsive.width(2, context)),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -172,14 +177,17 @@ class CompleteOrderScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: Responsive.width(5, context),
                       fontWeight: FontWeight.bold,
-                      color: themeChange.getThem() ? Colors.white : Colors.black,
+                      color:
+                          themeChange.getThem() ? Colors.white : Colors.black,
                     ),
                   ),
                   Text(
                     'Informações completas do pedido'.tr,
                     style: GoogleFonts.poppins(
                       fontSize: Responsive.width(3.2, context),
-                      color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                      color: themeChange.getThem()
+                          ? Colors.white70
+                          : Colors.black54,
                     ),
                   ),
                 ],
@@ -192,13 +200,18 @@ class CompleteOrderScreen extends StatelessWidget {
   }
 
   /// Card do Ride ID com funcionalidade de cópia
-  Widget _buildRideIdCard(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+  Widget _buildRideIdCard(BuildContext context,
+      CompleteOrderController controller, DarkThemeProvider themeChange) {
     return Container(
       decoration: BoxDecoration(
-        color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
+        color: themeChange.getThem()
+            ? AppColors.darkContainerBackground
+            : AppColors.containerBackground,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder,
+          color: themeChange.getThem()
+              ? AppColors.darkContainerBorder
+              : AppColors.containerBorder,
           width: 1,
         ),
         boxShadow: _buildCardShadow(themeChange),
@@ -222,7 +235,8 @@ class CompleteOrderScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w600,
                       fontSize: Responsive.width(4, context),
-                      color: themeChange.getThem() ? Colors.white : Colors.black,
+                      color:
+                          themeChange.getThem() ? Colors.white : Colors.black,
                     ),
                   ),
                 ),
@@ -236,9 +250,9 @@ class CompleteOrderScreen extends StatelessWidget {
                 vertical: Responsive.height(1, context),
               ),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
               ),
               child: Row(
                 children: [
@@ -268,10 +282,12 @@ class CompleteOrderScreen extends StatelessWidget {
   }
 
   /// Botão de cópia com design moderno
-  Widget _buildCopyButton(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+  Widget _buildCopyButton(BuildContext context,
+      CompleteOrderController controller, DarkThemeProvider themeChange) {
     return InkWell(
       onTap: () {
-        FlutterClipboard.copy(controller.orderModel.value.id.toString()).then((value) {
+        FlutterClipboard.copy(controller.orderModel.value.id.toString())
+            .then((value) {
           ShowToastDialog.showToast("OrderId copied".tr);
         });
       },
@@ -283,7 +299,9 @@ class CompleteOrderScreen extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           border: Border.all(
-            color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
+            color: themeChange.getThem()
+                ? AppColors.darkModePrimary
+                : AppColors.primary,
             width: 1.5,
           ),
           borderRadius: BorderRadius.circular(8),
@@ -293,7 +311,9 @@ class CompleteOrderScreen extends StatelessWidget {
           children: [
             Icon(
               Icons.content_copy,
-              color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
+              color: themeChange.getThem()
+                  ? AppColors.darkModePrimary
+                  : AppColors.primary,
               size: Responsive.width(4, context),
             ),
             SizedBox(width: Responsive.width(1.5, context)),
@@ -302,7 +322,9 @@ class CompleteOrderScreen extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w600,
                 fontSize: Responsive.width(3.2, context),
-                color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
+                color: themeChange.getThem()
+                    ? AppColors.darkModePrimary
+                    : AppColors.primary,
               ),
             ),
           ],
@@ -312,7 +334,8 @@ class CompleteOrderScreen extends StatelessWidget {
   }
 
   /// Seção de localizações
-  Widget _buildLocationsSection(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+  Widget _buildLocationsSection(BuildContext context,
+      CompleteOrderController controller, DarkThemeProvider themeChange) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -337,10 +360,14 @@ class CompleteOrderScreen extends StatelessWidget {
         SizedBox(height: Responsive.height(1.5, context)),
         Container(
           decoration: BoxDecoration(
-            color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
+            color: themeChange.getThem()
+                ? AppColors.darkContainerBackground
+                : AppColors.containerBackground,
             borderRadius: BorderRadius.circular(15),
             border: Border.all(
-              color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder,
+              color: themeChange.getThem()
+                  ? AppColors.darkContainerBorder
+                  : AppColors.containerBorder,
               width: 1,
             ),
             boxShadow: _buildCardShadow(themeChange),
@@ -348,8 +375,11 @@ class CompleteOrderScreen extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.all(Responsive.width(4, context)),
             child: LocationView(
-              sourceLocation: controller.orderModel.value.sourceLocationName.toString(),
-              destinationLocation: controller.orderModel.value.destinationLocationName.toString(),
+              sourceLocation:
+                  controller.orderModel.value.sourceLocationName.toString(),
+              destinationLocation: controller
+                  .orderModel.value.destinationLocationName
+                  .toString(),
             ),
           ),
         ),
@@ -358,7 +388,8 @@ class CompleteOrderScreen extends StatelessWidget {
   }
 
   /// Status da corrida
-  Widget _buildRideStatus(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+  Widget _buildRideStatus(BuildContext context,
+      CompleteOrderController controller, DarkThemeProvider themeChange) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(
@@ -374,7 +405,8 @@ class CompleteOrderScreen extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(Responsive.width(2, context)),
             decoration: BoxDecoration(
-              color: _getStatusColor(controller.orderModel.value.status.toString()),
+              color: _getStatusColor(
+                  controller.orderModel.value.status.toString()),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(
@@ -393,14 +425,17 @@ class CompleteOrderScreen extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w600,
                     fontSize: Responsive.width(3.8, context),
-                    color: themeChange.getThem() ? Colors.white : Colors.black87,
+                    color:
+                        themeChange.getThem() ? Colors.white : Colors.black87,
                   ),
                 ),
                 Text(
-                  Constant().formatTimestamp(controller.orderModel.value.createdDate),
+                  Constant()
+                      .formatTimestamp(controller.orderModel.value.createdDate),
                   style: GoogleFonts.poppins(
                     fontSize: Responsive.width(3.2, context),
-                    color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                    color:
+                        themeChange.getThem() ? Colors.white70 : Colors.black54,
                   ),
                 ),
               ],
@@ -412,13 +447,18 @@ class CompleteOrderScreen extends StatelessWidget {
   }
 
   /// Resumo da reserva
-  Widget _buildBookingSummary(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+  Widget _buildBookingSummary(BuildContext context,
+      CompleteOrderController controller, DarkThemeProvider themeChange) {
     return Container(
       decoration: BoxDecoration(
-        color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
+        color: themeChange.getThem()
+            ? AppColors.darkContainerBackground
+            : AppColors.containerBackground,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder,
+          color: themeChange.getThem()
+              ? AppColors.darkContainerBorder
+              : AppColors.containerBorder,
           width: 1,
         ),
         boxShadow: _buildCardShadow(themeChange),
@@ -453,7 +493,8 @@ class CompleteOrderScreen extends StatelessWidget {
             _buildSummaryRow(
               context,
               "Ride Amount".tr,
-              Constant.amountShow(amount: controller.orderModel.value.finalRate.toString()),
+              Constant.amountShow(
+                  amount: controller.orderModel.value.finalRate.toString()),
               themeChange,
             ),
 
@@ -462,25 +503,29 @@ class CompleteOrderScreen extends StatelessWidget {
             // Lista de taxas
             if (controller.orderModel.value.taxList != null) ...[
               ...controller.orderModel.value.taxList!.map((taxModel) => Column(
-                children: [
-                  _buildSummaryRow(
-                    context,
-                    "${taxModel.title.toString()} (${taxModel.type == "fix" ? Constant.amountShow(amount: taxModel.tax) : "${taxModel.tax}%"})",
-                    Constant.amountShow(
-                      amount: Constant()
-                          .calculateTax(
-                        amount: (double.parse(controller.orderModel.value.finalRate.toString()) -
-                            double.parse(controller.couponAmount.value.toString()))
-                            .toString(),
-                        taxModel: taxModel,
-                      )
-                          .toString(),
-                    ),
-                    themeChange,
-                  ),
-                  _buildDivider(context, themeChange),
-                ],
-              )),
+                    children: [
+                      _buildSummaryRow(
+                        context,
+                        "${taxModel.title.toString()} (${taxModel.type == "fix" ? Constant.amountShow(amount: taxModel.tax) : "${taxModel.tax}%"})",
+                        Constant.amountShow(
+                          amount: Constant()
+                              .calculateTax(
+                                amount: (double.parse(controller
+                                            .orderModel.value.finalRate
+                                            .toString()) -
+                                        double.parse(controller
+                                            .couponAmount.value
+                                            .toString()))
+                                    .toString(),
+                                taxModel: taxModel,
+                              )
+                              .toString(),
+                        ),
+                        themeChange,
+                      ),
+                      _buildDivider(context, themeChange),
+                    ],
+                  )),
             ],
 
             // Desconto
@@ -496,15 +541,17 @@ class CompleteOrderScreen extends StatelessWidget {
 
             // Total a pagar
             Container(
-              padding: EdgeInsets.symmetric(vertical: Responsive.height(1, context)),
+              padding:
+                  EdgeInsets.symmetric(vertical: Responsive.height(1, context)),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: _buildSummaryRow(
                 context,
                 "Payable amount".tr,
-                Constant.amountShow(amount: controller.calculateAmount().toString()),
+                Constant.amountShow(
+                    amount: controller.calculateAmount().toString()),
                 themeChange,
                 isBold: true,
               ),
@@ -516,13 +563,18 @@ class CompleteOrderScreen extends StatelessWidget {
   }
 
   /// Comissão do administrador
-  Widget _buildAdminCommission(BuildContext context, CompleteOrderController controller, DarkThemeProvider themeChange) {
+  Widget _buildAdminCommission(BuildContext context,
+      CompleteOrderController controller, DarkThemeProvider themeChange) {
     return Container(
       decoration: BoxDecoration(
-        color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
+        color: themeChange.getThem()
+            ? AppColors.darkContainerBackground
+            : AppColors.containerBackground,
         borderRadius: BorderRadius.circular(15),
         border: Border.all(
-          color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder,
+          color: themeChange.getThem()
+              ? AppColors.darkContainerBorder
+              : AppColors.containerBorder,
           width: 1,
         ),
         boxShadow: _buildCardShadow(themeChange),
@@ -551,7 +603,6 @@ class CompleteOrderScreen extends StatelessWidget {
               ],
             ),
             SizedBox(height: Responsive.height(1.5, context)),
-
             _buildSummaryRow(
               context,
               "Admin commission".tr,
@@ -559,15 +610,13 @@ class CompleteOrderScreen extends StatelessWidget {
               themeChange,
               valueColor: Colors.red,
             ),
-
             SizedBox(height: Responsive.height(2, context)),
-
             Container(
               padding: EdgeInsets.all(Responsive.width(3, context)),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.red.withOpacity(0.3)),
+                border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -580,7 +629,8 @@ class CompleteOrderScreen extends StatelessWidget {
                   SizedBox(width: Responsive.width(2, context)),
                   Expanded(
                     child: Text(
-                      "Note : Admin commission will be debited from your wallet balance. \n Admin commission will apply on Ride Amount minus Discount(if applicable).".tr,
+                      "Note : Admin commission will be debited from your wallet balance. \n Admin commission will apply on Ride Amount minus Discount(if applicable)."
+                          .tr,
                       style: GoogleFonts.poppins(
                         color: Colors.red,
                         fontSize: Responsive.width(3, context),
@@ -599,13 +649,13 @@ class CompleteOrderScreen extends StatelessWidget {
 
   /// Widget para linha do resumo
   Widget _buildSummaryRow(
-      BuildContext context,
-      String title,
-      String value,
-      DarkThemeProvider themeChange, {
-        Color? valueColor,
-        bool isBold = false,
-      }) {
+    BuildContext context,
+    String title,
+    String value,
+    DarkThemeProvider themeChange, {
+    Color? valueColor,
+    bool isBold = false,
+  }) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: Responsive.height(0.8, context)),
       child: Row(
@@ -627,7 +677,8 @@ class CompleteOrderScreen extends StatelessWidget {
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.w600,
               fontSize: Responsive.width(3.5, context),
-              color: valueColor ?? (themeChange.getThem() ? Colors.white : Colors.black),
+              color: valueColor ??
+                  (themeChange.getThem() ? Colors.white : Colors.black),
             ),
           ),
         ],
@@ -650,19 +701,19 @@ class CompleteOrderScreen extends StatelessWidget {
   List<BoxShadow> _buildCardShadow(DarkThemeProvider themeChange) {
     return themeChange.getThem()
         ? [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.3),
-        blurRadius: 8,
-        offset: const Offset(0, 4),
-      ),
-    ]
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ]
         : [
-      BoxShadow(
-        color: Colors.grey.withOpacity(0.2),
-        blurRadius: 10,
-        offset: const Offset(0, 3),
-      ),
-    ];
+            BoxShadow(
+              color: Colors.grey.withValues(alpha: 0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 3),
+            ),
+          ];
   }
 
   /// Cor do status

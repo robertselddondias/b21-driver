@@ -70,9 +70,9 @@ class AutoAssignmentController extends GetxController {
           .collection(CollectionName.orders)
           .where('driverId', isEqualTo: FireStoreUtils.getCurrentUid())
           .where('status', whereIn: [
-        Constant.rideActive,
-        Constant.rideInProgress,
-      ])
+            Constant.rideActive,
+            Constant.rideInProgress,
+          ])
           .limit(1)
           .get();
 
@@ -91,25 +91,25 @@ class AutoAssignmentController extends GetxController {
         .collection(CollectionName.orders)
         .where('driverId', isEqualTo: FireStoreUtils.getCurrentUid())
         .where('status', whereIn: [
-      Constant.rideActive,
-      Constant.rideInProgress,
-    ])
+          Constant.rideActive,
+          Constant.rideInProgress,
+        ])
         .snapshots()
         .listen((snapshot) {
-      if (snapshot.docs.isNotEmpty) {
-        // Se tem corrida ativa, limpa qualquer atribuição pendente
-        if (isShowingModal.value || currentAssignedRide.value != null) {
-          _clearCurrentAssignment();
-        }
-        // Para o listener de novas corridas
-        stopOrderListener();
-      } else {
-        // Se não tem mais corrida ativa e está online, reinicia listener
-        if (isOnline.value && driverModel.value.location != null) {
-          startRealTimeOrderListener();
-        }
-      }
-    });
+          if (snapshot.docs.isNotEmpty) {
+            // Se tem corrida ativa, limpa qualquer atribuição pendente
+            if (isShowingModal.value || currentAssignedRide.value != null) {
+              _clearCurrentAssignment();
+            }
+            // Para o listener de novas corridas
+            stopOrderListener();
+          } else {
+            // Se não tem mais corrida ativa e está online, reinicia listener
+            if (isOnline.value && driverModel.value.location != null) {
+              startRealTimeOrderListener();
+            }
+          }
+        });
   }
 
   /// ====================================================================
@@ -140,7 +140,6 @@ class AutoAssignmentController extends GetxController {
               startRealTimeOrderListener();
             }
           });
-
         } else if (!isOnline.value && wasOnline) {
           // Ficou offline agora
           stopOrderListener();
@@ -160,7 +159,8 @@ class AutoAssignmentController extends GetxController {
       return;
     }
 
-    if (driverModel.value.serviceId == null || driverModel.value.serviceId!.isEmpty) {
+    if (driverModel.value.serviceId == null ||
+        driverModel.value.serviceId!.isEmpty) {
       return;
     }
 
@@ -172,7 +172,6 @@ class AutoAssignmentController extends GetxController {
         .where('status', isEqualTo: Constant.ridePlaced)
         .snapshots()
         .listen((snapshot) async {
-
       // ⚠️ VERIFICAÇÃO CRÍTICA #1: Bloqueia se já tem corrida ativa
       bool activeRide = await hasActiveRide();
       if (activeRide) {
@@ -205,12 +204,14 @@ class AutoAssignmentController extends GetxController {
 
           // Verifica se já foi rejeitada por este motorista
           if (order.rejectedDriverId != null &&
-              order.rejectedDriverId!.contains(FireStoreUtils.getCurrentUid())) {
+              order.rejectedDriverId!
+                  .contains(FireStoreUtils.getCurrentUid())) {
             continue;
           }
 
           // Verifica se já tem motorista atribuído
-          if (order.assignedDriverId != null && order.assignedDriverId!.isNotEmpty) {
+          if (order.assignedDriverId != null &&
+              order.assignedDriverId!.isNotEmpty) {
             continue;
           }
 
@@ -323,7 +324,8 @@ class AutoAssignmentController extends GetxController {
       await FireStoreUtils.setOrder(orderModel);
 
       // Notifica passageiro
-      await FireStoreUtils.getCustomer(orderModel.userId.toString()).then((value) async {
+      await FireStoreUtils.getCustomer(orderModel.userId.toString())
+          .then((value) async {
         if (value != null) {
           await SendNotification.sendOneNotification(
               token: value.fcmToken.toString(),
@@ -347,7 +349,6 @@ class AutoAssignmentController extends GetxController {
       // Fecha modal e aguarda resposta do passageiro
       _clearModalOnly();
       _startPassengerResponseMonitoring(orderModel);
-
     } catch (e) {
       ShowToastDialog.closeLoader();
       ShowToastDialog.showToast("Erro ao aceitar corrida".tr);
@@ -400,7 +401,6 @@ class AutoAssignmentController extends GetxController {
           .update(updateData);
 
       ShowToastDialog.showToast("Corrida rejeitada".tr);
-
     } catch (e) {
       ShowToastDialog.showToast("Erro ao rejeitar corrida".tr);
     } finally {
@@ -421,7 +421,8 @@ class AutoAssignmentController extends GetxController {
     // Timeout de 60 segundos
     passengerResponseTimeout = Timer(const Duration(seconds: 60), () {
       print('⏰ TIMEOUT - Passageiro não respondeu');
-      _handlePassengerResponse('TIMEOUT', order, 'O passageiro não respondeu a tempo');
+      _handlePassengerResponse(
+          'TIMEOUT', order, 'O passageiro não respondeu a tempo');
     });
 
     // Listener para mudanças na corrida
@@ -437,20 +438,23 @@ class AutoAssignmentController extends GetxController {
       // Passageiro aceitou
       if (updatedOrder.status == Constant.rideActive) {
         print('✅ PASSAGEIRO ACEITOU!');
-        _handlePassengerResponse('ACCEPTED', updatedOrder, 'Passageiro aceitou! Indo buscar...');
+        _handlePassengerResponse(
+            'ACCEPTED', updatedOrder, 'Passageiro aceitou! Indo buscar...');
       }
       // Passageiro rejeitou
       else if (updatedOrder.rejectedDriverId != null &&
-          updatedOrder.rejectedDriverId!.contains(FireStoreUtils.getCurrentUid())) {
+          updatedOrder.rejectedDriverId!
+              .contains(FireStoreUtils.getCurrentUid())) {
         print('❌ PASSAGEIRO REJEITOU');
-        _handlePassengerResponse('REJECTED', updatedOrder, 'Passageiro escolheu outro motorista');
+        _handlePassengerResponse(
+            'REJECTED', updatedOrder, 'Passageiro escolheu outro motorista');
       }
     });
 
     // Mostra dialog de aguardo
     Get.dialog(
-      WillPopScope(
-        onWillPop: () async => false,
+      PopScope(
+        canPop: false,
         child: Center(
           child: Material(
             color: Colors.transparent,
@@ -470,7 +474,8 @@ class AutoAssignmentController extends GetxController {
                       style: GoogleFonts.poppins(fontSize: 16)),
                   const SizedBox(height: 10),
                   Text('Aguarde...',
-                      style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14)),
+                      style: GoogleFonts.poppins(
+                          color: Colors.grey, fontSize: 14)),
                 ],
               ),
             ),
@@ -482,7 +487,8 @@ class AutoAssignmentController extends GetxController {
   }
 
   /// Trata resposta do passageiro
-  void _handlePassengerResponse(String responseType, OrderModel order, String message) {
+  void _handlePassengerResponse(
+      String responseType, OrderModel order, String message) {
     if (!isWaitingPassengerResponse.value) return;
 
     print('📱 RESPOSTA DO PASSAGEIRO: $responseType');
@@ -508,18 +514,164 @@ class AutoAssignmentController extends GetxController {
   /// CONTROLE DE STATUS ONLINE/OFFLINE
   /// ====================================================================
 
-  /// Alterna status online/offline
+  /// Verifica se o motorista pode ficar online
+  /// Retorna um mapa com o status e a mensagem de erro (se houver)
+  Future<Map<String, dynamic>> canGoOnline() async {
+    try {
+      String currentUserId = FireStoreUtils.getCurrentUid();
+
+      // 1. Verificar informações básicas
+      if (driverModel.value.fullName == null ||
+          driverModel.value.fullName!.isEmpty) {
+        return {
+          'canGoOnline': false,
+          'reason': 'complete_profile',
+          'message': 'Complete suas informações pessoais antes de ficar online'
+        };
+      }
+
+      if (driverModel.value.email == null ||
+          driverModel.value.email!.isEmpty) {
+        return {
+          'canGoOnline': false,
+          'reason': 'add_email',
+          'message': 'Adicione seu e-mail antes de ficar online'
+        };
+      }
+
+      // 2. Verificar informações do veículo
+      if (driverModel.value.vehicleInformation == null) {
+        return {
+          'canGoOnline': false,
+          'reason': 'add_vehicle',
+          'message': 'Cadastre seu veículo antes de ficar online'
+        };
+      }
+
+      VehicleInformation? vehicle = driverModel.value.vehicleInformation;
+      if (vehicle?.vehicleNumber == null ||
+          vehicle!.vehicleNumber!.isEmpty ||
+          vehicle.vehicleType == null ||
+          vehicle.vehicleType!.isEmpty) {
+        return {
+          'canGoOnline': false,
+          'reason': 'complete_vehicle',
+          'message': 'Complete as informações do veículo antes de ficar online'
+        };
+      }
+
+      // 3. Verificar documentos
+      final driverDocuments = await FireStoreUtils.fireStore
+          .collection(CollectionName.driverDocument)
+          .doc(currentUserId)
+          .get();
+
+      if (!driverDocuments.exists ||
+          driverDocuments.data() == null ||
+          driverDocuments.data()!['documents'] == null ||
+          (driverDocuments.data()!['documents'] as List).isEmpty) {
+        return {
+          'canGoOnline': false,
+          'reason': 'upload_documents',
+          'message': 'Envie seus documentos antes de ficar online'
+        };
+      }
+
+      // 4. Verificar se TODOS os documentos estão APROVADOS
+      List<dynamic> documents = driverDocuments.data()!['documents'];
+      List<Map<String, String>> pendingDocs = [];
+
+      for (var doc in documents) {
+        bool verified = doc['verified'] ?? false;
+        String docId = doc['documentId'] ?? '';
+
+        if (!verified) {
+          // Buscar informações do tipo de documento
+          final docType = await FireStoreUtils.fireStore
+              .collection(CollectionName.documents)
+              .doc(docId)
+              .get();
+
+          String docTitle = docType.exists ? (docType.data()?['title'] ?? docId) : docId;
+          pendingDocs.add({'id': docId, 'title': docTitle});
+        }
+      }
+
+      if (pendingDocs.isNotEmpty) {
+        String docNames = pendingDocs
+            .map((d) => d['title']!)
+            .take(3)
+            .join(', ');
+        return {
+          'canGoOnline': false,
+          'reason': 'documents_not_approved',
+          'message':
+              'Aguarde a aprovação dos seus documentos: $docNames${pendingDocs.length > 3 ? '...' : ''}',
+          'pendingDocuments': pendingDocs
+        };
+      }
+
+      // 5. Verificar dados bancários
+      final bankDetails = await FireStoreUtils.fireStore
+          .collection(CollectionName.bankDetails)
+          .where('driverId', isEqualTo: currentUserId)
+          .limit(1)
+          .get();
+
+      if (bankDetails.docs.isEmpty) {
+        return {
+          'canGoOnline': false,
+          'reason': 'add_bank_details',
+          'message': 'Cadastre seus dados bancários antes de ficar online'
+        };
+      }
+
+      final bank = bankDetails.docs.first.data();
+      if (bank['accountNumber'] == null ||
+          bank['accountNumber'].toString().isEmpty ||
+          bank['bankName'] == null ||
+          bank['bankName'].toString().isEmpty) {
+        return {
+          'canGoOnline': false,
+          'reason': 'complete_bank_details',
+          'message': 'Complete seus dados bancários antes de ficar online'
+        };
+      }
+
+      // 6. Verificar se tem corrida ativa
+      bool activeRide = await hasActiveRide();
+      if (activeRide) {
+        return {
+          'canGoOnline': false,
+          'reason': 'active_ride',
+          'message': 'Complete sua corrida ativa antes de ficar online novamente'
+        };
+      }
+
+      // ✅ TUDO OK! Pode ficar online
+      return {'canGoOnline': true, 'message': 'Pronto para ficar online!'};
+    } catch (e) {
+      print('❌ ERRO AO VERIFICAR STATUS: $e');
+      return {
+        'canGoOnline': false,
+        'reason': 'error',
+        'message': 'Erro ao verificar status: $e'
+      };
+    }
+  }
+
+  /// Alterna status online/offline COM VALIDAÇÃO COMPLETA
   Future<void> toggleOnlineStatus() async {
     try {
       bool newStatus = !isOnline.value;
 
-      // ⚠️ VERIFICAÇÃO CRÍTICA #5: Se tentando ficar online, verifica corrida ativa
+      // ⚠️ VALIDAÇÃO COMPLETA: Se tentando ficar online, verifica TUDO
       if (newStatus) {
-        bool activeRide = await hasActiveRide();
-        if (activeRide) {
-          ShowToastDialog.showToast(
-              "Complete sua corrida ativa antes de ficar online novamente"
-          );
+        final validation = await canGoOnline();
+
+        if (validation['canGoOnline'] != true) {
+          // Não pode ficar online - mostrar motivo
+          ShowToastDialog.showToast(validation['message']);
           return;
         }
       }
@@ -534,10 +686,9 @@ class AutoAssignmentController extends GetxController {
       if (!newStatus) {
         forceCleanState();
       } else {
-        // Inicia monitoramento ao ficar online
+        ShowToastDialog.showToast("Você está online! Aguarde novas corridas...");
         startActiveRideMonitoring();
       }
-
     } catch (e) {
       print('❌ Erro ao alterar status: $e');
       ShowToastDialog.showToast("Erro ao alterar status");
@@ -589,12 +740,16 @@ class AutoAssignmentController extends GetxController {
   }
 
   /// Calcula distância entre dois pontos (Haversine)
-  double _calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+  double _calculateDistance(
+      double lat1, double lon1, double lat2, double lon2) {
     const double radiusOfEarth = 6371.0;
     double dLat = _toRadians(lat2 - lat1);
     double dLon = _toRadians(lon2 - lon1);
     double a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_toRadians(lat1)) * cos(_toRadians(lat2)) * sin(dLon / 2) * sin(dLon / 2);
+        cos(_toRadians(lat1)) *
+            cos(_toRadians(lat2)) *
+            sin(dLon / 2) *
+            sin(dLon / 2);
     double c = 2 * atan2(sqrt(a), sqrt(1 - a));
     return radiusOfEarth * c;
   }
@@ -677,5 +832,6 @@ class AutoAssignmentController extends GetxController {
       });
     }
   }
+
   OrderModel? getCurrentAssignedRide() => currentAssignedRide.value;
 }

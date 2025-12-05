@@ -55,176 +55,290 @@ class WalletScreen extends StatelessWidget {
             body: controller.isLoading.value
                 ? Constant.loader(context)
                 : Column(
-              children: [
-                Container(
-                  height: Responsive.height(24, context),
-                  width: Responsive.width(100, context),
-                  color: AppColors.primary,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: Responsive.width(2.5, context)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: Responsive.height(24, context),
+                        width: Responsive.width(100, context),
+                        color: AppColors.primary,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: Responsive.width(2.5, context)),
+                          child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              Text(
-                                "Total Balance".tr,
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: Responsive.width(4, context),
-                                ),
-                              ),
-                              Text(
-                                Constant.amountShow(amount: safeString(controller.driverUserModel.value.walletAmount, defaultValue: "0")),
-                                style: GoogleFonts.poppins(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: Responsive.width(6, context),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Total Balance".tr,
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: Responsive.width(4, context),
+                                      ),
+                                    ),
+                                    Text(
+                                      Constant.amountShow(
+                                          amount: safeString(
+                                              controller.driverUserModel.value
+                                                  .walletAmount,
+                                              defaultValue: "0")),
+                                      style: GoogleFonts.poppins(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: Responsive.width(6, context),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: themeChange.getThem() ? AppColors.darkBackground : AppColors.background,
-                        borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25))
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: Responsive.width(2.5, context)),
-                      child: controller.transactionList.isEmpty
-                          ? Center(
-                        child: Text(
-                          "No transaction found".tr,
-                          style: GoogleFonts.poppins(
-                            color: themeChange.getThem() ? Colors.white : Colors.black,
-                            fontSize: Responsive.width(4, context),
-                          ),
-                        ),
-                      )
-                          : ListView.builder(
-                        itemCount: controller.transactionList.length,
-                        itemBuilder: (context, index) {
-                          WalletTransactionModel walletTransactionModel = controller.transactionList[index];
-                          return InkWell(
-                            onTap: () async {
-                              if (walletTransactionModel.orderType == "city") {
-                                await FireStoreUtils.getOrder(walletTransactionModel.transactionId.toString()).then((value) {
-                                  if (value != null) {
-                                    OrderModel orderModel = value;
-                                    Get.to(const CompleteOrderScreen(), arguments: {
-                                      "orderModel": orderModel,
-                                    });
-                                  }
-                                });
-                              } else if (walletTransactionModel.orderType == "intercity") {
-                                await FireStoreUtils.getInterCityOrder(walletTransactionModel.transactionId.toString()).then((value) {
-                                  if (value != null) {
-                                    InterCityOrderModel orderModel = value;
-                                    // Get.to(const CompleteIntercityOrderScreen(), arguments: {
-                                    //   "orderModel": orderModel,
-                                    // });
-                                  }
-                                });
-                              } else {
-                                showTransactionDetails(context: context, walletTransactionModel: walletTransactionModel);
-                              }
-                            },
-                            child: Padding(
-                              padding: EdgeInsets.all(Responsive.width(2, context)),
-                              child: Container(
-                                  decoration: BoxDecoration(
-                                    color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
-                                    borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                    border: Border.all(color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder, width: 0.5),
-                                    boxShadow: themeChange.getThem()
-                                        ? null
-                                        : [
-                                      BoxShadow(
-                                        color: Colors.grey.withOpacity(0.5),
-                                        blurRadius: 8,
-                                        offset: const Offset(0, 2),
+                      ),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: themeChange.getThem()
+                                  ? AppColors.darkBackground
+                                  : AppColors.background,
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(25),
+                                  topRight: Radius.circular(25))),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: Responsive.width(2.5, context)),
+                            child: controller.transactionList.isEmpty
+                                ? Center(
+                                    child: Text(
+                                      "No transaction found".tr,
+                                      style: GoogleFonts.poppins(
+                                        color: themeChange.getThem()
+                                            ? Colors.white
+                                            : Colors.black,
+                                        fontSize: Responsive.width(4, context),
                                       ),
-                                    ],
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(Responsive.width(2, context)),
-                                    child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                            decoration: BoxDecoration(color: AppColors.lightGray, borderRadius: BorderRadius.circular(50)),
-                                            child: Padding(
-                                              padding: EdgeInsets.all(Responsive.width(3, context)),
-                                              child: SvgPicture.asset(
-                                                'assets/icons/ic_wallet.svg',
-                                                width: Responsive.width(6, context),
-                                                color: Colors.black,
+                                    ),
+                                  )
+                                : ListView.builder(
+                                    itemCount:
+                                        controller.transactionList.length,
+                                    itemBuilder: (context, index) {
+                                      WalletTransactionModel
+                                          walletTransactionModel =
+                                          controller.transactionList[index];
+                                      return InkWell(
+                                        onTap: () async {
+                                          if (walletTransactionModel
+                                                  .orderType ==
+                                              "city") {
+                                            await FireStoreUtils.getOrder(
+                                                    walletTransactionModel
+                                                        .transactionId
+                                                        .toString())
+                                                .then((value) {
+                                              if (value != null) {
+                                                OrderModel orderModel = value;
+                                                Get.to(
+                                                    const CompleteOrderScreen(),
+                                                    arguments: {
+                                                      "orderModel": orderModel,
+                                                    });
+                                              }
+                                            });
+                                          } else if (walletTransactionModel
+                                                  .orderType ==
+                                              "intercity") {
+                                            await FireStoreUtils
+                                                    .getInterCityOrder(
+                                                        walletTransactionModel
+                                                            .transactionId
+                                                            .toString())
+                                                .then((value) {
+                                              if (value != null) {
+                                                InterCityOrderModel orderModel =
+                                                    value;
+                                                // Get.to(const CompleteIntercityOrderScreen(), arguments: {
+                                                //   "orderModel": orderModel,
+                                                // });
+                                              }
+                                            });
+                                          } else {
+                                            showTransactionDetails(
+                                                context: context,
+                                                walletTransactionModel:
+                                                    walletTransactionModel);
+                                          }
+                                        },
+                                        child: Padding(
+                                          padding: EdgeInsets.all(
+                                              Responsive.width(2, context)),
+                                          child: Container(
+                                              decoration: BoxDecoration(
+                                                color: themeChange.getThem()
+                                                    ? AppColors
+                                                        .darkContainerBackground
+                                                    : AppColors
+                                                        .containerBackground,
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(10)),
+                                                border: Border.all(
+                                                    color: themeChange.getThem()
+                                                        ? AppColors
+                                                            .darkContainerBorder
+                                                        : AppColors
+                                                            .containerBorder,
+                                                    width: 0.5),
+                                                boxShadow: themeChange.getThem()
+                                                    ? null
+                                                    : [
+                                                        BoxShadow(
+                                                          color: Colors.grey
+                                                              .withValues(
+                                                                  alpha: 0.5),
+                                                          blurRadius: 8,
+                                                          offset: const Offset(
+                                                              0, 2),
+                                                        ),
+                                                      ],
                                               ),
-                                            )),
-                                        SizedBox(
-                                          width: Responsive.width(2.5, context),
-                                        ),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Text(
-                                                      Constant.dateFormatTimestamp(walletTransactionModel.createdDate),
-                                                      style: GoogleFonts.poppins(
-                                                        fontWeight: FontWeight.w600,
-                                                        fontSize: Responsive.width(3.5, context),
-                                                        color: themeChange.getThem() ? Colors.white : Colors.black,
+                                              child: Padding(
+                                                padding: EdgeInsets.all(
+                                                    Responsive.width(
+                                                        2, context)),
+                                                child: Row(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Container(
+                                                        decoration: BoxDecoration(
+                                                            color: AppColors
+                                                                .lightGray,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        50)),
+                                                        child: Padding(
+                                                          padding: EdgeInsets
+                                                              .all(Responsive
+                                                                  .width(3,
+                                                                      context)),
+                                                          child:
+                                                              SvgPicture.asset(
+                                                            'assets/icons/ic_wallet.svg',
+                                                            width: Responsive
+                                                                .width(
+                                                                    6, context),
+                                                            colorFilter:
+                                                                ColorFilter.mode(
+                                                                    Colors
+                                                                        .black,
+                                                                    BlendMode
+                                                                        .srcIn),
+                                                          ),
+                                                        )),
+                                                    SizedBox(
+                                                      width: Responsive.width(
+                                                          2.5, context),
+                                                    ),
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              Expanded(
+                                                                child: Text(
+                                                                  Constant.dateFormatTimestamp(
+                                                                      walletTransactionModel
+                                                                          .createdDate),
+                                                                  style: GoogleFonts
+                                                                      .poppins(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    fontSize: Responsive
+                                                                        .width(
+                                                                            3.5,
+                                                                            context),
+                                                                    color: themeChange.getThem()
+                                                                        ? Colors
+                                                                            .white
+                                                                        : Colors
+                                                                            .black,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                "${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? "(-" : "+"}${Constant.amountShow(amount: safeString(walletTransactionModel.amount?.toString().replaceAll("-", ""), defaultValue: "0"))}${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? ")" : ""}",
+                                                                style: GoogleFonts.poppins(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600,
+                                                                    fontSize: Responsive
+                                                                        .width(
+                                                                            3.5,
+                                                                            context),
+                                                                    color: safeParseDouble(walletTransactionModel.amount?.toString()) <
+                                                                            0
+                                                                        ? Colors
+                                                                            .red
+                                                                        : Colors
+                                                                            .green),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Text(
+                                                            safeString(
+                                                                walletTransactionModel
+                                                                    .note,
+                                                                defaultValue:
+                                                                    ""),
+                                                            style: GoogleFonts
+                                                                .poppins(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w400,
+                                                              fontSize: Responsive
+                                                                  .width(3.2,
+                                                                      context),
+                                                              color: themeChange
+                                                                      .getThem()
+                                                                  ? Colors.white
+                                                                      .withValues(
+                                                                          alpha:
+                                                                              0.7)
+                                                                  : Colors.black
+                                                                      .withValues(
+                                                                          alpha:
+                                                                              0.54),
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
-                                                  ),
-                                                  Text(
-                                                    "${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? "(-" : "+"}${Constant.amountShow(amount: safeString(walletTransactionModel.amount?.toString().replaceAll("-", ""), defaultValue: "0"))}${safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? ")" : ""}",
-                                                    style: GoogleFonts.poppins(
-                                                        fontWeight: FontWeight.w600,
-                                                        fontSize: Responsive.width(3.5, context),
-                                                        color: safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? Colors.red : Colors.green),
-                                                  ),
-                                                ],
-                                              ),
-                                              Text(
-                                                safeString(walletTransactionModel.note, defaultValue: ""),
-                                                style: GoogleFonts.poppins(
-                                                  fontWeight: FontWeight.w400,
-                                                  fontSize: Responsive.width(3.2, context),
-                                                  color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                                                  ],
                                                 ),
-                                              ),
-                                            ],
-                                          ),
+                                              )),
                                         ),
-                                      ],
-                                    ),
-                                  )),
-                            ),
-                          );
-                        },
+                                      );
+                                    },
+                                  ),
+                          ),
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ),
-              ],
-            ),
             bottomNavigationBar: Padding(
-              padding: EdgeInsets.symmetric(horizontal: Responsive.width(2.5, context), vertical: Responsive.height(5, context)),
+              padding: EdgeInsets.symmetric(
+                  horizontal: Responsive.width(2.5, context),
+                  vertical: Responsive.height(5, context)),
               child: Row(
                 children: [
                   Expanded(
@@ -232,18 +346,23 @@ class WalletScreen extends StatelessWidget {
                       context,
                       title: "withdraw".tr,
                       onPress: () async {
-                        double currentBalance = safeParseDouble(controller.driverUserModel.value.walletAmount?.toString());
+                        double currentBalance = safeParseDouble(controller
+                            .driverUserModel.value.walletAmount
+                            ?.toString());
 
                         if (currentBalance <= 0) {
                           ShowToastDialog.showToast("Insufficient balance".tr);
                         } else {
                           ShowToastDialog.showLoader("Aguarde...".tr);
-                          await FireStoreUtils.bankDetailsIsAvailable().then((value) {
+                          await FireStoreUtils.bankDetailsIsAvailable()
+                              .then((value) {
                             ShowToastDialog.closeLoader();
                             if (value == true) {
                               withdrawAmountBottomSheet(context, controller);
                             } else {
-                              ShowToastDialog.showToast("Your bank details is not available.Please add bank details".tr);
+                              ShowToastDialog.showToast(
+                                  "Your bank details is not available.Please add bank details"
+                                      .tr);
                             }
                           });
                         }
@@ -271,7 +390,9 @@ class WalletScreen extends StatelessWidget {
 
   paymentMethodDialog(BuildContext context, WalletController controller) {
     return showModalBottomSheet(
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30))),
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topRight: Radius.circular(30), topLeft: Radius.circular(30))),
         context: context,
         isScrollControlled: true,
         isDismissible: false,
@@ -282,13 +403,19 @@ class WalletScreen extends StatelessWidget {
             heightFactor: 0.9,
             child: Container(
               decoration: BoxDecoration(
-                color: themeChange.getThem() ? AppColors.darkBackground : AppColors.background,
-                borderRadius: const BorderRadius.only(topRight: Radius.circular(30), topLeft: Radius.circular(30)),
+                color: themeChange.getThem()
+                    ? AppColors.darkBackground
+                    : AppColors.background,
+                borderRadius: const BorderRadius.only(
+                    topRight: Radius.circular(30),
+                    topLeft: Radius.circular(30)),
               ),
               child: StatefulBuilder(builder: (context1, setState) {
                 return Obx(
-                      () => Padding(
-                    padding: EdgeInsets.symmetric(horizontal: Responsive.width(2.5, context), vertical: Responsive.height(1.2, context)),
+                  () => Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: Responsive.width(2.5, context),
+                        vertical: Responsive.height(1.2, context)),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -302,25 +429,30 @@ class WalletScreen extends StatelessWidget {
                                   },
                                   child: Icon(
                                     Icons.arrow_back_ios,
-                                    color: themeChange.getThem() ? Colors.white : Colors.black,
+                                    color: themeChange.getThem()
+                                        ? Colors.white
+                                        : Colors.black,
                                   )),
                               Expanded(
                                   child: Center(
                                       child: Text(
-                                        "Topup Wallet".tr,
-                                        style: GoogleFonts.poppins(
-                                          fontSize: Responsive.width(4.5, context),
-                                          fontWeight: FontWeight.w600,
-                                          color: themeChange.getThem() ? Colors.white : Colors.black,
-                                        ),
-                                      ))),
+                                "Topup Wallet".tr,
+                                style: GoogleFonts.poppins(
+                                  fontSize: Responsive.width(4.5, context),
+                                  fontWeight: FontWeight.w600,
+                                  color: themeChange.getThem()
+                                      ? Colors.white
+                                      : Colors.black,
+                                ),
+                              ))),
                             ],
                           ),
                         ),
                         Expanded(
                           child: SingleChildScrollView(
                             child: Padding(
-                              padding: EdgeInsets.all(Responsive.width(2, context)),
+                              padding:
+                                  EdgeInsets.all(Responsive.width(2, context)),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -329,13 +461,19 @@ class WalletScreen extends StatelessWidget {
                                     style: GoogleFonts.poppins(
                                       fontWeight: FontWeight.w600,
                                       fontSize: Responsive.width(4, context),
-                                      color: themeChange.getThem() ? Colors.white : Colors.black,
+                                      color: themeChange.getThem()
+                                          ? Colors.white
+                                          : Colors.black,
                                     ),
                                   ),
                                   SizedBox(
                                     height: Responsive.height(0.6, context),
                                   ),
-                                  TextFieldThem.buildTextFiled(context, hintText: 'Enter Amount'.tr, controller: controller.amountController.value, keyBoardType: TextInputType.number),
+                                  TextFieldThem.buildTextFiled(context,
+                                      hintText: 'Enter Amount'.tr,
+                                      controller:
+                                          controller.amountController.value,
+                                      keyBoardType: TextInputType.number),
                                   SizedBox(
                                     height: Responsive.height(1.2, context),
                                   ),
@@ -344,65 +482,143 @@ class WalletScreen extends StatelessWidget {
                                     style: GoogleFonts.poppins(
                                       fontWeight: FontWeight.w600,
                                       fontSize: Responsive.width(4, context),
-                                      color: themeChange.getThem() ? Colors.white : Colors.black,
+                                      color: themeChange.getThem()
+                                          ? Colors.white
+                                          : Colors.black,
                                     ),
                                   ),
                                   Visibility(
-                                    visible: controller.paymentModel.value.strip?.enable == true,
+                                    visible: controller
+                                            .paymentModel.value.strip?.enable ==
+                                        true,
                                     child: Obx(
-                                          () => Column(
+                                      () => Column(
                                         children: [
                                           SizedBox(
-                                            height: Responsive.height(1.2, context),
+                                            height:
+                                                Responsive.height(1.2, context),
                                           ),
                                           InkWell(
                                             onTap: () {
-                                              controller.selectedPaymentMethod.value = safeString(controller.paymentModel.value.strip?.name, defaultValue: "");
+                                              controller.selectedPaymentMethod
+                                                      .value =
+                                                  safeString(
+                                                      controller.paymentModel
+                                                          .value.strip?.name,
+                                                      defaultValue: "");
                                             },
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                borderRadius: const BorderRadius.all(Radius.circular(10)),
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(10)),
                                                 border: Border.all(
-                                                    color: controller.selectedPaymentMethod.value == safeString(controller.paymentModel.value.strip?.name, defaultValue: "")
+                                                    color: controller
+                                                                .selectedPaymentMethod
+                                                                .value ==
+                                                            safeString(
+                                                                controller
+                                                                    .paymentModel
+                                                                    .value
+                                                                    .strip
+                                                                    ?.name,
+                                                                defaultValue:
+                                                                    "")
                                                         ? themeChange.getThem()
-                                                        ? AppColors.darkModePrimary
-                                                        : AppColors.primary
+                                                            ? AppColors
+                                                                .darkModePrimary
+                                                            : AppColors.primary
                                                         : themeChange.getThem()
-                                                        ? AppColors.darkTextFieldBorder
-                                                        : AppColors.textFieldBorder,
+                                                            ? AppColors
+                                                                .darkTextFieldBorder
+                                                            : AppColors
+                                                                .textFieldBorder,
                                                     width: 1),
                                               ),
                                               child: Padding(
-                                                padding: EdgeInsets.symmetric(horizontal: Responsive.width(2.5, context), vertical: Responsive.height(1.2, context)),
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal:
+                                                        Responsive.width(
+                                                            2.5, context),
+                                                    vertical: Responsive.height(
+                                                        1.2, context)),
                                                 child: Row(
                                                   children: [
                                                     Container(
-                                                      height: Responsive.height(5, context),
-                                                      width: Responsive.width(20, context),
-                                                      decoration: const BoxDecoration(color: AppColors.lightGray, borderRadius: BorderRadius.all(Radius.circular(5))),
+                                                      height: Responsive.height(
+                                                          5, context),
+                                                      width: Responsive.width(
+                                                          20, context),
+                                                      decoration: const BoxDecoration(
+                                                          color: AppColors
+                                                              .lightGray,
+                                                          borderRadius:
+                                                              BorderRadius.all(
+                                                                  Radius
+                                                                      .circular(
+                                                                          5))),
                                                       child: Padding(
-                                                        padding: EdgeInsets.all(Responsive.width(2, context)),
-                                                        child: Image.asset('assets/images/stripe.png'),
+                                                        padding: EdgeInsets.all(
+                                                            Responsive.width(
+                                                                2, context)),
+                                                        child: Image.asset(
+                                                            'assets/images/stripe.png'),
                                                       ),
                                                     ),
                                                     SizedBox(
-                                                      width: Responsive.width(2.5, context),
+                                                      width: Responsive.width(
+                                                          2.5, context),
                                                     ),
                                                     Expanded(
                                                       child: Text(
-                                                        safeString(controller.paymentModel.value.strip?.name, defaultValue: "Stripe"),
-                                                        style: GoogleFonts.poppins(
-                                                          fontSize: Responsive.width(3.8, context),
-                                                          color: themeChange.getThem() ? Colors.white : Colors.black,
+                                                        safeString(
+                                                            controller
+                                                                .paymentModel
+                                                                .value
+                                                                .strip
+                                                                ?.name,
+                                                            defaultValue:
+                                                                "Stripe"),
+                                                        style:
+                                                            GoogleFonts.poppins(
+                                                          fontSize:
+                                                              Responsive.width(
+                                                                  3.8, context),
+                                                          color: themeChange
+                                                                  .getThem()
+                                                              ? Colors.white
+                                                              : Colors.black,
                                                         ),
                                                       ),
                                                     ),
                                                     Radio(
-                                                      value: safeString(controller.paymentModel.value.strip?.name, defaultValue: ""),
-                                                      groupValue: controller.selectedPaymentMethod.value,
-                                                      activeColor: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
+                                                      value: safeString(
+                                                          controller
+                                                              .paymentModel
+                                                              .value
+                                                              .strip
+                                                              ?.name,
+                                                          defaultValue: ""),
+                                                      groupValue: controller
+                                                          .selectedPaymentMethod
+                                                          .value,
+                                                      activeColor: themeChange
+                                                              .getThem()
+                                                          ? AppColors
+                                                              .darkModePrimary
+                                                          : AppColors.primary,
                                                       onChanged: (value) {
-                                                        controller.selectedPaymentMethod.value = safeString(controller.paymentModel.value.strip?.name, defaultValue: "");
+                                                        controller
+                                                                .selectedPaymentMethod
+                                                                .value =
+                                                            safeString(
+                                                                controller
+                                                                    .paymentModel
+                                                                    .value
+                                                                    .strip
+                                                                    ?.name,
+                                                                defaultValue:
+                                                                    "");
                                                       },
                                                     )
                                                   ],
@@ -424,15 +640,20 @@ class WalletScreen extends StatelessWidget {
                           height: Responsive.height(1.2, context),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(horizontal: Responsive.width(5, context)),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: Responsive.width(5, context)),
                           child: ButtonThem.buildButton(
                             context,
                             title: "Add Amount".tr,
                             onPress: () {
-                              if (controller.amountController.value.text.isEmpty) {
-                                ShowToastDialog.showToast("Please enter amount".tr);
-                              } else if (controller.selectedPaymentMethod.value.isEmpty) {
-                                ShowToastDialog.showToast("Please select payment method".tr);
+                              if (controller
+                                  .amountController.value.text.isEmpty) {
+                                ShowToastDialog.showToast(
+                                    "Please enter amount".tr);
+                              } else if (controller
+                                  .selectedPaymentMethod.value.isEmpty) {
+                                ShowToastDialog.showToast(
+                                    "Please select payment method".tr);
                               } else {
                                 controller.walletTopUp();
                                 Get.back();
@@ -450,10 +671,14 @@ class WalletScreen extends StatelessWidget {
         });
   }
 
-  showTransactionDetails({required BuildContext context, required WalletTransactionModel walletTransactionModel}) {
+  showTransactionDetails(
+      {required BuildContext context,
+      required WalletTransactionModel walletTransactionModel}) {
     return showModalBottomSheet(
         elevation: 5,
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15))),
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(15), topRight: Radius.circular(15))),
         context: context,
         builder: (context) {
           return StatefulBuilder(builder: (context, setState) {
@@ -461,40 +686,55 @@ class WalletScreen extends StatelessWidget {
 
             return Container(
               decoration: BoxDecoration(
-                color: themeChange.getThem() ? AppColors.darkBackground : AppColors.background,
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(15), topRight: Radius.circular(15)),
+                color: themeChange.getThem()
+                    ? AppColors.darkBackground
+                    : AppColors.background,
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15)),
               ),
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: Responsive.width(2.5, context)),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: Responsive.width(2.5, context)),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Padding(
-                        padding: EdgeInsets.symmetric(vertical: Responsive.height(1.2, context)),
+                        padding: EdgeInsets.symmetric(
+                            vertical: Responsive.height(1.2, context)),
                         child: Text(
                           "Transaction Details".tr,
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w600,
                             fontSize: Responsive.width(4, context),
-                            color: themeChange.getThem() ? Colors.white : Colors.black,
+                            color: themeChange.getThem()
+                                ? Colors.white
+                                : Colors.black,
                           ),
                         ),
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
-                          borderRadius: const BorderRadius.all(Radius.circular(10)),
-                          border: Border.all(color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder, width: 0.5),
+                          color: themeChange.getThem()
+                              ? AppColors.darkContainerBackground
+                              : AppColors.containerBackground,
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          border: Border.all(
+                              color: themeChange.getThem()
+                                  ? AppColors.darkContainerBorder
+                                  : AppColors.containerBorder,
+                              width: 0.5),
                           boxShadow: themeChange.getThem()
                               ? null
                               : [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.10),
-                              blurRadius: 5,
-                              offset: const Offset(0, 4),
-                            ),
-                          ],
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.10),
+                                    blurRadius: 5,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
                         ),
                         child: Padding(
                           padding: EdgeInsets.all(Responsive.width(2, context)),
@@ -506,7 +746,9 @@ class WalletScreen extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w600,
                                   fontSize: Responsive.width(3.8, context),
-                                  color: themeChange.getThem() ? Colors.white : Colors.black,
+                                  color: themeChange.getThem()
+                                      ? Colors.white
+                                      : Colors.black,
                                 ),
                               ),
                               SizedBox(
@@ -517,7 +759,9 @@ class WalletScreen extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w400,
                                   fontSize: Responsive.width(3.5, context),
-                                  color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                                  color: themeChange.getThem()
+                                      ? Colors.white70
+                                      : Colors.black54,
                                 ),
                               ),
                               SizedBox(
@@ -528,7 +772,9 @@ class WalletScreen extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w600,
                                   fontSize: Responsive.width(3.8, context),
-                                  color: themeChange.getThem() ? Colors.white : Colors.black,
+                                  color: themeChange.getThem()
+                                      ? Colors.white
+                                      : Colors.black,
                                 ),
                               ),
                               SizedBox(
@@ -539,7 +785,12 @@ class WalletScreen extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w600,
                                   fontSize: Responsive.width(3.8, context),
-                                  color: safeParseDouble(walletTransactionModel.amount?.toString()) < 0 ? Colors.red : Colors.green,
+                                  color: safeParseDouble(walletTransactionModel
+                                              .amount
+                                              ?.toString()) <
+                                          0
+                                      ? Colors.red
+                                      : Colors.green,
                                 ),
                               ),
                               SizedBox(
@@ -550,18 +801,23 @@ class WalletScreen extends StatelessWidget {
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w600,
                                   fontSize: Responsive.width(3.8, context),
-                                  color: themeChange.getThem() ? Colors.white : Colors.black,
+                                  color: themeChange.getThem()
+                                      ? Colors.white
+                                      : Colors.black,
                                 ),
                               ),
                               SizedBox(
                                 height: Responsive.height(0.6, context),
                               ),
                               Text(
-                                safeString(walletTransactionModel.note, defaultValue: "No note available"),
+                                safeString(walletTransactionModel.note,
+                                    defaultValue: "No note available"),
                                 style: GoogleFonts.poppins(
                                   fontWeight: FontWeight.w400,
                                   fontSize: Responsive.width(3.5, context),
-                                  color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                                  color: themeChange.getThem()
+                                      ? Colors.white70
+                                      : Colors.black54,
                                 ),
                               ),
                             ],
@@ -585,7 +841,8 @@ class WalletScreen extends StatelessWidget {
         context: context,
         isScrollControlled: true,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(25), topRight: Radius.circular(25)),
         ),
         builder: (context) {
           final themeChange = Provider.of<DarkThemeProvider>(context);
@@ -593,64 +850,90 @@ class WalletScreen extends StatelessWidget {
           return StatefulBuilder(builder: (context, setState) {
             return Container(
               decoration: BoxDecoration(
-                color: themeChange.getThem() ? AppColors.darkBackground : AppColors.background,
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25)),
+                color: themeChange.getThem()
+                    ? AppColors.darkBackground
+                    : AppColors.background,
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(25),
+                    topRight: Radius.circular(25)),
               ),
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: Responsive.width(2.5, context)),
+                padding: EdgeInsets.symmetric(
+                    horizontal: Responsive.width(2.5, context)),
                 child: SingleChildScrollView(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: EdgeInsets.only(top: Responsive.height(3, context), bottom: Responsive.height(1.2, context)),
+                        padding: EdgeInsets.only(
+                            top: Responsive.height(3, context),
+                            bottom: Responsive.height(1.2, context)),
                         child: Text(
                           "Withdraw".tr,
                           style: GoogleFonts.poppins(
                             fontSize: Responsive.width(4.5, context),
                             fontWeight: FontWeight.w600,
-                            color: themeChange.getThem() ? Colors.white : Colors.black,
+                            color: themeChange.getThem()
+                                ? Colors.white
+                                : Colors.black,
                           ),
                         ),
                       ),
                       Container(
                           decoration: BoxDecoration(
-                            color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
-                            borderRadius: const BorderRadius.all(Radius.circular(10)),
-                            border: Border.all(color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder, width: 0.5),
+                            color: themeChange.getThem()
+                                ? AppColors.darkContainerBackground
+                                : AppColors.containerBackground,
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(10)),
+                            border: Border.all(
+                                color: themeChange.getThem()
+                                    ? AppColors.darkContainerBorder
+                                    : AppColors.containerBorder,
+                                width: 0.5),
                             boxShadow: themeChange.getThem()
                                 ? null
                                 : [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
+                                    BoxShadow(
+                                      color: Colors.grey.withValues(alpha: 0.5),
+                                      blurRadius: 8,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
                           ),
                           child: Padding(
-                            padding: EdgeInsets.all(Responsive.width(2, context)),
+                            padding:
+                                EdgeInsets.all(Responsive.width(2, context)),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        safeString(controller.bankDetailsModel.value.bankName, defaultValue: "Bank Name"),
+                                        safeString(
+                                            controller.bankDetailsModel.value
+                                                .bankName,
+                                            defaultValue: "Bank Name"),
                                         style: GoogleFonts.poppins(
-                                          fontSize: Responsive.width(5.5, context),
+                                          fontSize:
+                                              Responsive.width(5.5, context),
                                           fontWeight: FontWeight.bold,
-                                          color: themeChange.getThem() ? Colors.white : Colors.black,
+                                          color: themeChange.getThem()
+                                              ? Colors.white
+                                              : Colors.black,
                                         ),
                                       ),
                                     ),
                                     Icon(
                                       Icons.account_balance,
                                       size: Responsive.width(10, context),
-                                      color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                                      color: themeChange.getThem()
+                                          ? Colors.white70
+                                          : Colors.black54,
                                     ),
                                   ],
                                 ),
@@ -658,39 +941,59 @@ class WalletScreen extends StatelessWidget {
                                   height: Responsive.height(0.2, context),
                                 ),
                                 Text(
-                                  safeString(controller.bankDetailsModel.value.accountNumber, defaultValue: "Account Number"),
+                                  safeString(
+                                      controller
+                                          .bankDetailsModel.value.accountNumber,
+                                      defaultValue: "Account Number"),
                                   style: GoogleFonts.poppins(
                                     fontSize: Responsive.width(5, context),
                                     fontWeight: FontWeight.w600,
-                                    color: themeChange.getThem() ? Colors.white70 : Colors.black87,
+                                    color: themeChange.getThem()
+                                        ? Colors.white70
+                                        : Colors.black87,
                                   ),
                                 ),
                                 SizedBox(
                                   height: Responsive.height(0.6, context),
                                 ),
                                 Text(
-                                  safeString(controller.bankDetailsModel.value.holderName, defaultValue: "Holder Name"),
+                                  safeString(
+                                      controller
+                                          .bankDetailsModel.value.holderName,
+                                      defaultValue: "Holder Name"),
                                   style: GoogleFonts.poppins(
                                     fontSize: Responsive.width(4.5, context),
                                     fontWeight: FontWeight.bold,
-                                    color: themeChange.getThem() ? Colors.white : Colors.black,
+                                    color: themeChange.getThem()
+                                        ? Colors.white
+                                        : Colors.black,
                                   ),
                                 ),
                                 SizedBox(
                                   height: Responsive.height(0.4, context),
                                 ),
                                 Text(
-                                  safeString(controller.bankDetailsModel.value.branchName, defaultValue: "Branch Name"),
+                                  safeString(
+                                      controller
+                                          .bankDetailsModel.value.branchName,
+                                      defaultValue: "Branch Name"),
                                   style: GoogleFonts.poppins(
                                     fontSize: Responsive.width(4.5, context),
-                                    color: themeChange.getThem() ? Colors.white70 : Colors.black87,
+                                    color: themeChange.getThem()
+                                        ? Colors.white70
+                                        : Colors.black87,
                                   ),
                                 ),
                                 Text(
-                                  safeString(controller.bankDetailsModel.value.otherInformation, defaultValue: "Other Information"),
+                                  safeString(
+                                      controller.bankDetailsModel.value
+                                          .otherInformation,
+                                      defaultValue: "Other Information"),
                                   style: GoogleFonts.poppins(
                                     fontSize: Responsive.width(3.8, context),
-                                    color: themeChange.getThem() ? Colors.white60 : Colors.black54,
+                                    color: themeChange.getThem()
+                                        ? Colors.white60
+                                        : Colors.black54,
                                   ),
                                 ),
                                 SizedBox(
@@ -707,18 +1010,26 @@ class WalletScreen extends StatelessWidget {
                           text: "Amount to Withdraw".tr,
                           style: GoogleFonts.poppins(
                             fontSize: Responsive.width(4, context),
-                            color: themeChange.getThem() ? Colors.white : Colors.black,
+                            color: themeChange.getThem()
+                                ? Colors.white
+                                : Colors.black,
                           ),
                         ),
                       ),
                       SizedBox(
                         height: Responsive.height(1.2, context),
                       ),
-                      TextFieldThem.buildTextFiled(context, hintText: 'Enter Amount'.tr, controller: controller.withdrawalAmountController.value),
+                      TextFieldThem.buildTextFiled(context,
+                          hintText: 'Enter Amount'.tr,
+                          controller:
+                              controller.withdrawalAmountController.value),
                       SizedBox(
                         height: Responsive.height(1.2, context),
                       ),
-                      TextFieldThem.buildTextFiled(context, hintText: 'Notes'.tr, maxLine: 3, controller: controller.noteController.value),
+                      TextFieldThem.buildTextFiled(context,
+                          hintText: 'Notes'.tr,
+                          maxLine: 3,
+                          controller: controller.noteController.value),
                       SizedBox(
                         height: Responsive.height(1.2, context),
                       ),
@@ -729,33 +1040,74 @@ class WalletScreen extends StatelessWidget {
                             context,
                             title: "Withdrawal".tr,
                             onPress: () async {
-                              double currentBalance = safeParseDouble(controller.driverUserModel.value.walletAmount?.toString());
-                              double withdrawAmount = safeParseDouble(controller.withdrawalAmountController.value.text);
-                              double minimumAmount = safeParseDouble(Constant.minimumAmountToWithdrawal);
+                              double currentBalance = safeParseDouble(controller
+                                  .driverUserModel.value.walletAmount
+                                  ?.toString());
+                              double withdrawAmount = safeParseDouble(controller
+                                  .withdrawalAmountController.value.text);
+                              double minimumAmount = safeParseDouble(
+                                  Constant.minimumAmountToWithdrawal);
+
+                              // Validação do valor
+                              if (controller.withdrawalAmountController.value.text.isEmpty) {
+                                ShowToastDialog.showToast("Please enter amount".tr);
+                                return;
+                              }
+
+                              if (withdrawAmount <= 0) {
+                                ShowToastDialog.showToast("Invalid amount".tr);
+                                return;
+                              }
 
                               if (currentBalance < withdrawAmount) {
-                                ShowToastDialog.showToast("Insufficient balance".tr);
+                                ShowToastDialog.showToast(
+                                    "Insufficient balance".tr);
                               } else if (minimumAmount > withdrawAmount) {
                                 ShowToastDialog.showToast(
-                                    "Withdraw amount must be greater or equal to ${Constant.amountShow(amount: Constant.minimumAmountToWithdrawal.toString())}".tr);
+                                    "Withdraw amount must be greater or equal to ${Constant.amountShow(amount: Constant.minimumAmountToWithdrawal.toString())}"
+                                        .tr);
                               } else {
-                                ShowToastDialog.showLoader("Aguarde...".tr);
-                                WithdrawModel withdrawModel = WithdrawModel();
-                                withdrawModel.id = Constant.getUuid();
-                                withdrawModel.userId = FireStoreUtils.getCurrentUid();
-                                withdrawModel.paymentStatus = "pending";
-                                withdrawModel.amount = controller.withdrawalAmountController.value.text;
-                                withdrawModel.note = controller.noteController.value.text;
-                                withdrawModel.createdDate = Timestamp.now();
+                                ShowToastDialog.showLoader("Enviando solicitação...".tr);
 
-                                await FireStoreUtils.updatedDriverWallet(amount: "-${controller.withdrawalAmountController.value.text}");
+                                try {
+                                  WithdrawModel withdrawModel = WithdrawModel();
+                                  withdrawModel.id = Constant.getUuid();
+                                  withdrawModel.userId =
+                                      FireStoreUtils.getCurrentUid();
+                                  withdrawModel.paymentStatus = "pending";
+                                  withdrawModel.amount = controller
+                                      .withdrawalAmountController.value.text;
+                                  withdrawModel.note =
+                                      controller.noteController.value.text;
+                                  withdrawModel.createdDate = Timestamp.now();
 
-                                await FireStoreUtils.setWithdrawRequest(withdrawModel).then((value) {
-                                  controller.getUser();
+                                  // ⚠️ CORREÇÃO CRÍTICA: NÃO descontar imediatamente!
+                                  // O desconto só deve ocorrer quando o ADMIN APROVAR o saque
+                                  // Por enquanto, apenas cria a solicitação
+                                  // TODO: Implementar sistema de saldo bloqueado no backend
+
+                                  // Salva solicitação de saque (sem descontar ainda)
+                                  await FireStoreUtils.setWithdrawRequest(withdrawModel)
+                                      .then((value) async {
+                                    // Atualiza dados do usuário
+                                    await controller.getUser();
+                                    await controller.getTraction();
+
+                                    ShowToastDialog.closeLoader();
+                                    ShowToastDialog.showToast(
+                                        "Solicitação enviada! Aguarde aprovação do admin.".tr);
+
+                                    // Limpa campos
+                                    controller.withdrawalAmountController.value.clear();
+                                    controller.noteController.value.clear();
+
+                                    Get.back();
+                                  });
+                                } catch (e) {
                                   ShowToastDialog.closeLoader();
-                                  ShowToastDialog.showToast("Request sent to admin".tr);
-                                  Get.back();
-                                });
+                                  ShowToastDialog.showToast(
+                                      "Erro ao enviar solicitação: $e");
+                                }
                               }
                             },
                           )

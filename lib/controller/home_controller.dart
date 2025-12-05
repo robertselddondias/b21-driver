@@ -75,29 +75,29 @@ class HomeController extends GetxController {
           .doc(FireStoreUtils.getCurrentUid())
           .snapshots()
           .listen(
-            (event) {
-              if (event.exists) {
-                try {
-                  driverModel.value = DriverUserModel.fromJson(event.data()!);
-                  isLoading.value = false;
-                  hasError.value = false;
-                } catch (e) {
-                  hasError.value = true;
-                  errorMessage.value = 'Erro ao processar dados do motorista';
-                  isLoading.value = false;
-                }
-              } else {
-                hasError.value = true;
-                errorMessage.value = 'Motorista não encontrado';
-                isLoading.value = false;
-              }
-            },
-            onError: (error) {
-              hasError.value = true;
-              errorMessage.value = 'Erro ao carregar dados: ${error.toString()}';
+        (event) {
+          if (event.exists) {
+            try {
+              driverModel.value = DriverUserModel.fromJson(event.data()!);
               isLoading.value = false;
-            },
-          );
+              hasError.value = false;
+            } catch (e) {
+              hasError.value = true;
+              errorMessage.value = 'Erro ao processar dados do motorista';
+              isLoading.value = false;
+            }
+          } else {
+            hasError.value = true;
+            errorMessage.value = 'Motorista não encontrado';
+            isLoading.value = false;
+          }
+        },
+        onError: (error) {
+          hasError.value = true;
+          errorMessage.value = 'Erro ao carregar dados: ${error.toString()}';
+          isLoading.value = false;
+        },
+      );
     } catch (e) {
       hasError.value = true;
       errorMessage.value = 'Erro inesperado: ${e.toString()}';
@@ -110,7 +110,8 @@ class HomeController extends GetxController {
       FireStoreUtils.fireStore
           .collection(CollectionName.orders)
           .where('driverId', isEqualTo: FireStoreUtils.getCurrentUid())
-          .where('status', whereIn: [Constant.rideInProgress, Constant.rideActive])
+          .where('status',
+              whereIn: [Constant.rideInProgress, Constant.rideActive])
           .snapshots()
           .listen(
             (event) {
@@ -210,10 +211,8 @@ class HomeController extends GetxController {
         longitude: Constant.currentLocation!.longitude!,
       );
 
-      Positions positions = Positions(
-          geoPoint: position.geoPoint,
-          geohash: position.hash
-      );
+      Positions positions =
+          Positions(geoPoint: position.geoPoint, geohash: position.hash);
 
       await FireStoreUtils.fireStore
           .collection(CollectionName.driverUsers)
@@ -234,7 +233,8 @@ class HomeController extends GetxController {
 
   // CORREÇÃO: Getter seguro para widget atual
   Widget get currentWidget {
-    if (selectedIndex.value >= 0 && selectedIndex.value < widgetOptions.length) {
+    if (selectedIndex.value >= 0 &&
+        selectedIndex.value < widgetOptions.length) {
       return widgetOptions[selectedIndex.value];
     } else {
       // selectedIndex fora do range, retorna primeiro widget

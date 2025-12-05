@@ -67,7 +67,11 @@ class LiveTrackingController extends GetxController {
 
       await startLocationTracking();
 
-      FireStoreUtils.fireStore.collection(CollectionName.orders).doc(argumentOrderModel.id).snapshots().listen((event) async {
+      FireStoreUtils.fireStore
+          .collection(CollectionName.orders)
+          .doc(argumentOrderModel.id)
+          .snapshots()
+          .listen((event) async {
         if (event.data() != null) {
           OrderModel orderModelStream = OrderModel.fromJson(event.data()!);
           orderModel.value = orderModelStream;
@@ -76,14 +80,18 @@ class LiveTrackingController extends GetxController {
             getPolyline(
                 sourceLatitude: driverCurrentPosition.value.latitude,
                 sourceLongitude: driverCurrentPosition.value.longitude,
-                destinationLatitude: orderModel.value.destinationLocationLAtLng!.latitude,
-                destinationLongitude: orderModel.value.destinationLocationLAtLng!.longitude);
+                destinationLatitude:
+                    orderModel.value.destinationLocationLAtLng!.latitude,
+                destinationLongitude:
+                    orderModel.value.destinationLocationLAtLng!.longitude);
           } else {
             getPolyline(
                 sourceLatitude: driverCurrentPosition.value.latitude,
                 sourceLongitude: driverCurrentPosition.value.longitude,
-                destinationLatitude: orderModel.value.sourceLocationLAtLng!.latitude,
-                destinationLongitude: orderModel.value.sourceLocationLAtLng!.longitude);
+                destinationLatitude:
+                    orderModel.value.sourceLocationLAtLng!.latitude,
+                destinationLongitude:
+                    orderModel.value.sourceLocationLAtLng!.longitude);
           }
         }
       });
@@ -125,7 +133,8 @@ class LiveTrackingController extends GetxController {
     ).listen((Position position) async {
       driverCurrentPosition.value = position;
       currentSpeed.value = position.speed * 3.6;
-      streetName.value = await getStreetName(position.latitude, position.longitude);
+      streetName.value =
+          await getStreetName(position.latitude, position.longitude);
       updateCameraPosition(position);
 
       addMarker(
@@ -145,7 +154,8 @@ class LiveTrackingController extends GetxController {
         bearing: position.heading,
         tilt: 55.0,
       );
-      mapController!.animateCamera(CameraUpdate.newCameraPosition(newCameraPosition));
+      mapController!
+          .animateCamera(CameraUpdate.newCameraPosition(newCameraPosition));
     }
   }
 
@@ -158,7 +168,8 @@ class LiveTrackingController extends GetxController {
 
   Future<String> getStreetName(double latitude, double longitude) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(latitude, longitude);
+      List<Placemark> placemarks =
+          await placemarkFromCoordinates(latitude, longitude);
       if (placemarks.isNotEmpty) {
         return placemarks.first.street ?? "Rua Desconhecida";
       }
@@ -170,17 +181,20 @@ class LiveTrackingController extends GetxController {
     return "Rua Desconhecida";
   }
 
-  void getPolyline({
-    required double? sourceLatitude,
-    required double? sourceLongitude,
-    required double? destinationLatitude,
-    required double? destinationLongitude
-  }) async {
-    if (sourceLatitude != null && sourceLongitude != null && destinationLatitude != null && destinationLongitude != null) {
+  void getPolyline(
+      {required double? sourceLatitude,
+      required double? sourceLongitude,
+      required double? destinationLatitude,
+      required double? destinationLongitude}) async {
+    if (sourceLatitude != null &&
+        sourceLongitude != null &&
+        destinationLatitude != null &&
+        destinationLongitude != null) {
       ShowToastDialog.showLoader("Calculando rota...");
 
       try {
-        final String url = "https://maps.googleapis.com/maps/api/directions/json"
+        final String url =
+            "https://maps.googleapis.com/maps/api/directions/json"
             "?origin=$sourceLatitude,$sourceLongitude"
             "&destination=$destinationLatitude,$destinationLongitude"
             "&mode=driving"
@@ -195,18 +209,25 @@ class LiveTrackingController extends GetxController {
             if (data["routes"] != null && data["routes"].isNotEmpty) {
               final route = data["routes"][0];
               final polylineString = route["overview_polyline"]["points"];
-              final polylineCoordinates = polylinePoints.decodePolyline(polylineString);
+              final polylineCoordinates =
+                  polylinePoints.decodePolyline(polylineString);
 
               if (route["legs"] != null && route["legs"].isNotEmpty) {
                 final leg = route["legs"][0];
-                if (leg["distance"] != null && leg["distance"]["value"] != null) {
-                  distanceRemaining.value = (leg["distance"]["value"] / 1000).toDouble();
+                if (leg["distance"] != null &&
+                    leg["distance"]["value"] != null) {
+                  distanceRemaining.value =
+                      (leg["distance"]["value"] / 1000).toDouble();
                 }
-                if (leg["duration"] != null && leg["duration"]["value"] != null) {
-                  etaInMinutes.value = (leg["duration"]["value"] / 60).toStringAsFixed(0);
+                if (leg["duration"] != null &&
+                    leg["duration"]["value"] != null) {
+                  etaInMinutes.value =
+                      (leg["duration"]["value"] / 60).toStringAsFixed(0);
                 }
               }
-              _addPolyLine(polylineCoordinates.map((p) => LatLng(p.latitude, p.longitude)).toList());
+              _addPolyLine(polylineCoordinates
+                  .map((p) => LatLng(p.latitude, p.longitude))
+                  .toList());
             }
           } else {
             if (kDebugMode) {
@@ -242,18 +263,30 @@ class LiveTrackingController extends GetxController {
   }
 
   addMarkerSetup() async {
-    final Uint8List departure = await Constant().getBytesFromAsset('assets/images/pickup.png', 100);
-    final Uint8List destination = await Constant().getBytesFromAsset('assets/images/dropoff.png', 100);
-    final Uint8List driver = await Constant().getBytesFromAsset('assets/images/ic_cab.png', 120);
+    final Uint8List departure =
+        await Constant().getBytesFromAsset('assets/images/pickup.png', 100);
+    final Uint8List destination =
+        await Constant().getBytesFromAsset('assets/images/dropoff.png', 100);
+    final Uint8List driver =
+        await Constant().getBytesFromAsset('assets/images/ic_cab.png', 120);
 
     departureIcon = BitmapDescriptor.fromBytes(departure);
     destinationIcon = BitmapDescriptor.fromBytes(destination);
     driverIcon = BitmapDescriptor.fromBytes(driver);
   }
 
-  addMarker({required double? latitude, required double? longitude, required String id, required BitmapDescriptor descriptor, required double? rotation}) {
+  addMarker(
+      {required double? latitude,
+      required double? longitude,
+      required String id,
+      required BitmapDescriptor descriptor,
+      required double? rotation}) {
     MarkerId markerId = MarkerId(id);
-    Marker marker = Marker(markerId: markerId, icon: descriptor, position: LatLng(latitude ?? 0.0, longitude ?? 0.0), rotation: rotation ?? 0.0);
+    Marker marker = Marker(
+        markerId: markerId,
+        icon: descriptor,
+        position: LatLng(latitude ?? 0.0, longitude ?? 0.0),
+        rotation: rotation ?? 0.0);
     markers[markerId] = marker;
   }
 
@@ -267,24 +300,30 @@ class LiveTrackingController extends GetxController {
       width: 6,
     );
     polyLines[id] = polyline;
-    updateCameraLocationBounds(polylineCoordinates.first, polylineCoordinates.last, mapController);
+    updateCameraLocationBounds(
+        polylineCoordinates.first, polylineCoordinates.last, mapController);
   }
 
   Future<void> updateCameraLocationBounds(
-      LatLng source,
-      LatLng destination,
-      GoogleMapController? mapController,
-      ) async {
+    LatLng source,
+    LatLng destination,
+    GoogleMapController? mapController,
+  ) async {
     if (mapController == null) return;
 
     LatLngBounds bounds;
 
-    if (source.latitude > destination.latitude && source.longitude > destination.longitude) {
+    if (source.latitude > destination.latitude &&
+        source.longitude > destination.longitude) {
       bounds = LatLngBounds(southwest: destination, northeast: source);
     } else if (source.longitude > destination.longitude) {
-      bounds = LatLngBounds(southwest: LatLng(source.latitude, destination.longitude), northeast: LatLng(destination.latitude, source.longitude));
+      bounds = LatLngBounds(
+          southwest: LatLng(source.latitude, destination.longitude),
+          northeast: LatLng(destination.latitude, source.longitude));
     } else if (source.latitude > destination.latitude) {
-      bounds = LatLngBounds(southwest: LatLng(destination.latitude, source.longitude), northeast: LatLng(source.latitude, destination.longitude));
+      bounds = LatLngBounds(
+          southwest: LatLng(destination.latitude, source.longitude),
+          northeast: LatLng(source.latitude, destination.longitude));
     } else {
       bounds = LatLngBounds(southwest: source, northeast: destination);
     }
@@ -294,7 +333,8 @@ class LiveTrackingController extends GetxController {
     return checkCameraLocation(cameraUpdate, mapController);
   }
 
-  Future<void> checkCameraLocation(CameraUpdate cameraUpdate, GoogleMapController mapController) async {
+  Future<void> checkCameraLocation(
+      CameraUpdate cameraUpdate, GoogleMapController mapController) async {
     mapController.animateCamera(cameraUpdate);
     LatLngBounds l1 = await mapController.getVisibleRegion();
     LatLngBounds l2 = await mapController.getVisibleRegion();

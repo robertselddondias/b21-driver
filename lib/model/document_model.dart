@@ -7,7 +7,14 @@ class DocumentModel {
   String? title;
   String? formatter;
 
-  DocumentModel({this.backSide, this.enable, this.formatter, this.id, this.frontSide, this.title, this.expireAt});
+  DocumentModel(
+      {this.backSide,
+      this.enable,
+      this.formatter,
+      this.id,
+      this.frontSide,
+      this.title,
+      this.expireAt});
 
   DocumentModel.fromJson(Map<String, dynamic> json) {
     backSide = json['backSide'];

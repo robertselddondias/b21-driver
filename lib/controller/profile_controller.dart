@@ -23,11 +23,13 @@ class ProfileController extends GetxController {
   }
 
   getData() async {
-    await FireStoreUtils.getDriverProfile(FireStoreUtils.getCurrentUid()).then((value) {
+    await FireStoreUtils.getDriverProfile(FireStoreUtils.getCurrentUid())
+        .then((value) {
       if (value != null) {
         driverModel.value = value;
 
-        phoneNumberController.value.text = driverModel.value.phoneNumber.toString();
+        phoneNumberController.value.text =
+            driverModel.value.phoneNumber.toString();
         countryCode.value = driverModel.value.countryCode.toString();
         emailController.value.text = driverModel.value.email.toString();
         fullNameController.value.text = driverModel.value.fullName.toString();
@@ -50,5 +52,4 @@ class ProfileController extends GetxController {
       ShowToastDialog.showToast("Failed to Pick : \n $e");
     }
   }
-
 }

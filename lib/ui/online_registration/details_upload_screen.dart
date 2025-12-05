@@ -46,10 +46,8 @@ class DetailsUploadScreen extends StatelessWidget {
   /// ============================================================================
   /// APP BAR
   /// ============================================================================
-  PreferredSizeWidget _buildAppBar(
-      BuildContext context,
-      DetailsUploadController controller,
-      DarkThemeProvider themeChange) {
+  PreferredSizeWidget _buildAppBar(BuildContext context,
+      DetailsUploadController controller, DarkThemeProvider themeChange) {
     return AppBar(
       backgroundColor: AppColors.primary,
       elevation: 0,
@@ -68,7 +66,7 @@ class DetailsUploadScreen extends StatelessWidget {
         child: Container(
           margin: EdgeInsets.all(Responsive.width(2, context)),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(25),
           ),
           child: Icon(
@@ -87,8 +85,8 @@ class DetailsUploadScreen extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: controller.documents.value.verified == true
-                ? Colors.green.withOpacity(0.2)
-                : Colors.orange.withOpacity(0.2),
+                ? Colors.green.withValues(alpha: 0.2)
+                : Colors.orange.withValues(alpha: 0.2),
             borderRadius: BorderRadius.circular(15),
             border: Border.all(
               color: controller.documents.value.verified == true
@@ -131,10 +129,8 @@ class DetailsUploadScreen extends StatelessWidget {
   /// ============================================================================
   /// CONTEÚDO PRINCIPAL
   /// ============================================================================
-  Widget _buildMainContent(
-      BuildContext context,
-      DetailsUploadController controller,
-      DarkThemeProvider themeChange) {
+  Widget _buildMainContent(BuildContext context,
+      DetailsUploadController controller, DarkThemeProvider themeChange) {
     return Container(
       decoration: BoxDecoration(
         color: themeChange.getThem()
@@ -148,55 +144,53 @@ class DetailsUploadScreen extends StatelessWidget {
       child: controller.isLoading.value
           ? Center(child: Constant.loader(context))
           : SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.all(Responsive.width(5, context)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            _buildDocumentHeader(context, controller, themeChange),
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.all(Responsive.width(5, context)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Header
+                  _buildDocumentHeader(context, controller, themeChange),
 
-            SizedBox(height: Responsive.height(3, context)),
+                  SizedBox(height: Responsive.height(3, context)),
 
-            // Progresso
-            _buildProgressIndicator(context, themeChange),
+                  // Progresso
+                  _buildProgressIndicator(context, themeChange),
 
-            SizedBox(height: Responsive.height(3, context)),
+                  SizedBox(height: Responsive.height(3, context)),
 
-            // Campo número do documento
-            _buildDocumentNumberField(context, controller, themeChange),
+                  // Campo número do documento
+                  _buildDocumentNumberField(context, controller, themeChange),
 
-            // Data de expiração (se necessário)
-            if (controller.documentModel.value.expireAt == true) ...[
-              SizedBox(height: Responsive.height(2, context)),
-              _buildExpirationDateField(context, controller, themeChange),
-            ],
+                  // Data de expiração (se necessário)
+                  if (controller.documentModel.value.expireAt == true) ...[
+                    SizedBox(height: Responsive.height(2, context)),
+                    _buildExpirationDateField(context, controller, themeChange),
+                  ],
 
-            SizedBox(height: Responsive.height(3, context)),
+                  SizedBox(height: Responsive.height(3, context)),
 
-            // Upload de imagens
-            _buildImageUploadSection(context, controller, themeChange),
+                  // Upload de imagens
+                  _buildImageUploadSection(context, controller, themeChange),
 
-            SizedBox(height: Responsive.height(4, context)),
+                  SizedBox(height: Responsive.height(4, context)),
 
-            // Botão enviar
-            if (controller.documents.value.verified != true)
-              _buildSubmitButton(context, controller),
+                  // Botão enviar
+                  if (controller.documents.value.verified != true)
+                    _buildSubmitButton(context, controller),
 
-            SizedBox(height: Responsive.height(2, context)),
-          ],
-        ),
-      ),
+                  SizedBox(height: Responsive.height(2, context)),
+                ],
+              ),
+            ),
     );
   }
 
   /// ============================================================================
   /// HEADER DO DOCUMENTO
   /// ============================================================================
-  Widget _buildDocumentHeader(
-      BuildContext context,
-      DetailsUploadController controller,
-      DarkThemeProvider themeChange) {
+  Widget _buildDocumentHeader(BuildContext context,
+      DetailsUploadController controller, DarkThemeProvider themeChange) {
     return Column(
       children: [
         // Indicador de arraste
@@ -204,9 +198,7 @@ class DetailsUploadScreen extends StatelessWidget {
           width: Responsive.width(12, context),
           height: Responsive.height(0.6, context),
           decoration: BoxDecoration(
-            color: themeChange.getThem()
-                ? Colors.white24
-                : Colors.black26,
+            color: themeChange.getThem() ? Colors.white24 : Colors.black26,
             borderRadius: BorderRadius.circular(10),
           ),
         ),
@@ -219,7 +211,7 @@ class DetailsUploadScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(Responsive.width(3, context)),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Icon(
@@ -238,7 +230,8 @@ class DetailsUploadScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: Responsive.width(5.5, context),
                       fontWeight: FontWeight.bold,
-                      color: themeChange.getThem() ? Colors.white : Colors.black,
+                      color:
+                          themeChange.getThem() ? Colors.white : Colors.black,
                     ),
                   ),
                   Text(
@@ -305,9 +298,8 @@ class DetailsUploadScreen extends StatelessWidget {
             child: LinearProgressIndicator(
               value: 1.0,
               minHeight: Responsive.height(1, context),
-              backgroundColor: themeChange.getThem()
-                  ? Colors.white12
-                  : Colors.black12,
+              backgroundColor:
+                  themeChange.getThem() ? Colors.white12 : Colors.black12,
               valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
             ),
           ),
@@ -319,10 +311,8 @@ class DetailsUploadScreen extends StatelessWidget {
   /// ============================================================================
   /// CAMPO NÚMERO DO DOCUMENTO
   /// ============================================================================
-  Widget _buildDocumentNumberField(
-      BuildContext context,
-      DetailsUploadController controller,
-      DarkThemeProvider themeChange) {
+  Widget _buildDocumentNumberField(BuildContext context,
+      DetailsUploadController controller, DarkThemeProvider themeChange) {
     return _buildFormField(
       context,
       label: 'Número do Documento',
@@ -341,10 +331,8 @@ class DetailsUploadScreen extends StatelessWidget {
   /// ============================================================================
   /// CAMPO DATA DE EXPIRAÇÃO
   /// ============================================================================
-  Widget _buildExpirationDateField(
-      BuildContext context,
-      DetailsUploadController controller,
-      DarkThemeProvider themeChange) {
+  Widget _buildExpirationDateField(BuildContext context,
+      DetailsUploadController controller, DarkThemeProvider themeChange) {
     return _buildFormField(
       context,
       label: 'Data de Validade',
@@ -363,12 +351,10 @@ class DetailsUploadScreen extends StatelessWidget {
           }
         },
         child: AbsorbPointer(
-          child: TextFieldThem.buildTextFiled(
-            context,
-            hintText: 'Selecione a data de validade',
-            controller: controller.expireAtController.value,
-            enable: controller.documents.value.verified != true
-          ),
+          child: TextFieldThem.buildTextFiled(context,
+              hintText: 'Selecione a data de validade',
+              controller: controller.expireAtController.value,
+              enable: controller.documents.value.verified != true),
         ),
       ),
     );
@@ -378,12 +364,12 @@ class DetailsUploadScreen extends StatelessWidget {
   /// CAMPO AUXILIAR
   /// ============================================================================
   Widget _buildFormField(
-      BuildContext context, {
-        required String label,
-        required IconData icon,
-        required Widget child,
-        required DarkThemeProvider themeChange,
-      }) {
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    required Widget child,
+    required DarkThemeProvider themeChange,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -392,7 +378,7 @@ class DetailsUploadScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(Responsive.width(1.5, context)),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -421,10 +407,8 @@ class DetailsUploadScreen extends StatelessWidget {
   /// ============================================================================
   /// SEÇÃO DE UPLOAD DE IMAGENS
   /// ============================================================================
-  Widget _buildImageUploadSection(
-      BuildContext context,
-      DetailsUploadController controller,
-      DarkThemeProvider themeChange) {
+  Widget _buildImageUploadSection(BuildContext context,
+      DetailsUploadController controller, DarkThemeProvider themeChange) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -482,13 +466,13 @@ class DetailsUploadScreen extends StatelessWidget {
   /// CARD DE UPLOAD DE IMAGEM
   /// ============================================================================
   Widget _buildImageUploadCard(
-      BuildContext context,
-      DetailsUploadController controller,
-      DarkThemeProvider themeChange, {
-        required String title,
-        required String type,
-        required String imagePath,
-      }) {
+    BuildContext context,
+    DetailsUploadController controller,
+    DarkThemeProvider themeChange, {
+    required String title,
+    required String type,
+    required String imagePath,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -506,7 +490,7 @@ class DetailsUploadScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(15),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, 3),
               ),
@@ -514,9 +498,8 @@ class DetailsUploadScreen extends StatelessWidget {
           ),
           child: imagePath.isNotEmpty
               ? _buildImagePreview(
-              context, controller, themeChange, imagePath, type)
-              : _buildImagePlaceholder(
-              context, controller, themeChange, type),
+                  context, controller, themeChange, imagePath, type)
+              : _buildImagePlaceholder(context, controller, themeChange, type),
         ),
       ],
     );
@@ -526,12 +509,12 @@ class DetailsUploadScreen extends StatelessWidget {
   /// PREVIEW DA IMAGEM
   /// ============================================================================
   Widget _buildImagePreview(
-      BuildContext context,
-      DetailsUploadController controller,
-      DarkThemeProvider themeChange,
-      String imagePath,
-      String type,
-      ) {
+    BuildContext context,
+    DetailsUploadController controller,
+    DarkThemeProvider themeChange,
+    String imagePath,
+    String type,
+  ) {
     return InkWell(
       onTap: () {
         if (controller.documents.value.verified != true) {
@@ -544,9 +527,8 @@ class DetailsUploadScreen extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
-          border: Border.all(
-            color: AppColors.primary.withOpacity(0.3),
-            width: 2,
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.3),            width: 2,
           ),
         ),
         child: Stack(
@@ -556,32 +538,32 @@ class DetailsUploadScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(13),
               child: Constant().hasValidUrl(imagePath) == false
                   ? Image.file(
-                File(imagePath),
-                height: double.infinity,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              )
+                      File(imagePath),
+                      height: double.infinity,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    )
                   : CachedNetworkImage(
-                imageUrl: imagePath,
-                fit: BoxFit.cover,
-                height: double.infinity,
-                width: double.infinity,
-                placeholder: (context, url) => Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primary,
-                  ),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  color: themeChange.getThem()
-                      ? Colors.grey[800]
-                      : Colors.grey[300],
-                  child: Icon(
-                    Icons.error,
-                    color: Colors.red,
-                    size: Responsive.width(10, context),
-                  ),
-                ),
-              ),
+                      imageUrl: imagePath,
+                      fit: BoxFit.cover,
+                      height: double.infinity,
+                      width: double.infinity,
+                      placeholder: (context, url) => Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: themeChange.getThem()
+                            ? Colors.grey[800]
+                            : Colors.grey[300],
+                        child: Icon(
+                          Icons.error,
+                          color: Colors.red,
+                          size: Responsive.width(10, context),
+                        ),
+                      ),
+                    ),
             ),
 
             // Overlay de edição
@@ -592,7 +574,7 @@ class DetailsUploadScreen extends StatelessWidget {
                 child: Container(
                   padding: EdgeInsets.all(Responsive.width(2, context)),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.7),
+                    color: Colors.black.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Icon(
@@ -613,7 +595,7 @@ class DetailsUploadScreen extends StatelessWidget {
                   vertical: Responsive.height(0.5, context),
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.9),
+                  color: Colors.green.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Row(
@@ -647,11 +629,11 @@ class DetailsUploadScreen extends StatelessWidget {
   /// PLACEHOLDER PARA UPLOAD
   /// ============================================================================
   Widget _buildImagePlaceholder(
-      BuildContext context,
-      DetailsUploadController controller,
-      DarkThemeProvider themeChange,
-      String type,
-      ) {
+    BuildContext context,
+    DetailsUploadController controller,
+    DarkThemeProvider themeChange,
+    String type,
+  ) {
     return InkWell(
       onTap: () {
         _showImageSourceBottomSheet(context, controller, type, themeChange);
@@ -668,8 +650,8 @@ class DetailsUploadScreen extends StatelessWidget {
           width: double.infinity,
           decoration: BoxDecoration(
             color: themeChange.getThem()
-                ? AppColors.darkContainerBackground.withOpacity(0.5)
-                : AppColors.containerBackground.withOpacity(0.5),
+                ? AppColors.darkContainerBackground.withValues(alpha: 0.5)
+                : AppColors.containerBackground.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(15),
           ),
           child: Column(
@@ -678,7 +660,7 @@ class DetailsUploadScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(Responsive.width(4, context)),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -701,9 +683,8 @@ class DetailsUploadScreen extends StatelessWidget {
                 'Câmera ou Galeria',
                 style: GoogleFonts.poppins(
                   fontSize: Responsive.width(3, context),
-                  color: themeChange.getThem()
-                      ? Colors.white70
-                      : Colors.black54,
+                  color:
+                      themeChange.getThem() ? Colors.white70 : Colors.black54,
                 ),
               ),
             ],
@@ -728,7 +709,7 @@ class DetailsUploadScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.4),
+            color: AppColors.primary.withValues(alpha: 0.4),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -776,11 +757,11 @@ class DetailsUploadScreen extends StatelessWidget {
   /// BOTTOM SHEET PARA SELEÇÃO DE FONTE DA IMAGEM
   /// ============================================================================
   void _showImageSourceBottomSheet(
-      BuildContext context,
-      DetailsUploadController controller,
-      String type,
-      DarkThemeProvider themeChange,
-      ) {
+    BuildContext context,
+    DetailsUploadController controller,
+    String type,
+    DarkThemeProvider themeChange,
+  ) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -809,9 +790,8 @@ class DetailsUploadScreen extends StatelessWidget {
                   width: Responsive.width(12, context),
                   height: 4,
                   decoration: BoxDecoration(
-                    color: themeChange.getThem()
-                        ? Colors.white24
-                        : Colors.black26,
+                    color:
+                        themeChange.getThem() ? Colors.white24 : Colors.black26,
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -841,9 +821,7 @@ class DetailsUploadScreen extends StatelessWidget {
                     print('📷 Botão Câmera pressionado');
                     // Chama o método pickFile do controller
                     await controller.pickFile(
-                        source: ImageSource.camera,
-                        type: type
-                    );
+                        source: ImageSource.camera, type: type);
                   },
                   themeChange: themeChange,
                 ),
@@ -861,9 +839,7 @@ class DetailsUploadScreen extends StatelessWidget {
                     print('🖼️ Botão Galeria pressionado');
                     // Chama o método pickFile do controller
                     await controller.pickFile(
-                        source: ImageSource.gallery,
-                        type: type
-                    );
+                        source: ImageSource.gallery, type: type);
                   },
                   themeChange: themeChange,
                 ),
@@ -899,14 +875,14 @@ class DetailsUploadScreen extends StatelessWidget {
   /// OPÇÃO DE FONTE DE IMAGEM
   /// ============================================================================
   Widget _buildSourceOption(
-      BuildContext context, {
-        required IconData icon,
-        required String title,
-        required String subtitle,
-        required Color color,
-        required Future<void> Function() onTap, // Mudado para Future
-        required DarkThemeProvider themeChange,
-      }) {
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required Future<void> Function() onTap, // Mudado para Future
+    required DarkThemeProvider themeChange,
+  }) {
     return InkWell(
       onTap: () async {
         print('🔘 Opção selecionada: $title');
@@ -931,7 +907,7 @@ class DetailsUploadScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(Responsive.width(3, context)),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
+                color: color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -950,7 +926,8 @@ class DetailsUploadScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontSize: Responsive.width(4, context),
                       fontWeight: FontWeight.w600,
-                      color: themeChange.getThem() ? Colors.white : Colors.black,
+                      color:
+                          themeChange.getThem() ? Colors.white : Colors.black,
                     ),
                   ),
                   SizedBox(height: Responsive.height(0.3, context)),
@@ -990,7 +967,8 @@ class DetailsUploadScreen extends StatelessWidget {
     // Validação da imagem frontal
     if (controller.documentModel.value.frontSide == true &&
         controller.frontImage.value.isEmpty) {
-      ShowToastDialog.showToast("Por favor, faça upload da frente do documento");
+      ShowToastDialog.showToast(
+          "Por favor, faça upload da frente do documento");
       return;
     }
 

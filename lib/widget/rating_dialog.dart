@@ -29,7 +29,8 @@ class RatingDialog extends StatefulWidget {
   State<RatingDialog> createState() => _RatingDialogState();
 }
 
-class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMixin {
+class _RatingDialogState extends State<RatingDialog>
+    with TickerProviderStateMixin {
   double _rating = 5.0;
   final TextEditingController _commentController = TextEditingController();
   bool _isLoading = false;
@@ -60,7 +61,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
   }
 
   Future<void> _loadCustomerData() async {
-    final customer = await FireStoreUtils.getCustomer(widget.orderModel.userId.toString());
+    final customer =
+        await FireStoreUtils.getCustomer(widget.orderModel.userId.toString());
     if (mounted) {
       setState(() {
         _customer = customer;
@@ -74,7 +76,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
       widget.orderModel.status = Constant.rideComplete;
       widget.orderModel.paymentStatus = true;
 
-      await FireStoreUtils.getCustomer(widget.orderModel.userId.toString()).then((value) async {
+      await FireStoreUtils.getCustomer(widget.orderModel.userId.toString())
+          .then((value) async {
         if (value != null) {
           if (value.fcmToken != null) {
             Map<String, dynamic> playLoad = <String, dynamic>{
@@ -149,7 +152,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
         if (_customer != null) {
           UserModel updatedCustomer = _customer!;
           double currentSum = double.parse(updatedCustomer.reviewsSum ?? '0.0');
-          double currentCount = double.parse(updatedCustomer.reviewsCount ?? '0.0');
+          double currentCount =
+              double.parse(updatedCustomer.reviewsCount ?? '0.0');
           updatedCustomer.reviewsSum = (currentSum + _rating).toString();
           updatedCustomer.reviewsCount = (currentCount + 1).toString();
           await FireStoreUtils.updateUser(updatedCustomer);
@@ -210,7 +214,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Header
-                _buildHeader(context, themeChange, isSmallScreen, isLargeScreen),
+                _buildHeader(
+                    context, themeChange, isSmallScreen, isLargeScreen),
 
                 // Conteúdo
                 Padding(
@@ -222,7 +227,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
                   child: Column(
                     children: [
                       // Info do passageiro
-                      _buildCustomerInfo(context, themeChange, isSmallScreen, isLargeScreen),
+                      _buildCustomerInfo(
+                          context, themeChange, isSmallScreen, isLargeScreen),
 
                       SizedBox(
                         height: isSmallScreen
@@ -231,7 +237,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
                       ),
 
                       // Rating
-                      _buildRatingSection(context, themeChange, isSmallScreen, isLargeScreen),
+                      _buildRatingSection(
+                          context, themeChange, isSmallScreen, isLargeScreen),
 
                       SizedBox(
                         height: isSmallScreen
@@ -240,7 +247,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
                       ),
 
                       // Campo de comentário
-                      _buildCommentField(context, themeChange, isSmallScreen, isLargeScreen),
+                      _buildCommentField(
+                          context, themeChange, isSmallScreen, isLargeScreen),
 
                       SizedBox(
                         height: isSmallScreen
@@ -249,7 +257,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
                       ),
 
                       // Botões
-                      _buildActionButtons(context, themeChange, isSmallScreen, isLargeScreen),
+                      _buildActionButtons(
+                          context, themeChange, isSmallScreen, isLargeScreen),
                     ],
                   ),
                 ),
@@ -262,11 +271,11 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
   }
 
   Widget _buildHeader(
-      BuildContext context,
-      DarkThemeProvider themeChange,
-      bool isSmallScreen,
-      bool isLargeScreen,
-      ) {
+    BuildContext context,
+    DarkThemeProvider themeChange,
+    bool isSmallScreen,
+    bool isLargeScreen,
+  ) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(
@@ -299,8 +308,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
               size: isSmallScreen
                   ? Responsive.width(7, context)
                   : (isLargeScreen
-                  ? Responsive.width(6, context)
-                  : Responsive.width(8, context)),
+                      ? Responsive.width(6, context)
+                      : Responsive.width(8, context)),
             ),
           ),
           SizedBox(
@@ -314,8 +323,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
               fontSize: isSmallScreen
                   ? Responsive.width(4.5, context)
                   : (isLargeScreen
-                  ? Responsive.width(4, context)
-                  : Responsive.width(5, context)),
+                      ? Responsive.width(4, context)
+                      : Responsive.width(5, context)),
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
@@ -327,8 +336,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
               fontSize: isSmallScreen
                   ? Responsive.width(3, context)
                   : (isLargeScreen
-                  ? Responsive.width(2.8, context)
-                  : Responsive.width(3.5, context)),
+                      ? Responsive.width(2.8, context)
+                      : Responsive.width(3.5, context)),
               color: Colors.white70,
             ),
           ),
@@ -338,16 +347,16 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
   }
 
   Widget _buildCustomerInfo(
-      BuildContext context,
-      DarkThemeProvider themeChange,
-      bool isSmallScreen,
-      bool isLargeScreen,
-      ) {
+    BuildContext context,
+    DarkThemeProvider themeChange,
+    bool isSmallScreen,
+    bool isLargeScreen,
+  ) {
     final avatarSize = isSmallScreen
         ? Responsive.width(11, context)
         : (isLargeScreen
-        ? Responsive.width(10, context)
-        : Responsive.width(12, context));
+            ? Responsive.width(10, context)
+            : Responsive.width(12, context));
 
     return Container(
       padding: EdgeInsets.all(
@@ -403,8 +412,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
                     fontSize: isSmallScreen
                         ? Responsive.width(3.5, context)
                         : (isLargeScreen
-                        ? Responsive.width(3.2, context)
-                        : Responsive.width(4, context)),
+                            ? Responsive.width(3.2, context)
+                            : Responsive.width(4, context)),
                     fontWeight: FontWeight.w600,
                     color: themeChange.getThem() ? Colors.white : Colors.black,
                   ),
@@ -418,8 +427,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
                     fontSize: isSmallScreen
                         ? Responsive.width(2.6, context)
                         : (isLargeScreen
-                        ? Responsive.width(2.4, context)
-                        : Responsive.width(3, context)),
+                            ? Responsive.width(2.4, context)
+                            : Responsive.width(3, context)),
                     color: AppColors.subTitleColor,
                   ),
                 ),
@@ -432,16 +441,16 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
   }
 
   Widget _buildRatingSection(
-      BuildContext context,
-      DarkThemeProvider themeChange,
-      bool isSmallScreen,
-      bool isLargeScreen,
-      ) {
+    BuildContext context,
+    DarkThemeProvider themeChange,
+    bool isSmallScreen,
+    bool isLargeScreen,
+  ) {
     final starSize = isSmallScreen
         ? Responsive.width(8.5, context)
         : (isLargeScreen
-        ? Responsive.width(7, context)
-        : Responsive.width(10, context));
+            ? Responsive.width(7, context)
+            : Responsive.width(10, context));
 
     return Column(
       children: [
@@ -451,8 +460,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
             fontSize: isSmallScreen
                 ? Responsive.width(3.5, context)
                 : (isLargeScreen
-                ? Responsive.width(3.2, context)
-                : Responsive.width(4, context)),
+                    ? Responsive.width(3.2, context)
+                    : Responsive.width(4, context)),
             fontWeight: FontWeight.w600,
             color: themeChange.getThem() ? Colors.white : Colors.black,
           ),
@@ -493,8 +502,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
             fontSize: isSmallScreen
                 ? Responsive.width(3, context)
                 : (isLargeScreen
-                ? Responsive.width(2.8, context)
-                : Responsive.width(3.5, context)),
+                    ? Responsive.width(2.8, context)
+                    : Responsive.width(3.5, context)),
             color: AppColors.subTitleColor,
             fontWeight: FontWeight.w500,
           ),
@@ -504,11 +513,11 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
   }
 
   Widget _buildCommentField(
-      BuildContext context,
-      DarkThemeProvider themeChange,
-      bool isSmallScreen,
-      bool isLargeScreen,
-      ) {
+    BuildContext context,
+    DarkThemeProvider themeChange,
+    bool isSmallScreen,
+    bool isLargeScreen,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -518,8 +527,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
             fontSize: isSmallScreen
                 ? Responsive.width(3.5, context)
                 : (isLargeScreen
-                ? Responsive.width(3.2, context)
-                : Responsive.width(4, context)),
+                    ? Responsive.width(3.2, context)
+                    : Responsive.width(4, context)),
             fontWeight: FontWeight.w600,
             color: themeChange.getThem() ? Colors.white : Colors.black,
           ),
@@ -553,8 +562,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
                 fontSize: isSmallScreen
                     ? Responsive.width(3, context)
                     : (isLargeScreen
-                    ? Responsive.width(2.8, context)
-                    : Responsive.width(3.5, context)),
+                        ? Responsive.width(2.8, context)
+                        : Responsive.width(3.5, context)),
               ),
               border: InputBorder.none,
               contentPadding: EdgeInsets.all(
@@ -574,8 +583,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
               fontSize: isSmallScreen
                   ? Responsive.width(3.2, context)
                   : (isLargeScreen
-                  ? Responsive.width(3, context)
-                  : Responsive.width(3.8, context)),
+                      ? Responsive.width(3, context)
+                      : Responsive.width(3.8, context)),
             ),
           ),
         ),
@@ -584,11 +593,11 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
   }
 
   Widget _buildActionButtons(
-      BuildContext context,
-      DarkThemeProvider themeChange,
-      bool isSmallScreen,
-      bool isLargeScreen,
-      ) {
+    BuildContext context,
+    DarkThemeProvider themeChange,
+    bool isSmallScreen,
+    bool isLargeScreen,
+  ) {
     final buttonHeight = isSmallScreen
         ? Responsive.height(5.5, context)
         : Responsive.height(6, context);
@@ -596,8 +605,8 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
     final fontSize = isSmallScreen
         ? Responsive.width(3.5, context)
         : (isLargeScreen
-        ? Responsive.width(3.2, context)
-        : Responsive.width(4, context));
+            ? Responsive.width(3.2, context)
+            : Responsive.width(4, context));
 
     return Row(
       children: [
@@ -616,25 +625,25 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
               onPressed: _isLoading ? null : _skipRating,
               child: _isLoading
                   ? SizedBox(
-                width: isSmallScreen
-                    ? Responsive.width(3.5, context)
-                    : Responsive.width(4, context),
-                height: isSmallScreen
-                    ? Responsive.width(3.5, context)
-                    : Responsive.width(4, context),
-                child: const CircularProgressIndicator(
-                  color: AppColors.subTitleColor,
-                  strokeWidth: 2,
-                ),
-              )
+                      width: isSmallScreen
+                          ? Responsive.width(3.5, context)
+                          : Responsive.width(4, context),
+                      height: isSmallScreen
+                          ? Responsive.width(3.5, context)
+                          : Responsive.width(4, context),
+                      child: const CircularProgressIndicator(
+                        color: AppColors.subTitleColor,
+                        strokeWidth: 2,
+                      ),
+                    )
                   : Text(
-                'Pular',
-                style: GoogleFonts.poppins(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.subTitleColor,
-                ),
-              ),
+                      'Pular',
+                      style: GoogleFonts.poppins(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.subTitleColor,
+                      ),
+                    ),
             ),
           ),
         ),
@@ -665,25 +674,25 @@ class _RatingDialogState extends State<RatingDialog> with TickerProviderStateMix
               onPressed: _isLoading ? null : _submitRating,
               child: _isLoading
                   ? SizedBox(
-                width: isSmallScreen
-                    ? Responsive.width(4, context)
-                    : Responsive.width(5, context),
-                height: isSmallScreen
-                    ? Responsive.width(4, context)
-                    : Responsive.width(5, context),
-                child: const CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
+                      width: isSmallScreen
+                          ? Responsive.width(4, context)
+                          : Responsive.width(5, context),
+                      height: isSmallScreen
+                          ? Responsive.width(4, context)
+                          : Responsive.width(5, context),
+                      child: const CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
                   : Text(
-                'Avaliar',
-                style: GoogleFonts.poppins(
-                  fontSize: fontSize,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
+                      'Avaliar',
+                      style: GoogleFonts.poppins(
+                        fontSize: fontSize,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
             ),
           ),
         ),

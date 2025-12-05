@@ -9,10 +9,10 @@ class BankDetailsModel {
   BankDetailsModel(
       {this.userId,
       this.bankName,
-        this.holderName,
-        this.branchName,
-        this.accountNumber,
-        this.otherInformation});
+      this.holderName,
+      this.branchName,
+      this.accountNumber,
+      this.otherInformation});
 
   BankDetailsModel.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];

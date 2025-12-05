@@ -35,7 +35,14 @@ class Documents {
   String? backImage;
   Timestamp? expireAt;
 
-  Documents({this.frontImage, this.documentNumber, this.formatter, this.verified, this.documentId, this.backImage, this.expireAt});
+  Documents(
+      {this.frontImage,
+      this.documentNumber,
+      this.formatter,
+      this.verified,
+      this.documentId,
+      this.backImage,
+      this.expireAt});
 
   Documents.fromJson(Map<String, dynamic> json) {
     frontImage = json['frontImage'];

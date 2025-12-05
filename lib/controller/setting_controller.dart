@@ -25,7 +25,9 @@ class SettingController extends GetxController {
     await FireStoreUtils.getLanguage().then((value) {
       if (value != null) {
         languageList.value = value;
-        if (Preferences.getString(Preferences.languageCodeKey).toString().isNotEmpty) {
+        if (Preferences.getString(Preferences.languageCodeKey)
+            .toString()
+            .isNotEmpty) {
           LanguageModel pref = Constant.getLanguage();
 
           for (var element in languageList) {
@@ -39,7 +41,8 @@ class SettingController extends GetxController {
 
     // Carrega o tema salvo das preferências
     if (Preferences.getString(Preferences.themKey).toString().isNotEmpty) {
-      selectedMode.value = Preferences.getString(Preferences.themKey).toString();
+      selectedMode.value =
+          Preferences.getString(Preferences.themKey).toString();
     } else {
       // Define um valor padrão se não houver tema salvo
       selectedMode.value = "System";
@@ -57,13 +60,15 @@ class SettingController extends GetxController {
     await Preferences.setString(Preferences.themKey, newMode);
 
     // Atualiza o DarkThemeProvider
-    final themeProvider = Provider.of<DarkThemeProvider>(context, listen: false);
+    final themeProvider =
+        Provider.of<DarkThemeProvider>(context, listen: false);
 
     if (newMode == "Dark mode") {
       themeProvider.darkTheme = 0;
     } else if (newMode == "Light mode") {
       themeProvider.darkTheme = 1;
-    } else { // System
+    } else {
+      // System
       themeProvider.darkTheme = 2;
     }
 
@@ -72,7 +77,8 @@ class SettingController extends GetxController {
 
   /// Método para carregar o tema inicial do DarkThemeProvider
   void loadThemeFromProvider(BuildContext context) {
-    final themeProvider = Provider.of<DarkThemeProvider>(context, listen: false);
+    final themeProvider =
+        Provider.of<DarkThemeProvider>(context, listen: false);
 
     // Converte o valor numérico do provider para string
     switch (themeProvider.darkTheme) {

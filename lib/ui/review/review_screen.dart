@@ -42,13 +42,16 @@ class ReviewScreen extends StatelessWidget {
                 : Stack(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 20, top: 42, bottom: 20),
+                        padding: const EdgeInsets.only(
+                            left: 20, right: 20, top: 42, bottom: 20),
                         child: Card(
                           elevation: 2,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
                           child: SingleChildScrollView(
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
                               child: Column(
                                 children: [
                                   const SizedBox(
@@ -57,14 +60,17 @@ class ReviewScreen extends StatelessWidget {
                                   Text(
                                     '${controller.userModel.value.fullName}',
                                     textAlign: TextAlign.center,
-                                    style: GoogleFonts.poppins(letterSpacing: 0.8, fontWeight: FontWeight.w800),
+                                    style: GoogleFonts.poppins(
+                                        letterSpacing: 0.8,
+                                        fontWeight: FontWeight.w800),
                                   ),
                                   const SizedBox(
                                     height: 8,
                                   ),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       const Icon(
                                         Icons.star,
@@ -76,9 +82,19 @@ class ReviewScreen extends StatelessWidget {
                                       ),
                                       Text(
                                           Constant.calculateReview(
-                                                  reviewCount: controller.userModel.value.reviewsCount.toString(), reviewSum: controller.userModel.value.reviewsSum.toString())
+                                                  reviewCount: controller
+                                                      .userModel
+                                                      .value
+                                                      .reviewsCount
+                                                      .toString(),
+                                                  reviewSum: controller
+                                                      .userModel
+                                                      .value
+                                                      .reviewsSum
+                                                      .toString())
                                               .toString(),
-                                          style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
+                                          style: GoogleFonts.poppins(
+                                              fontWeight: FontWeight.w500)),
                                     ],
                                   ),
                                   const SizedBox(
@@ -90,14 +106,17 @@ class ReviewScreen extends StatelessWidget {
                                     child: Text(
                                       'Rate for'.tr,
                                       textAlign: TextAlign.center,
-                                      style: GoogleFonts.poppins(letterSpacing: 0.8),
+                                      style: GoogleFonts.poppins(
+                                          letterSpacing: 0.8),
                                     ),
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(top: 8),
                                     child: Text(
                                       "${controller.userModel.value.fullName}",
-                                      style: GoogleFonts.poppins(fontWeight: FontWeight.bold, letterSpacing: 2),
+                                      style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 2),
                                     ),
                                   ),
                                   Padding(
@@ -108,7 +127,8 @@ class ReviewScreen extends StatelessWidget {
                                       direction: Axis.horizontal,
                                       allowHalfRating: true,
                                       itemCount: 5,
-                                      itemPadding: const EdgeInsets.symmetric(horizontal: 4.0),
+                                      itemPadding: const EdgeInsets.symmetric(
+                                          horizontal: 4.0),
                                       itemBuilder: (context, _) => const Icon(
                                         Icons.star,
                                         color: Colors.amber,
@@ -120,7 +140,11 @@ class ReviewScreen extends StatelessWidget {
                                   ),
                                   Padding(
                                     padding: const EdgeInsets.only(top: 30),
-                                    child: TextFieldThem.buildTextFiled(context, hintText: 'Comment..'.tr, controller: controller.commentController.value, maxLine: 5),
+                                    child: TextFieldThem.buildTextFiled(context,
+                                        hintText: 'Comment..'.tr,
+                                        controller:
+                                            controller.commentController.value,
+                                        maxLine: 5),
                                   ),
                                   const SizedBox(
                                     height: 10,
@@ -129,40 +153,93 @@ class ReviewScreen extends StatelessWidget {
                                     context,
                                     title: "Submit".tr,
                                     onPress: () async {
-                                      ShowToastDialog.showLoader("Aguarde...".tr);
+                                      ShowToastDialog.showLoader(
+                                          "Aguarde...".tr);
 
-                                      await FireStoreUtils.getCustomer(controller.type.value == "orderModel"
-                                              ? controller.orderModel.value.userId.toString()
-                                              : controller.intercityOrderModel.value.userId.toString())
+                                      await FireStoreUtils.getCustomer(
+                                              controller.type.value ==
+                                                      "orderModel"
+                                                  ? controller
+                                                      .orderModel.value.userId
+                                                      .toString()
+                                                  : controller
+                                                      .intercityOrderModel
+                                                      .value
+                                                      .userId
+                                                      .toString())
                                           .then((value) async {
                                         if (value != null) {
                                           UserModel userModel = value;
 
-                                          if (controller.reviewModel.value.id != null) {
+                                          if (controller.reviewModel.value.id !=
+                                              null) {
                                             userModel.reviewsSum =
-                                                (double.parse(userModel.reviewsSum.toString()) - double.parse(controller.reviewModel.value.rating.toString())).toString();
-                                            userModel.reviewsCount = (double.parse(userModel.reviewsCount.toString()) - 1).toString();
+                                                (double.parse(userModel
+                                                            .reviewsSum
+                                                            .toString()) -
+                                                        double.parse(controller
+                                                            .reviewModel
+                                                            .value
+                                                            .rating
+                                                            .toString()))
+                                                    .toString();
+                                            userModel.reviewsCount =
+                                                (double.parse(userModel
+                                                            .reviewsCount
+                                                            .toString()) -
+                                                        1)
+                                                    .toString();
                                           }
-                                          userModel.reviewsSum = (double.parse(userModel.reviewsSum.toString()) + double.parse(controller.rating.value.toString())).toString();
-                                          userModel.reviewsCount = (double.parse(userModel.reviewsCount.toString()) + 1).toString();
-                                          await FireStoreUtils.updateUser(userModel);
+                                          userModel.reviewsSum = (double.parse(
+                                                      userModel.reviewsSum
+                                                          .toString()) +
+                                                  double.parse(controller
+                                                      .rating.value
+                                                      .toString()))
+                                              .toString();
+                                          userModel.reviewsCount =
+                                              (double.parse(userModel
+                                                          .reviewsCount
+                                                          .toString()) +
+                                                      1)
+                                                  .toString();
+                                          await FireStoreUtils.updateUser(
+                                              userModel);
                                         }
                                       });
 
                                       controller.reviewModel.value.id =
-                                          controller.type.value == "orderModel" ? controller.orderModel.value.id : controller.intercityOrderModel.value.id;
-                                      controller.reviewModel.value.comment = controller.commentController.value.text;
-                                      controller.reviewModel.value.rating = controller.rating.value.toString();
-                                      controller.reviewModel.value.customerId = FireStoreUtils.getCurrentUid();
+                                          controller.type.value == "orderModel"
+                                              ? controller.orderModel.value.id
+                                              : controller
+                                                  .intercityOrderModel.value.id;
+                                      controller.reviewModel.value.comment =
+                                          controller
+                                              .commentController.value.text;
+                                      controller.reviewModel.value.rating =
+                                          controller.rating.value.toString();
+                                      controller.reviewModel.value.customerId =
+                                          FireStoreUtils.getCurrentUid();
                                       controller.reviewModel.value.driverId =
-                                          controller.type.value == "orderModel" ? controller.orderModel.value.driverId : controller.intercityOrderModel.value.driverId;
-                                      controller.reviewModel.value.date = Timestamp.now();
-                                      controller.reviewModel.value.type = controller.type.value == "orderModel" ? "city" : "intercity";
+                                          controller.type.value == "orderModel"
+                                              ? controller
+                                                  .orderModel.value.driverId
+                                              : controller.intercityOrderModel
+                                                  .value.driverId;
+                                      controller.reviewModel.value.date =
+                                          Timestamp.now();
+                                      controller.reviewModel.value.type =
+                                          controller.type.value == "orderModel"
+                                              ? "city"
+                                              : "intercity";
 
-                                      FireStoreUtils.setReview(controller.reviewModel.value).then((value) {
+                                      FireStoreUtils.setReview(
+                                              controller.reviewModel.value)
+                                          .then((value) {
                                         if (value != null && value == true) {
                                           ShowToastDialog.closeLoader();
-                                          ShowToastDialog.showToast("Review submit successfully".tr);
+                                          ShowToastDialog.showToast(
+                                              "Review submit successfully".tr);
                                           Get.back();
                                         }
                                       });
@@ -187,7 +264,7 @@ class ReviewScreen extends StatelessWidget {
                                 color: Colors.white,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.grey.withOpacity(0.15),
+                                    color: Colors.grey.withValues(alpha: 0.15),
                                     blurRadius: 8,
                                     spreadRadius: 6,
                                     offset: const Offset(0, 0),
@@ -197,12 +274,16 @@ class ReviewScreen extends StatelessWidget {
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(60),
                                 child: CachedNetworkImage(
-                                  imageUrl: controller.userModel.value.profilePic.toString(),
+                                  imageUrl: controller
+                                      .userModel.value.profilePic
+                                      .toString(),
                                   height: 110,
                                   width: 110,
                                   fit: BoxFit.cover,
-                                  placeholder: (context, url) => Constant.loader(context),
-                                  errorWidget: (context, url, error) => Image.network(Constant.userPlaceHolder),
+                                  placeholder: (context, url) =>
+                                      Constant.loader(context),
+                                  errorWidget: (context, url, error) =>
+                                      Image.network(Constant.userPlaceHolder),
                                 ),
                               ),
                             ),

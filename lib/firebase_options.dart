@@ -65,9 +65,10 @@ class DefaultFirebaseOptions {
     projectId: 'b21-project',
     databaseURL: 'https://b21-project-default-rtdb.firebaseio.com',
     storageBucket: 'b21-project.appspot.com',
-    androidClientId: '114149785250-0ph1etl3sapgfujsq3s72u5q0lpku4mg.apps.googleusercontent.com',
-    iosClientId: '114149785250-bk044m3bv8a5o2kdbfop5qv07534u0lf.apps.googleusercontent.com',
+    androidClientId:
+        '114149785250-0ph1etl3sapgfujsq3s72u5q0lpku4mg.apps.googleusercontent.com',
+    iosClientId:
+        '114149785250-bk044m3bv8a5o2kdbfop5qv07534u0lf.apps.googleusercontent.com',
     iosBundleId: 'br.com.b21.driver',
   );
-
 }

@@ -5,5 +5,4 @@ import 'package:get/get.dart';
 class ActiveOrderController extends GetxController {
   HomeController homeController = Get.put(HomeController());
   TextEditingController otpController = TextEditingController();
-
 }

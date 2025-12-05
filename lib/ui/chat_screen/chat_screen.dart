@@ -35,7 +35,16 @@ class ChatScreens extends StatefulWidget {
   final String? driverProfileImage;
   final String? token;
 
-  const ChatScreens({super.key, this.orderId, this.customerId, this.customerName, this.driverName, this.driverId, this.customerProfileImage, this.driverProfileImage, this.token});
+  const ChatScreens(
+      {super.key,
+      this.orderId,
+      this.customerId,
+      this.customerName,
+      this.driverName,
+      this.driverId,
+      this.customerProfileImage,
+      this.driverProfileImage,
+      this.token});
 
   @override
   State<ChatScreens> createState() => _ChatScreensState();
@@ -49,7 +58,8 @@ class _ChatScreensState extends State<ChatScreens> {
   void initState() {
     super.initState();
     if (_controller.hasClients) {
-      Timer(const Duration(milliseconds: 500), () => _controller.jumpTo(_controller.position.maxScrollExtent));
+      Timer(const Duration(milliseconds: 500),
+          () => _controller.jumpTo(_controller.position.maxScrollExtent));
     }
   }
 
@@ -58,7 +68,9 @@ class _ChatScreensState extends State<ChatScreens> {
     final themeChange = Provider.of<DarkThemeProvider>(context);
 
     return Scaffold(
-      backgroundColor: themeChange.getThem() ? AppColors.darkBackground : AppColors.background,
+      backgroundColor: themeChange.getThem()
+          ? AppColors.darkBackground
+          : AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.primary,
         elevation: 2,
@@ -84,7 +96,9 @@ class _ChatScreensState extends State<ChatScreens> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          color: themeChange.getThem() ? AppColors.darkBackground : AppColors.background,
+          color: themeChange.getThem()
+              ? AppColors.darkBackground
+              : AppColors.background,
         ),
         child: Padding(
           padding: EdgeInsets.only(
@@ -107,12 +121,11 @@ class _ChatScreensState extends State<ChatScreens> {
                     physics: const BouncingScrollPhysics(),
                     itemBuilder: (context, documentSnapshots, index) {
                       ConversationModel inboxModel = ConversationModel.fromJson(
-                          documentSnapshots[index].data() as Map<String, dynamic>
-                      );
+                          documentSnapshots[index].data()
+                              as Map<String, dynamic>);
                       return chatItemView(
                           inboxModel.senderId == FireStoreUtils.getCurrentUid(),
-                          inboxModel
-                      );
+                          inboxModel);
                     },
                     onEmpty: Center(
                       child: Column(
@@ -183,7 +196,9 @@ class _ChatScreensState extends State<ChatScreens> {
                             keyboardType: TextInputType.text,
                             textCapitalization: TextCapitalization.sentences,
                             style: GoogleFonts.poppins(
-                              color: themeChange.getThem() ? Colors.white : Colors.black87,
+                              color: themeChange.getThem()
+                                  ? Colors.white
+                                  : Colors.black87,
                               fontSize: Responsive.width(3.8, context),
                             ),
                             decoration: InputDecoration(
@@ -206,16 +221,21 @@ class _ChatScreensState extends State<ChatScreens> {
                                 },
                                 icon: Icon(
                                   Icons.camera_alt,
-                                  color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                                  color: themeChange.getThem()
+                                      ? Colors.white70
+                                      : Colors.black54,
                                   size: Responsive.width(6, context),
                                 ),
                               ),
                             ),
                             onSubmitted: (value) async {
                               if (_messageController.text.isNotEmpty) {
-                                _sendMessage(_messageController.text, null, '', 'text');
-                                Timer(const Duration(milliseconds: 500),
-                                        () => _controller.jumpTo(_controller.position.maxScrollExtent));
+                                _sendMessage(
+                                    _messageController.text, null, '', 'text');
+                                Timer(
+                                    const Duration(milliseconds: 500),
+                                    () => _controller.jumpTo(
+                                        _controller.position.maxScrollExtent));
                                 _messageController.clear();
                                 setState(() {});
                               }
@@ -232,7 +252,8 @@ class _ChatScreensState extends State<ChatScreens> {
                         child: IconButton(
                           onPressed: () async {
                             if (_messageController.text.isNotEmpty) {
-                              _sendMessage(_messageController.text, null, '', 'text');
+                              _sendMessage(
+                                  _messageController.text, null, '', 'text');
                               _messageController.clear();
                               setState(() {});
                             } else {
@@ -269,224 +290,221 @@ class _ChatScreensState extends State<ChatScreens> {
       ),
       child: isMe
           ? Align(
-        alignment: Alignment.topRight,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            // Message or Image
-            data.messageType == 'text'
-                ? Container(
-              constraints: BoxConstraints(
-                maxWidth: Responsive.width(75, context),
-              ),
-              decoration: BoxDecoration(
-                color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    topRight: Radius.circular(15),
-                    bottomLeft: Radius.circular(15)
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
+              alignment: Alignment.topRight,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  // Message or Image
+                  data.messageType == 'text'
+                      ? Container(
+                          constraints: BoxConstraints(
+                            maxWidth: Responsive.width(75, context),
+                          ),
+                          decoration: BoxDecoration(
+                            color: themeChange.getThem()
+                                ? AppColors.darkModePrimary
+                                : AppColors.primary,
+                            borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                topRight: Radius.circular(15),
+                                bottomLeft: Radius.circular(15)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: Responsive.width(4, context),
+                              vertical: Responsive.height(1.2, context)),
+                          child: Text(
+                            data.message.toString(),
+                            style: GoogleFonts.poppins(
+                              color: themeChange.getThem()
+                                  ? Colors.black
+                                  : Colors.white,
+                              fontSize: Responsive.width(3.8, context),
+                            ),
+                          ),
+                        )
+                      : ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minWidth: Responsive.width(12, context),
+                            maxWidth: Responsive.width(60, context),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                topRight: Radius.circular(15),
+                                bottomLeft: Radius.circular(15)),
+                            child:
+                                Stack(alignment: Alignment.center, children: [
+                              GestureDetector(
+                                onTap: () {
+                                  Get.to(FullScreenImageViewer(
+                                    imageUrl: data.url!.url,
+                                  ));
+                                },
+                                child: Hero(
+                                  tag: data.url!.url,
+                                  child: CachedNetworkImage(
+                                    imageUrl: data.url!.url,
+                                    placeholder: (context, url) => SizedBox(
+                                      height: Responsive.height(20, context),
+                                      child: Center(
+                                          child: Constant.loader(context)),
+                                    ),
+                                    errorWidget: (context, url, error) =>
+                                        SizedBox(
+                                      height: Responsive.height(20, context),
+                                      child: const Icon(Icons.error,
+                                          color: Colors.red),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ]),
+                          )),
+
+                  SizedBox(height: Responsive.height(0.5, context)),
+
+                  // Message Info
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text("Me".tr,
+                          style: GoogleFonts.poppins(
+                            fontSize: Responsive.width(3, context),
+                            fontWeight: FontWeight.w500,
+                            color: themeChange.getThem()
+                                ? Colors.white70
+                                : Colors.black54,
+                          )),
+                      Text(Constant.dateAndTimeFormatTimestamp(data.createdAt),
+                          style: GoogleFonts.poppins(
+                            fontSize: Responsive.width(2.8, context),
+                            fontWeight: FontWeight.w400,
+                            color: AppColors.subTitleColor,
+                          )),
+                    ],
                   ),
                 ],
               ),
-              padding: EdgeInsets.symmetric(
-                  horizontal: Responsive.width(4, context),
-                  vertical: Responsive.height(1.2, context)
-              ),
-              child: Text(
-                data.message.toString(),
-                style: GoogleFonts.poppins(
-                  color: themeChange.getThem() ? Colors.black : Colors.white,
-                  fontSize: Responsive.width(3.8, context),
-                ),
-              ),
             )
-                : ConstrainedBox(
-                constraints: BoxConstraints(
-                  minWidth: Responsive.width(12, context),
-                  maxWidth: Responsive.width(60, context),
-                ),
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15),
-                      bottomLeft: Radius.circular(15)
-                  ),
-                  child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Get.to(FullScreenImageViewer(
-                              imageUrl: data.url!.url,
-                            ));
-                          },
-                          child: Hero(
-                            tag: data.url!.url,
-                            child: CachedNetworkImage(
-                              imageUrl: data.url!.url,
-                              placeholder: (context, url) => SizedBox(
-                                height: Responsive.height(20, context),
-                                child: Center(child: Constant.loader(context)),
-                              ),
-                              errorWidget: (context, url, error) => SizedBox(
-                                height: Responsive.height(20, context),
-                                child: const Icon(Icons.error, color: Colors.red),
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    // Message or Image
+                    data.messageType == 'text'
+                        ? Container(
+                            constraints: BoxConstraints(
+                              maxWidth: Responsive.width(75, context),
+                            ),
+                            decoration: BoxDecoration(
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(15),
+                                  topRight: Radius.circular(15),
+                                  bottomRight: Radius.circular(15)),
+                              color: themeChange.getThem()
+                                  ? AppColors.darkContainerBackground
+                                  : Colors.grey.shade200,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: Responsive.width(4, context),
+                                vertical: Responsive.height(1.2, context)),
+                            child: Text(
+                              data.message.toString(),
+                              style: GoogleFonts.poppins(
+                                color: themeChange.getThem()
+                                    ? Colors.white
+                                    : Colors.black87,
+                                fontSize: Responsive.width(3.8, context),
                               ),
                             ),
-                          ),
-                        ),
-                      ]
-                  ),
-                )
-            ),
-
-            SizedBox(height: Responsive.height(0.5, context)),
-
-            // Message Info
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                    "Me".tr,
-                    style: GoogleFonts.poppins(
-                      fontSize: Responsive.width(3, context),
-                      fontWeight: FontWeight.w500,
-                      color: themeChange.getThem() ? Colors.white70 : Colors.black54,
-                    )
+                          )
+                        : ConstrainedBox(
+                            constraints: BoxConstraints(
+                              minWidth: Responsive.width(12, context),
+                              maxWidth: Responsive.width(60, context),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(15),
+                                  topRight: Radius.circular(15),
+                                  bottomRight: Radius.circular(15)),
+                              child:
+                                  Stack(alignment: Alignment.center, children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Get.to(FullScreenImageViewer(
+                                      imageUrl: data.url!.url,
+                                    ));
+                                  },
+                                  child: Hero(
+                                    tag: data.url!.url,
+                                    child: CachedNetworkImage(
+                                      imageUrl: data.url!.url,
+                                      placeholder: (context, url) => SizedBox(
+                                        height: Responsive.height(20, context),
+                                        child: Center(
+                                            child: Constant.loader(context)),
+                                      ),
+                                      errorWidget: (context, url, error) =>
+                                          SizedBox(
+                                        height: Responsive.height(20, context),
+                                        child: const Icon(Icons.error,
+                                            color: Colors.red),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ]),
+                            )),
+                  ],
                 ),
-                Text(
-                    Constant.dateAndTimeFormatTimestamp(data.createdAt),
-                    style: GoogleFonts.poppins(
-                      fontSize: Responsive.width(2.8, context),
-                      fontWeight: FontWeight.w400,
-                      color: AppColors.subTitleColor,
-                    )
+
+                SizedBox(height: Responsive.height(0.5, context)),
+
+                // Message Info
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(widget.customerName.toString(),
+                        style: GoogleFonts.poppins(
+                          fontSize: Responsive.width(3, context),
+                          fontWeight: FontWeight.w500,
+                          color: themeChange.getThem()
+                              ? Colors.white70
+                              : Colors.black54,
+                        )),
+                    Text(Constant.dateAndTimeFormatTimestamp(data.createdAt),
+                        style: GoogleFonts.poppins(
+                          fontSize: Responsive.width(2.8, context),
+                          fontWeight: FontWeight.w400,
+                          color: AppColors.subTitleColor,
+                        )),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      )
-          : Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              // Message or Image
-              data.messageType == 'text'
-                  ? Container(
-                constraints: BoxConstraints(
-                  maxWidth: Responsive.width(75, context),
-                ),
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(15),
-                      topRight: Radius.circular(15),
-                      bottomRight: Radius.circular(15)
-                  ),
-                  color: themeChange.getThem()
-                      ? AppColors.darkContainerBackground
-                      : Colors.grey.shade200,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                padding: EdgeInsets.symmetric(
-                    horizontal: Responsive.width(4, context),
-                    vertical: Responsive.height(1.2, context)
-                ),
-                child: Text(
-                  data.message.toString(),
-                  style: GoogleFonts.poppins(
-                    color: themeChange.getThem() ? Colors.white : Colors.black87,
-                    fontSize: Responsive.width(3.8, context),
-                  ),
-                ),
-              )
-                  : ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: Responsive.width(12, context),
-                    maxWidth: Responsive.width(60, context),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15),
-                        bottomRight: Radius.circular(15)
-                    ),
-                    child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              Get.to(FullScreenImageViewer(
-                                imageUrl: data.url!.url,
-                              ));
-                            },
-                            child: Hero(
-                              tag: data.url!.url,
-                              child: CachedNetworkImage(
-                                imageUrl: data.url!.url,
-                                placeholder: (context, url) => SizedBox(
-                                  height: Responsive.height(20, context),
-                                  child: Center(child: Constant.loader(context)),
-                                ),
-                                errorWidget: (context, url, error) => SizedBox(
-                                  height: Responsive.height(20, context),
-                                  child: const Icon(Icons.error, color: Colors.red),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ]
-                    ),
-                  )
-              ),
-            ],
-          ),
-
-          SizedBox(height: Responsive.height(0.5, context)),
-
-          // Message Info
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                  widget.customerName.toString(),
-                  style: GoogleFonts.poppins(
-                    fontSize: Responsive.width(3, context),
-                    fontWeight: FontWeight.w500,
-                    color: themeChange.getThem() ? Colors.white70 : Colors.black54,
-                  )
-              ),
-              Text(
-                  Constant.dateAndTimeFormatTimestamp(data.createdAt),
-                  style: GoogleFonts.poppins(
-                    fontSize: Responsive.width(2.8, context),
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.subTitleColor,
-                  )
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 
-  _sendMessage(String message, Url? url, String videoThumbnail, String messageType) async {
+  _sendMessage(String message, Url? url, String videoThumbnail,
+      String messageType) async {
     InboxModel inboxModel = InboxModel(
         lastSenderId: widget.customerId,
         customerId: widget.customerId,
@@ -532,7 +550,8 @@ class _ChatScreensState extends State<ChatScreens> {
     };
 
     SendNotification.sendOneNotification(
-        title: "${widget.driverName} ${messageType == "image" ? messageType == "video" ? "sent video to you" : "sent image to you" : "sent message to you"}",
+        title:
+            "${widget.driverName} ${messageType == "image" ? messageType == "video" ? "sent video to you" : "sent image to you" : "sent message to you"}",
         body: conversationModel.message.toString(),
         token: widget.token.toString(),
         payload: playLoad);
@@ -556,9 +575,11 @@ class _ChatScreensState extends State<ChatScreens> {
           isDefaultAction: false,
           onPressed: () async {
             Get.back();
-            XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
+            XFile? image =
+                await _imagePicker.pickImage(source: ImageSource.gallery);
             if (image != null) {
-              Url url = await Constant().uploadChatImageToFireStorage(File(image.path));
+              Url url = await Constant()
+                  .uploadChatImageToFireStorage(File(image.path));
               _sendMessage('', url, '', 'image');
             }
           },
@@ -574,9 +595,11 @@ class _ChatScreensState extends State<ChatScreens> {
           isDestructiveAction: false,
           onPressed: () async {
             Navigator.pop(context);
-            XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
+            XFile? image =
+                await _imagePicker.pickImage(source: ImageSource.camera);
             if (image != null) {
-              Url url = await Constant().uploadChatImageToFireStorage(File(image.path));
+              Url url = await Constant()
+                  .uploadChatImageToFireStorage(File(image.path));
               _sendMessage('', url, '', 'image');
             }
           },

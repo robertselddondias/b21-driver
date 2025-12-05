@@ -11,7 +11,6 @@ class CollectionName {
 
   static const String referral = "referral";
 
-
   static const String orders = "orders";
   static const String ordersIntercity = "orders_intercity";
   static const String walletTransaction = "wallet_transaction";
@@ -25,5 +24,4 @@ class CollectionName {
   static const String withdrawalHistory = "withdrawal_history";
 
   static const String zone = "zone";
-
 }

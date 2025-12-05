@@ -53,265 +53,290 @@ class VehicleInformationScreen extends StatelessWidget {
                   child: controller.isLoading.value
                       ? Center(child: Constant.loader(context))
                       : Column(
-                    children: [
-                      // Header
-                      Container(
-                        width: Responsive.width(100, context),
-                        padding: EdgeInsets.all(Responsive.width(5, context)),
-                        child: Text(
-                          'Informações do Veículo',
-                          style: GoogleFonts.poppins(
-                            fontSize: Responsive.width(5, context),
-                            fontWeight: FontWeight.w600,
-                            color: themeChange.getThem()
-                                ? Colors.white
-                                : Colors.black,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-
-                      // BANNER DE STATUS
-                      _buildStatusBanner(context, controller, themeChange),
-
-                      // Content
-                      Expanded(
-                        child: SingleChildScrollView(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: Responsive.width(5, context),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Service Selection Section
-                              _buildSectionTitle(
-                                  context, themeChange, 'Tipo de Serviço'),
-                              SizedBox(height: Responsive.height(1, context)),
-                              _buildServiceSelector(
-                                  context, controller, themeChange),
-
-                              SizedBox(height: Responsive.height(3, context)),
-
-                              // Vehicle Information Section
-                              _buildSectionTitle(context, themeChange,
-                                  'Informações do Veículo'),
-                              SizedBox(height: Responsive.height(1.5, context)),
-
-                              // Vehicle Number Field
-                              _buildFormField(
-                                context,
-                                themeChange,
-                                label: 'Placa do Veículo',
-                                child: TextFieldThem.buildTextMask(
-                                  context,
-                                  enable: controller.isEditable.value,
-                                  hintText: 'Placa do Veículo'.tr,
-                                  controller: controller
-                                      .vehicleNumberController.value,
-                                  inputMaskFormatter: controller.maskFormatter,
+                          children: [
+                            // Header
+                            Container(
+                              width: Responsive.width(100, context),
+                              padding:
+                                  EdgeInsets.all(Responsive.width(5, context)),
+                              child: Text(
+                                'Informações do Veículo',
+                                style: GoogleFonts.poppins(
+                                  fontSize: Responsive.width(5, context),
+                                  fontWeight: FontWeight.w600,
+                                  color: themeChange.getThem()
+                                      ? Colors.white
+                                      : Colors.black,
                                 ),
+                                textAlign: TextAlign.center,
                               ),
+                            ),
 
-                              SizedBox(height: Responsive.height(2, context)),
+                            // BANNER DE STATUS
+                            _buildStatusBanner(
+                                context, controller, themeChange),
 
-                              // Registration Date Field
-                              _buildFormField(
-                                context,
-                                themeChange,
-                                label: 'Data de Registro',
-                                child: InkWell(
-                                  onTap: () async {
-                                    if (controller.isEditable.value) {
-                                      await Constant.selectDate(context)
-                                          .then((value) {
-                                        if (value != null) {
-                                          controller.selectedDate.value = value;
-                                          controller.registrationDateController
-                                              .value.text =
-                                              DateFormat("dd/MM/yyyy")
-                                                  .format(value);
-                                        }
-                                      });
-                                    }
-                                  },
-                                  child: AbsorbPointer(
-                                    child: TextFieldThem.buildTextFiled(
-                                      context,
-                                      hintText: 'Registration Date'.tr,
-                                      enable: controller.isEditable.value,
-                                      controller: controller
-                                          .registrationDateController.value,
-                                    ),
-                                  ),
+                            // Content
+                            Expanded(
+                              child: SingleChildScrollView(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: Responsive.width(5, context),
                                 ),
-                              ),
-
-                              SizedBox(height: Responsive.height(2, context)),
-
-                              // Vehicle Type Dropdown
-                              _buildFormField(
-                                context,
-                                themeChange,
-                                label: 'Tipo de Veículo',
-                                child: _buildDropdown<VehicleTypeModel>(
-                                  context,
-                                  themeChange,
-                                  value: controller.selectedVehicle.value.id ==
-                                      null
-                                      ? null
-                                      : controller.selectedVehicle.value,
-                                  hint: "Select vehicle type".tr,
-                                  items: controller.vehicleList,
-                                  onChanged: controller.isEditable.value
-                                      ? (value) {
-                                    controller.selectedVehicle.value =
-                                    value!;
-                                  }
-                                      : null,
-                                  itemBuilder: (item) =>
-                                      Text(item.name ?? 'Tipo'),
-                                ),
-                              ),
-
-                              SizedBox(height: Responsive.height(2, context)),
-
-                              // Vehicle Color Dropdown
-                              _buildFormField(
-                                context,
-                                themeChange,
-                                label: 'Cor do Veículo',
-                                child: _buildDropdown<String>(
-                                  context,
-                                  themeChange,
-                                  value: controller.selectedColor.value.isEmpty
-                                      ? null
-                                      : controller.selectedColor.value,
-                                  hint: "Select vehicle color".tr,
-                                  items: controller.carColorList,
-                                  onChanged: controller.isEditable.value
-                                      ? (value) {
-                                    controller.selectedColor.value =
-                                    value!;
-                                  }
-                                      : null,
-                                  itemBuilder: (item) =>
-                                      Text(item.toString()),
-                                ),
-                              ),
-
-                              SizedBox(height: Responsive.height(2, context)),
-
-                              // Number of Seats Dropdown
-                              _buildFormField(
-                                context,
-                                themeChange,
-                                label: 'Número de Assentos',
-                                child: _buildDropdown<String>(
-                                  context,
-                                  themeChange,
-                                  value: controller
-                                      .seatsController.value.text.isEmpty
-                                      ? null
-                                      : controller.seatsController.value.text,
-                                  hint: "How Many Seats".tr,
-                                  items: controller.sheetList,
-                                  onChanged: controller.isEditable.value
-                                      ? (value) {
-                                    controller.seatsController.value
-                                        .text = value!;
-                                  }
-                                      : null,
-                                  itemBuilder: (item) =>
-                                      Text(item.toString()),
-                                ),
-                              ),
-
-                              SizedBox(height: Responsive.height(2, context)),
-
-                              // Zone Selection Field
-                              _buildFormField(
-                                context,
-                                themeChange,
-                                label: 'Zona de Atuação',
-                                child: InkWell(
-                                  onTap: () {
-                                    if (controller.isEditable.value) {
-                                      _showZoneDialog(
-                                          context, controller, themeChange);
-                                    }
-                                  },
-                                  child: AbsorbPointer(
-                                    child: TextFieldThem.buildTextFiled(
-                                      context,
-                                      hintText: 'Select Zone'.tr,
-                                      controller: controller
-                                          .zoneNameController.value,
-                                      enable: controller.isEditable.value,
-                                    ),
-                                  ),
-                                ),
-                              ),
-
-                              SizedBox(height: Responsive.height(3, context)),
-
-                              _buildDriverRules(
-                                  context, controller, themeChange),
-
-                              SizedBox(height: Responsive.height(3, context)),
-
-                              // Warning Text
-                              Container(
-                                padding:
-                                EdgeInsets.all(Responsive.width(4, context)),
-                                margin: EdgeInsets.symmetric(
-                                  horizontal: Responsive.width(2, context),
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: Colors.orange.withOpacity(0.3),
-                                  ),
-                                ),
-                                child: Row(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Icon(
-                                      Icons.warning_rounded,
-                                      color: Colors.orange,
-                                      size: Responsive.width(5, context),
-                                    ),
+                                    // Service Selection Section
+                                    _buildSectionTitle(context, themeChange,
+                                        'Tipo de Serviço'),
                                     SizedBox(
-                                        width: Responsive.width(3, context)),
-                                    Expanded(
-                                      child: Text(
-                                        "You can not change once you select one service type if you want to change please contact to administrator "
-                                            .tr,
-                                        style: GoogleFonts.poppins(
-                                          fontSize:
-                                          Responsive.width(3, context),
-                                          color: Colors.orange.shade700,
-                                          height: 1.4,
+                                        height: Responsive.height(1, context)),
+                                    _buildServiceSelector(
+                                        context, controller, themeChange),
+
+                                    SizedBox(
+                                        height: Responsive.height(3, context)),
+
+                                    // Vehicle Information Section
+                                    _buildSectionTitle(context, themeChange,
+                                        'Informações do Veículo'),
+                                    SizedBox(
+                                        height:
+                                            Responsive.height(1.5, context)),
+
+                                    // Vehicle Number Field
+                                    _buildFormField(
+                                      context,
+                                      themeChange,
+                                      label: 'Placa do Veículo',
+                                      child: TextFieldThem.buildTextMask(
+                                        context,
+                                        enable: controller.isEditable.value,
+                                        hintText: 'Placa do Veículo'.tr,
+                                        controller: controller
+                                            .vehicleNumberController.value,
+                                        inputMaskFormatter:
+                                            controller.maskFormatter,
+                                      ),
+                                    ),
+
+                                    SizedBox(
+                                        height: Responsive.height(2, context)),
+
+                                    // Registration Date Field
+                                    _buildFormField(
+                                      context,
+                                      themeChange,
+                                      label: 'Data de Registro',
+                                      child: InkWell(
+                                        onTap: () async {
+                                          if (controller.isEditable.value) {
+                                            await Constant.selectDate(context)
+                                                .then((value) {
+                                              if (value != null) {
+                                                controller.selectedDate.value =
+                                                    value;
+                                                controller
+                                                    .registrationDateController
+                                                    .value
+                                                    .text = DateFormat(
+                                                        "dd/MM/yyyy")
+                                                    .format(value);
+                                              }
+                                            });
+                                          }
+                                        },
+                                        child: AbsorbPointer(
+                                          child: TextFieldThem.buildTextFiled(
+                                            context,
+                                            hintText: 'Registration Date'.tr,
+                                            enable: controller.isEditable.value,
+                                            controller: controller
+                                                .registrationDateController
+                                                .value,
+                                          ),
                                         ),
                                       ),
                                     ),
+
+                                    SizedBox(
+                                        height: Responsive.height(2, context)),
+
+                                    // Vehicle Type Dropdown
+                                    _buildFormField(
+                                      context,
+                                      themeChange,
+                                      label: 'Tipo de Veículo',
+                                      child: _buildDropdown<VehicleTypeModel>(
+                                        context,
+                                        themeChange,
+                                        value: controller
+                                                    .selectedVehicle.value.id ==
+                                                null
+                                            ? null
+                                            : controller.selectedVehicle.value,
+                                        hint: "Select vehicle type".tr,
+                                        items: controller.vehicleList,
+                                        onChanged: controller.isEditable.value
+                                            ? (value) {
+                                                controller.selectedVehicle
+                                                    .value = value!;
+                                              }
+                                            : null,
+                                        itemBuilder: (item) =>
+                                            Text(item.name ?? 'Tipo'),
+                                      ),
+                                    ),
+
+                                    SizedBox(
+                                        height: Responsive.height(2, context)),
+
+                                    // Vehicle Color Dropdown
+                                    _buildFormField(
+                                      context,
+                                      themeChange,
+                                      label: 'Cor do Veículo',
+                                      child: _buildDropdown<String>(
+                                        context,
+                                        themeChange,
+                                        value: controller
+                                                .selectedColor.value.isEmpty
+                                            ? null
+                                            : controller.selectedColor.value,
+                                        hint: "Select vehicle color".tr,
+                                        items: controller.carColorList,
+                                        onChanged: controller.isEditable.value
+                                            ? (value) {
+                                                controller.selectedColor.value =
+                                                    value!;
+                                              }
+                                            : null,
+                                        itemBuilder: (item) =>
+                                            Text(item.toString()),
+                                      ),
+                                    ),
+
+                                    SizedBox(
+                                        height: Responsive.height(2, context)),
+
+                                    // Number of Seats Dropdown
+                                    _buildFormField(
+                                      context,
+                                      themeChange,
+                                      label: 'Número de Assentos',
+                                      child: _buildDropdown<String>(
+                                        context,
+                                        themeChange,
+                                        value: controller.seatsController.value
+                                                .text.isEmpty
+                                            ? null
+                                            : controller
+                                                .seatsController.value.text,
+                                        hint: "How Many Seats".tr,
+                                        items: controller.sheetList,
+                                        onChanged: controller.isEditable.value
+                                            ? (value) {
+                                                controller.seatsController.value
+                                                    .text = value!;
+                                              }
+                                            : null,
+                                        itemBuilder: (item) =>
+                                            Text(item.toString()),
+                                      ),
+                                    ),
+
+                                    SizedBox(
+                                        height: Responsive.height(2, context)),
+
+                                    // Zone Selection Field
+                                    _buildFormField(
+                                      context,
+                                      themeChange,
+                                      label: 'Zona de Atuação',
+                                      child: InkWell(
+                                        onTap: () {
+                                          if (controller.isEditable.value) {
+                                            _showZoneDialog(context, controller,
+                                                themeChange);
+                                          }
+                                        },
+                                        child: AbsorbPointer(
+                                          child: TextFieldThem.buildTextFiled(
+                                            context,
+                                            hintText: 'Select Zone'.tr,
+                                            controller: controller
+                                                .zoneNameController.value,
+                                            enable: controller.isEditable.value,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+
+                                    SizedBox(
+                                        height: Responsive.height(3, context)),
+
+                                    _buildDriverRules(
+                                        context, controller, themeChange),
+
+                                    SizedBox(
+                                        height: Responsive.height(3, context)),
+
+                                    // Warning Text
+                                    Container(
+                                      padding: EdgeInsets.all(
+                                          Responsive.width(4, context)),
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal:
+                                            Responsive.width(2, context),
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: Colors.orange.withOpacity(0.3),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.warning_rounded,
+                                            color: Colors.orange,
+                                            size: Responsive.width(5, context),
+                                          ),
+                                          SizedBox(
+                                              width:
+                                                  Responsive.width(3, context)),
+                                          Expanded(
+                                            child: Text(
+                                              "You can not change once you select one service type if you want to change please contact to administrator "
+                                                  .tr,
+                                              style: GoogleFonts.poppins(
+                                                fontSize: Responsive.width(
+                                                    3, context),
+                                                color: Colors.orange.shade700,
+                                                height: 1.4,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    SizedBox(
+                                        height: Responsive.height(3, context)),
                                   ],
                                 ),
                               ),
+                            ),
 
-                              SizedBox(height: Responsive.height(3, context)),
-                            ],
-                          ),
+                            // BOTÕES DE AÇÃO
+                            Padding(
+                              padding:
+                                  EdgeInsets.all(Responsive.width(5, context)),
+                              child: _buildActionButtons(
+                                  context, controller, themeChange),
+                            ),
+                          ],
                         ),
-                      ),
-
-                      // BOTÕES DE AÇÃO
-                      Padding(
-                        padding: EdgeInsets.all(Responsive.width(5, context)),
-                        child: _buildActionButtons(
-                            context, controller, themeChange),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ],
@@ -342,7 +367,7 @@ class VehicleInformationScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.blue.withOpacity(0.3),
+                color: Colors.blue.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 3),
               ),
@@ -553,11 +578,11 @@ class VehicleInformationScreen extends StatelessWidget {
   }
 
   Widget _buildFormField(
-      BuildContext context,
-      DarkThemeProvider themeChange, {
-        required String label,
-        required Widget child,
-      }) {
+    BuildContext context,
+    DarkThemeProvider themeChange, {
+    required String label,
+    required Widget child,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -586,7 +611,7 @@ class VehicleInformationScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           ServiceModel serviceModel = controller.serviceList[index];
           return Obx(
-                () => Container(
+            () => Container(
               margin: EdgeInsets.only(right: Responsive.width(3, context)),
               child: InkWell(
                 onTap: () async {
@@ -598,18 +623,20 @@ class VehicleInformationScreen extends StatelessWidget {
                 child: Container(
                   width: Responsive.width(25, context),
                   decoration: BoxDecoration(
-                    color: controller.selectedServiceId.value == (serviceModel.id ?? '')
+                    color: controller.selectedServiceId.value ==
+                            (serviceModel.id ?? '')
                         ? AppColors.primary
                         : (themeChange.getThem()
-                        ? AppColors.darkContainerBackground
-                        : AppColors.containerBackground),
+                            ? AppColors.darkContainerBackground
+                            : AppColors.containerBackground),
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(
-                      color: controller.selectedServiceId.value == (serviceModel.id ?? '')
+                      color: controller.selectedServiceId.value ==
+                              (serviceModel.id ?? '')
                           ? AppColors.primary
                           : (themeChange.getThem()
-                          ? AppColors.darkContainerBorder
-                          : AppColors.containerBorder),
+                              ? AppColors.darkContainerBorder
+                              : AppColors.containerBorder),
                     ),
                   ),
                   child: Column(
@@ -620,7 +647,7 @@ class VehicleInformationScreen extends StatelessWidget {
                         height: Responsive.height(6, context),
                         width: Responsive.width(12, context),
                         color: controller.selectedServiceId.value ==
-                            (serviceModel.id ?? '')
+                                (serviceModel.id ?? '')
                             ? Colors.white
                             : null,
                         errorWidget: (context, url, error) => Icon(
@@ -637,11 +664,11 @@ class VehicleInformationScreen extends StatelessWidget {
                           fontSize: Responsive.width(3, context),
                           fontWeight: FontWeight.w500,
                           color: controller.selectedServiceId.value ==
-                              (serviceModel.id ?? '')
+                                  (serviceModel.id ?? '')
                               ? Colors.white
                               : (themeChange.getThem()
-                              ? Colors.white
-                              : Colors.black),
+                                  ? Colors.white
+                                  : Colors.black),
                         ),
                       ),
                     ],
@@ -656,23 +683,23 @@ class VehicleInformationScreen extends StatelessWidget {
   }
 
   Widget _buildDropdown<T>(
-      BuildContext context,
-      DarkThemeProvider themeChange, {
-        required T? value,
-        required String hint,
-        required List<T> items,
-        required void Function(T?)? onChanged,
-        required Widget Function(T) itemBuilder,
-      }) {
+    BuildContext context,
+    DarkThemeProvider themeChange, {
+    required T? value,
+    required String hint,
+    required List<T> items,
+    required void Function(T?)? onChanged,
+    required Widget Function(T) itemBuilder,
+  }) {
     final bool isEnabled = onChanged != null;
 
     final Color fillColor = isEnabled
         ? (themeChange.getThem()
-        ? AppColors.darkTextField
-        : AppColors.textField)
+            ? AppColors.darkTextField
+            : AppColors.textField)
         : (themeChange.getThem()
-        ? AppColors.darkTextField.withOpacity(0.5)
-        : AppColors.textField.withOpacity(0.5));
+            ? AppColors.darkTextField.withOpacity(0.5)
+            : AppColors.textField.withOpacity(0.5));
 
     final Color valueTextColor = isEnabled
         ? (themeChange.getThem() ? Colors.white : Colors.black87)
@@ -760,7 +787,7 @@ class VehicleInformationScreen extends StatelessWidget {
         ),
         SizedBox(height: Responsive.height(1.5, context)),
         Obx(
-              () => Wrap(
+          () => Wrap(
             spacing: 8,
             runSpacing: 8,
             children: controller.driverRulesList.map((rule) {
@@ -787,15 +814,15 @@ class VehicleInformationScreen extends StatelessWidget {
                     color: isSelected
                         ? AppColors.primary
                         : (themeChange.getThem()
-                        ? AppColors.darkContainerBackground
-                        : AppColors.containerBackground),
+                            ? AppColors.darkContainerBackground
+                            : AppColors.containerBackground),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(
                       color: isSelected
                           ? AppColors.primary
                           : (themeChange.getThem()
-                          ? AppColors.darkContainerBorder
-                          : AppColors.containerBorder),
+                              ? AppColors.darkContainerBorder
+                              : AppColors.containerBorder),
                     ),
                   ),
                   child: Row(
@@ -803,7 +830,8 @@ class VehicleInformationScreen extends StatelessWidget {
                     children: [
                       if (isSelected)
                         Padding(
-                          padding: EdgeInsets.only(right: Responsive.width(1.5, context)),
+                          padding: EdgeInsets.only(
+                              right: Responsive.width(1.5, context)),
                           child: Icon(
                             Icons.check,
                             color: Colors.white,
@@ -818,8 +846,8 @@ class VehicleInformationScreen extends StatelessWidget {
                           color: isSelected
                               ? Colors.white
                               : (themeChange.getThem()
-                              ? Colors.white
-                              : Colors.black),
+                                  ? Colors.white
+                                  : Colors.black),
                         ),
                       ),
                     ],
@@ -843,13 +871,13 @@ class VehicleInformationScreen extends StatelessWidget {
           content: SizedBox(
             width: double.maxFinite,
             child: Obx(
-                  () => ListView.builder(
+              () => ListView.builder(
                 shrinkWrap: true,
                 itemCount: controller.zoneList.length,
                 itemBuilder: (context, index) {
                   ZoneModel zone = controller.zoneList[index];
                   bool isSelected =
-                  controller.selectedZone.contains(zone.id.toString());
+                      controller.selectedZone.contains(zone.id.toString());
                   return CheckboxListTile(
                     title: Text(zone.name ?? 'Zona'),
                     value: isSelected,
@@ -874,11 +902,12 @@ class VehicleInformationScreen extends StatelessWidget {
               onPressed: () {
                 String nameValue = "";
                 for (var element in controller.selectedZone) {
-                  List list =
-                  controller.zoneList.where((p0) => p0.id == element).toList();
+                  List list = controller.zoneList
+                      .where((p0) => p0.id == element)
+                      .toList();
                   if (list.isNotEmpty) {
                     nameValue =
-                    "$nameValue${nameValue.isEmpty ? "" : ", "} ${list.first.name}";
+                        "$nameValue${nameValue.isEmpty ? "" : ", "} ${list.first.name}";
                   }
                 }
                 controller.zoneNameController.value.text = nameValue;

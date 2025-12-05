@@ -17,7 +17,8 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 class DetailsUploadController extends GetxController {
   Rx<DocumentModel> documentModel = DocumentModel().obs;
 
-  Rx<TextEditingController> documentNumberController = TextEditingController().obs;
+  Rx<TextEditingController> documentNumberController =
+      TextEditingController().obs;
   Rx<TextEditingController> expireAtController = TextEditingController().obs;
   Rx<DateTime?> selectedDate = DateTime.now().obs;
 
@@ -30,7 +31,7 @@ class DetailsUploadController extends GetxController {
   var cnhMaskFormatter = MaskTextInputFormatter();
 
   @override
-  void onInit() async{
+  void onInit() async {
     await getArgument();
     super.onInit();
   }
@@ -51,16 +52,19 @@ class DetailsUploadController extends GetxController {
     await FireStoreUtils.getDocumentOfDriver().then((value) {
       isLoading.value = false;
       if (value != null) {
-        var contain = value.documents!.where((element) => element.documentId == documentModel.value.id);
+        var contain = value.documents!
+            .where((element) => element.documentId == documentModel.value.id);
         if (contain.isNotEmpty) {
-          documents.value = value.documents!.firstWhere((itemToCheck) => itemToCheck.documentId == documentModel.value.id);
+          documents.value = value.documents!.firstWhere((itemToCheck) =>
+              itemToCheck.documentId == documentModel.value.id);
           documentNumberController.value.text = documents.value.documentNumber!;
           formatter.value = documents.value.formatter!;
           frontImage.value = documents.value.frontImage!;
           backImage.value = documents.value.backImage!;
           if (documents.value.expireAt != null) {
             selectedDate.value = documents.value.expireAt!.toDate();
-            expireAtController.value.text = DateFormat("dd/MM/yyyy").format(selectedDate.value!);
+            expireAtController.value.text =
+                DateFormat("dd/MM/yyyy").format(selectedDate.value!);
           }
           cnhMaskFormatter.updateMask(mask: formatter.value);
         }
@@ -75,7 +79,8 @@ class DetailsUploadController extends GetxController {
   // ============================================================================
   Future pickFile({required ImageSource source, required String type}) async {
     try {
-      print('🎯 Iniciando captura de imagem - Tipo: $type, Source: ${source == ImageSource.camera ? "Camera" : "Gallery"}');
+      print(
+          '🎯 Iniciando captura de imagem - Tipo: $type, Source: ${source == ImageSource.camera ? "Camera" : "Gallery"}');
 
       XFile? image = await _imagePicker.pickImage(
         source: source,
@@ -110,7 +115,6 @@ class DetailsUploadController extends GetxController {
 
       // Feedback para o usuário
       ShowToastDialog.showToast("Foto adicionada com sucesso!");
-
     } on PlatformException catch (e) {
       print('❌ Erro PlatformException: $e');
       Get.back(); // Fecha o bottom sheet mesmo com erro
@@ -129,20 +133,20 @@ class DetailsUploadController extends GetxController {
     String frontImageFileName = File(frontImage.value).path.split('/').last;
     String backImageFileName = File(backImage.value).path.split('/').last;
 
-    if(frontImage.value.isNotEmpty && Constant().hasValidUrl(frontImage.value) == false){
+    if (frontImage.value.isNotEmpty &&
+        Constant().hasValidUrl(frontImage.value) == false) {
       frontImage.value = await Constant.uploadUserImageToFireStorage(
           File(frontImage.value),
           "driverDocument/${FireStoreUtils.getCurrentUid()}",
-          frontImageFileName
-      );
+          frontImageFileName);
     }
 
-    if(backImage.value.isNotEmpty && Constant().hasValidUrl(backImage.value) == false){
+    if (backImage.value.isNotEmpty &&
+        Constant().hasValidUrl(backImage.value) == false) {
       backImage.value = await Constant.uploadUserImageToFireStorage(
           File(backImage.value),
           "driverDocument/${FireStoreUtils.getCurrentUid()}",
-          backImageFileName
-      );
+          backImageFileName);
     }
 
     documents.value.frontImage = frontImage.value;

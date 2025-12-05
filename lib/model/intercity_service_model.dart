@@ -8,11 +8,11 @@ class IntercityServiceModel {
 
   IntercityServiceModel(
       {this.image,
-        this.enable,
-        this.kmCharge,
-        this.name,
-        this.offerRate,
-        this.id});
+      this.enable,
+      this.kmCharge,
+      this.name,
+      this.offerRate,
+      this.id});
 
   IntercityServiceModel.fromJson(Map<String, dynamic> json) {
     image = json['image'];

@@ -86,16 +86,16 @@ class DashBoardController extends GetxController {
     await Utils.determinePosition();
   }
 
-  Rx<DateTime> currentBackPressTime = DateTime.now().obs;
+  DateTime? currentBackPressTime;
 
-  Future<bool> onWillPop() {
+  bool onWillPop() {
     DateTime now = DateTime.now();
-    if (now.difference(currentBackPressTime.value) > const Duration(seconds: 2)) {
-      currentBackPressTime.value = now;
+    if (currentBackPressTime == null || now.difference(currentBackPressTime!) > const Duration(seconds: 2)) {
+      currentBackPressTime = now;
       ShowToastDialog.showToast("Double press to exit", position: EasyLoadingToastPosition.center);
-      return Future.value(false);
+      return false;
     }
-    return Future.value(true);
+    return true;
   }
 }
 

@@ -49,10 +49,15 @@ class OnBoardingScreen extends StatelessWidget {
                                       child: Padding(
                                         padding: const EdgeInsets.all(40),
                                         child: CachedNetworkImage(
-                                          imageUrl: controller.onBoardingList[index].image.toString(),
+                                          imageUrl: controller
+                                              .onBoardingList[index].image
+                                              .toString(),
                                           fit: BoxFit.cover,
-                                          placeholder: (context, url) => Constant.loader(context),
-                                          errorWidget: (context, url, error) => Image.network(Constant.userPlaceHolder),
+                                          placeholder: (context, url) =>
+                                              Constant.loader(context),
+                                          errorWidget: (context, url, error) =>
+                                              Image.network(
+                                                  Constant.userPlaceHolder),
                                         ),
                                       ),
                                     ),
@@ -63,18 +68,28 @@ class OnBoardingScreen extends StatelessWidget {
                                       child: Column(
                                         children: [
                                           Text(
-                                            controller.onBoardingList[index].title.toString(),
-                                            style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, letterSpacing: 1.5),
+                                            controller
+                                                .onBoardingList[index].title
+                                                .toString(),
+                                            style: GoogleFonts.poppins(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w600,
+                                                letterSpacing: 1.5),
                                           ),
                                           const SizedBox(
                                             height: 10,
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20.0),
                                             child: Text(
-                                              controller.onBoardingList[index].description.toString(),
+                                              controller.onBoardingList[index]
+                                                  .description
+                                                  .toString(),
                                               textAlign: TextAlign.center,
-                                              style: GoogleFonts.poppins(fontWeight: FontWeight.w400, letterSpacing: 1.5),
+                                              style: GoogleFonts.poppins(
+                                                  fontWeight: FontWeight.w400,
+                                                  letterSpacing: 1.5),
                                             ),
                                           ),
                                         ],
@@ -93,7 +108,10 @@ class OnBoardingScreen extends StatelessWidget {
                                 },
                                 child: Text(
                                   'skip'.tr,
-                                  style: const TextStyle(fontSize: 16, letterSpacing: 1.5, fontWeight: FontWeight.w600),
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      letterSpacing: 1.5,
+                                      fontWeight: FontWeight.w600),
                                 )),
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 30),
@@ -102,26 +120,40 @@ class OnBoardingScreen extends StatelessWidget {
                                 children: List.generate(
                                   controller.onBoardingList.length,
                                   (index) => Container(
-                                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                                      width: controller.selectedPageIndex.value == index ? 30 : 10,
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 4),
+                                      width:
+                                          controller.selectedPageIndex.value ==
+                                                  index
+                                              ? 30
+                                              : 10,
                                       height: 10,
                                       decoration: BoxDecoration(
-                                        color: controller.selectedPageIndex.value == index ? AppColors.primary : const Color(0xffD4D5E0),
-                                        borderRadius: const BorderRadius.all(Radius.circular(20.0)),
+                                        color: controller
+                                                    .selectedPageIndex.value ==
+                                                index
+                                            ? AppColors.primary
+                                            : const Color(0xffD4D5E0),
+                                        borderRadius: const BorderRadius.all(
+                                            Radius.circular(20.0)),
                                       )),
                                 ),
                               ),
                             ),
                             ButtonThem.buildButton(
                               context,
-                              title: controller.selectedPageIndex.value == 2 ? 'Get started'.tr : 'Next'.tr,
+                              title: controller.selectedPageIndex.value == 2
+                                  ? 'Get started'.tr
+                                  : 'Next'.tr,
                               btnRadius: 30,
                               onPress: () {
                                 if (controller.selectedPageIndex.value == 2) {
-                                  Preferences.setBoolean(Preferences.isFinishOnBoardingKey, true);
+                                  Preferences.setBoolean(
+                                      Preferences.isFinishOnBoardingKey, true);
                                   Get.offAll(const LoginScreen());
                                 } else {
-                                  controller.pageController.jumpToPage(controller.selectedPageIndex.value + 1);
+                                  controller.pageController.jumpToPage(
+                                      controller.selectedPageIndex.value + 1);
                                 }
                               },
                             ),

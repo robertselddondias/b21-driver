@@ -10,11 +10,11 @@ class ZoneModel {
 
   ZoneModel(
       {this.area,
-        this.publish,
-        this.latitude,
-        this.name,
-        this.id,
-        this.longitude});
+      this.publish,
+      this.latitude,
+      this.name,
+      this.id,
+      this.longitude});
 
   ZoneModel.fromJson(Map<String, dynamic> json) {
     if (json['area'] != null) {

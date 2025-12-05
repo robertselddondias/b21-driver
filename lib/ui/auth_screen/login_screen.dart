@@ -52,7 +52,8 @@ class LoginScreen extends StatelessWidget {
   }
 
   /// Imagem de cabeçalho responsiva
-  Widget _buildHeaderImage(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildHeaderImage(
+      BuildContext context, DarkThemeProvider themeChange) {
     return Container(
       width: double.infinity,
       height: Responsive.height(35, context),
@@ -62,7 +63,7 @@ class LoginScreen extends StatelessWidget {
           end: Alignment.bottomCenter,
           colors: [
             AppColors.primary,
-            AppColors.primary.withOpacity(0.8),
+            AppColors.primary.withValues(alpha: 0.8),
           ],
         ),
       ),
@@ -87,8 +88,9 @@ class LoginScreen extends StatelessWidget {
                   colors: [
                     Colors.transparent,
                     (themeChange.getThem()
-                        ? AppColors.darkBackground
-                        : AppColors.background).withOpacity(0.1),
+                            ? AppColors.darkBackground
+                            : AppColors.background)
+                        .withValues(alpha: 0.1),
                   ],
                 ),
               ),
@@ -108,7 +110,7 @@ class LoginScreen extends StatelessWidget {
                     vertical: Responsive.height(1, context),
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -129,7 +131,8 @@ class LoginScreen extends StatelessWidget {
   }
 
   /// Conteúdo principal do login
-  Widget _buildLoginContent(BuildContext context, LoginController controller, DarkThemeProvider themeChange) {
+  Widget _buildLoginContent(BuildContext context, LoginController controller,
+      DarkThemeProvider themeChange) {
     return Padding(
       padding: EdgeInsets.all(Responsive.width(5, context)),
       child: Column(
@@ -163,7 +166,8 @@ class LoginScreen extends StatelessWidget {
   }
 
   /// Seção de boas-vindas
-  Widget _buildWelcomeSection(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildWelcomeSection(
+      BuildContext context, DarkThemeProvider themeChange) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -172,7 +176,7 @@ class LoginScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(Responsive.width(2, context)),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Icon(
@@ -191,7 +195,8 @@ class LoginScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w700,
                       fontSize: Responsive.width(6, context),
-                      color: themeChange.getThem() ? Colors.white : Colors.black,
+                      color:
+                          themeChange.getThem() ? Colors.white : Colors.black,
                     ),
                   ),
                   Text(
@@ -199,7 +204,9 @@ class LoginScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w400,
                       fontSize: Responsive.width(3.5, context),
-                      color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                      color: themeChange.getThem()
+                          ? Colors.white70
+                          : Colors.black54,
                       height: 1.4,
                     ),
                   ),
@@ -213,7 +220,8 @@ class LoginScreen extends StatelessWidget {
   }
 
   /// Campo de número de telefone responsivo
-  Widget _buildPhoneNumberField(BuildContext context, LoginController controller, DarkThemeProvider themeChange) {
+  Widget _buildPhoneNumberField(BuildContext context,
+      LoginController controller, DarkThemeProvider themeChange) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -236,7 +244,6 @@ class LoginScreen extends StatelessWidget {
           ],
         ),
         SizedBox(height: Responsive.height(1.5, context)),
-
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
@@ -248,14 +255,15 @@ class LoginScreen extends StatelessWidget {
             ),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
             ],
           ),
           child: TextFormField(
-            validator: (value) => value != null && value.isNotEmpty ? null : 'Required',
+            validator: (value) =>
+                value != null && value.isNotEmpty ? null : 'Required',
             keyboardType: TextInputType.number,
             textCapitalization: TextCapitalization.sentences,
             controller: controller.phoneNumberController.value,
@@ -275,7 +283,8 @@ class LoginScreen extends StatelessWidget {
                 horizontal: Responsive.width(1, context),
               ),
               prefixIcon: Container(
-                padding: EdgeInsets.symmetric(horizontal: Responsive.width(2, context)),
+                padding: EdgeInsets.symmetric(
+                    horizontal: Responsive.width(2, context)),
                 child: CountryCodePicker(
                   onChanged: (value) {
                     controller.countryCode.value = value.dialCode.toString();
@@ -334,7 +343,7 @@ class LoginScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -389,7 +398,8 @@ class LoginScreen extends StatelessWidget {
             ),
           ),
           Container(
-            margin: EdgeInsets.symmetric(horizontal: Responsive.width(5, context)),
+            margin:
+                EdgeInsets.symmetric(horizontal: Responsive.width(5, context)),
             padding: EdgeInsets.symmetric(
               horizontal: Responsive.width(4, context),
               vertical: Responsive.height(1, context),
@@ -424,7 +434,8 @@ class LoginScreen extends StatelessWidget {
   }
 
   /// Botões de login social
-  Widget _buildSocialLoginButtons(BuildContext context, LoginController controller, DarkThemeProvider themeChange) {
+  Widget _buildSocialLoginButtons(BuildContext context,
+      LoginController controller, DarkThemeProvider themeChange) {
     return Column(
       children: [
         // Google Login
@@ -457,12 +468,12 @@ class LoginScreen extends StatelessWidget {
 
   /// Botão social personalizado
   Widget _buildSocialButton(
-      BuildContext context, {
-        required String title,
-        required String iconPath,
-        required DarkThemeProvider themeChange,
-        required VoidCallback onPressed,
-      }) {
+    BuildContext context, {
+    required String title,
+    required String iconPath,
+    required DarkThemeProvider themeChange,
+    required VoidCallback onPressed,
+  }) {
     return Container(
       width: double.infinity,
       height: Responsive.height(6.5, context),
@@ -511,7 +522,8 @@ class LoginScreen extends StatelessWidget {
   }
 
   /// Termos e privacidade no bottom
-  Widget _buildTermsAndPrivacy(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildTermsAndPrivacy(
+      BuildContext context, DarkThemeProvider themeChange) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: Responsive.width(5, context),

@@ -27,7 +27,8 @@ class _LocationPickerState extends State<LocationPicker> {
   void initState() {
     super.initState();
     mapController = MapController(
-      initMapWithUserPosition: const UserTrackingOption(enableTracking: false, unFollowUser: true),
+      initMapWithUserPosition:
+          const UserTrackingOption(enableTracking: false, unFollowUser: true),
     );
   }
 
@@ -60,7 +61,8 @@ class _LocationPickerState extends State<LocationPicker> {
         await mapController
             .addMarker(position,
                 markerIcon: MarkerIcon(
-                  icon: Icon(Icons.location_on, size: Responsive.width(6.5, context)),
+                  icon: Icon(Icons.location_on,
+                      size: Responsive.width(6.5, context)),
                 ))
             .then((v) {
           _markers.add(position);
@@ -125,8 +127,10 @@ class _LocationPickerState extends State<LocationPicker> {
             mapIsLoading: const Center(child: CircularProgressIndicator()),
             osmOption: OSMOption(
               userLocationMarker: UserLocationMaker(
-                  personMarker: MarkerIcon(iconWidget: Image.asset("assets/images/pickup.png")),
-                  directionArrowMarker: MarkerIcon(iconWidget: Image.asset("assets/images/pickup.png"))),
+                  personMarker: MarkerIcon(
+                      iconWidget: Image.asset("assets/images/pickup.png")),
+                  directionArrowMarker: MarkerIcon(
+                      iconWidget: Image.asset("assets/images/pickup.png"))),
               isPicker: true,
               zoomOption: const ZoomOption(initZoom: 14),
             ),
@@ -149,7 +153,8 @@ class _LocationPickerState extends State<LocationPicker> {
                 padding: EdgeInsets.all(Responsive.width(5, context)),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(Responsive.width(2.5, context)),
+                  borderRadius:
+                      BorderRadius.circular(Responsive.width(2.5, context)),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black26,
@@ -198,7 +203,8 @@ class _LocationPickerState extends State<LocationPicker> {
                     Get.to(const OsmSearchPlacesApi())?.then((value) async {
                       if (value != null) {
                         SearchInfo place = value;
-                        textController = TextEditingController(text: place.address.toString());
+                        textController = TextEditingController(
+                            text: place.address.toString());
                         await addMarker(place.point);
                         print("Search :: ${place.point.toString()}");
                       }
@@ -215,7 +221,10 @@ class _LocationPickerState extends State<LocationPicker> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _setUserLocation,
-        child: Icon(Icons.my_location, color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary),
+        child: Icon(Icons.my_location,
+            color: themeChange.getThem()
+                ? AppColors.darkModePrimary
+                : AppColors.primary),
       ),
     );
   }

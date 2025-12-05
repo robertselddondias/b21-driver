@@ -15,6 +15,8 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import 'package:flutter/services.dart';
+
 class DashBoardScreen extends StatefulWidget {
   const DashBoardScreen({super.key});
 
@@ -43,144 +45,157 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                 : AppColors.background,
             appBar: _buildAppBar(context, controller, themeChange),
             drawer: _buildAppDrawer(context, controller, themeChange),
-            body: WillPopScope(
-              onWillPop: controller.onWillPop,
-              child: controller.getDrawerItemWidget(controller.selectedDrawerIndex.value),
+            body: PopScope(
+              canPop: false,
+              onPopInvoked: (didPop) {
+                if (didPop) {
+                  return;
+                }
+                if (controller.onWillPop()) {
+                  SystemNavigator.pop();
+                }
+              },
+              child: controller
+                  .getDrawerItemWidget(controller.selectedDrawerIndex.value),
             ),
           );
-        }
-    );
+        });
   }
 
-  PreferredSizeWidget _buildAppBar(BuildContext context, DashBoardController controller, DarkThemeProvider themeChange) {
+  PreferredSizeWidget _buildAppBar(BuildContext context,
+      DashBoardController controller, DarkThemeProvider themeChange) {
     return AppBar(
       backgroundColor: AppColors.primary,
       elevation: 0,
       title: controller.selectedDrawerIndex.value == 0
           ? _buildOnlineStatusToggle(context, themeChange)
           : Text(
-        controller.drawerItems[controller.selectedDrawerIndex.value].title,
-        style: GoogleFonts.poppins(
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
-          fontSize: Responsive.width(4, context),
-        ),
-      ),
-      centerTitle: true,
-      leading: Builder(
-          builder: (context) {
-            return InkWell(
-              onTap: () {
-                Scaffold.of(context).openDrawer();
-              },
-              child: Container(
-                margin: EdgeInsets.all(Responsive.width(3, context)),
-                child: SvgPicture.asset(
-                  'assets/icons/ic_humber.svg',
-                  width: Responsive.width(6, context),
-                  height: Responsive.width(6, context),
-                  color: Colors.white,
-                ),
+              controller
+                  .drawerItems[controller.selectedDrawerIndex.value].title,
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: Responsive.width(4, context),
               ),
-            );
-          }
-      ),
+            ),
+      centerTitle: true,
+      leading: Builder(builder: (context) {
+        return InkWell(
+          onTap: () {
+            Scaffold.of(context).openDrawer();
+          },
+          child: Container(
+            margin: EdgeInsets.all(Responsive.width(3, context)),
+            child: SvgPicture.asset(
+              'assets/icons/ic_humber.svg',
+              width: Responsive.width(6, context),
+              height: Responsive.width(6, context),
+              color: Colors.white,
+            ),
+          ),
+        );
+      }),
     );
   }
 
-  Widget _buildOnlineStatusToggle(BuildContext context, DarkThemeProvider themeChange) {
-    return GetBuilder<AutoAssignmentController>(
-        builder: (autoController) {
-          return Obx(() {
-            return GestureDetector(
-              onTap: () async {
-                ShowToastDialog.showLoader("Aguarde...".tr);
-                await autoController.toggleOnlineStatus();
-                ShowToastDialog.closeLoader();
-              },
-              child: Container(
-                width: Responsive.width(40, context),
-                height: Responsive.height(4.5, context),
-                decoration: BoxDecoration(
-                  color: themeChange.getThem()
-                      ? AppColors.darkContainerBackground
-                      : AppColors.containerBackground,
-                  borderRadius: BorderRadius.circular(25),
-                  border: Border.all(
-                    color: themeChange.getThem()
-                        ? AppColors.darkContainerBorder
-                        : AppColors.containerBorder,
-                    width: 1,
+  Widget _buildOnlineStatusToggle(
+      BuildContext context, DarkThemeProvider themeChange) {
+    return GetBuilder<AutoAssignmentController>(builder: (autoController) {
+      return Obx(() {
+        return GestureDetector(
+          onTap: () async {
+            ShowToastDialog.showLoader("Aguarde...".tr);
+            await autoController.toggleOnlineStatus();
+            ShowToastDialog.closeLoader();
+          },
+          child: Container(
+            width: Responsive.width(40, context),
+            height: Responsive.height(4.5, context),
+            decoration: BoxDecoration(
+              color: themeChange.getThem()
+                  ? AppColors.darkContainerBackground
+                  : AppColors.containerBackground,
+              borderRadius: BorderRadius.circular(25),
+              border: Border.all(
+                color: themeChange.getThem()
+                    ? AppColors.darkContainerBorder
+                    : AppColors.containerBorder,
+                width: 1,
+              ),
+            ),
+            child: Stack(
+              children: [
+                // Background animado
+                AnimatedAlign(
+                  alignment:
+                      Alignment(autoController.isOnline.value ? -1 : 1, 0),
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  child: Container(
+                    width: Responsive.width(20, context),
+                    height: Responsive.height(4.5, context),
+                    decoration: BoxDecoration(
+                      color: autoController.isOnline.value
+                          ? AppColors.darkModePrimary
+                          : AppColors.subTitleColor,
+                      borderRadius: BorderRadius.circular(25),
+                    ),
                   ),
                 ),
-                child: Stack(
-                  children: [
-                    // Background animado
-                    AnimatedAlign(
-                      alignment: Alignment(autoController.isOnline.value ? -1 : 1, 0),
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                      child: Container(
-                        width: Responsive.width(20, context),
-                        height: Responsive.height(4.5, context),
-                        decoration: BoxDecoration(
-                          color: autoController.isOnline.value
-                              ? AppColors.darkModePrimary
-                              : AppColors.subTitleColor,
-                          borderRadius: BorderRadius.circular(25),
-                        ),
+                // Texto Online
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: Responsive.width(20, context),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Online'.tr,
+                      style: GoogleFonts.poppins(
+                        color: autoController.isOnline.value
+                            ? Colors.white
+                            : (themeChange.getThem()
+                                ? Colors.white70
+                                : Colors.black54),
+                        fontWeight: FontWeight.w600,
+                        fontSize: Responsive.width(3, context),
                       ),
                     ),
-                    // Texto Online
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      bottom: 0,
-                      child: Container(
-                        width: Responsive.width(20, context),
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Online'.tr,
-                          style: GoogleFonts.poppins(
-                            color: autoController.isOnline.value
-                                ? Colors.white
-                                : (themeChange.getThem() ? Colors.white70 : Colors.black54),
-                            fontWeight: FontWeight.w600,
-                            fontSize: Responsive.width(3, context),
-                          ),
-                        ),
-                      ),
-                    ),
-                    // Texto Offline
-                    Positioned(
-                      right: 0,
-                      top: 0,
-                      bottom: 0,
-                      child: Container(
-                        width: Responsive.width(20, context),
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Offline'.tr,
-                          style: GoogleFonts.poppins(
-                            color: !autoController.isOnline.value
-                                ? Colors.white
-                                : (themeChange.getThem() ? Colors.white70 : Colors.black54),
-                            fontWeight: FontWeight.w600,
-                            fontSize: Responsive.width(3, context),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-            );
-          });
-        }
-    );
+                // Texto Offline
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  bottom: 0,
+                  child: Container(
+                    width: Responsive.width(20, context),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Offline'.tr,
+                      style: GoogleFonts.poppins(
+                        color: !autoController.isOnline.value
+                            ? Colors.white
+                            : (themeChange.getThem()
+                                ? Colors.white70
+                                : Colors.black54),
+                        fontWeight: FontWeight.w600,
+                        fontSize: Responsive.width(3, context),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      });
+    });
   }
 
-  Widget _buildAppDrawer(BuildContext context, DashBoardController controller, DarkThemeProvider themeChange) {
+  Widget _buildAppDrawer(BuildContext context, DashBoardController controller,
+      DarkThemeProvider themeChange) {
     return Drawer(
       backgroundColor: themeChange.getThem()
           ? AppColors.darkBackground
@@ -215,29 +230,31 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                         vertical: Responsive.height(1.2, context),
                       ),
                       decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppColors.primary
-                            : Colors.transparent,
+                        color:
+                            isSelected ? AppColors.primary : Colors.transparent,
                         borderRadius: BorderRadius.circular(12),
                         border: isSelected
                             ? null
                             : Border.all(
-                          color: themeChange.getThem()
-                              ? AppColors.darkContainerBorder.withOpacity(0.3)
-                              : AppColors.containerBorder.withOpacity(0.5),
-                          width: 1,
-                        ),
+                                color: themeChange.getThem()
+                                    ? AppColors.darkContainerBorder
+                                        .withValues(alpha: 0.3)
+                                    : AppColors.containerBorder
+                                        .withValues(alpha: 0.5),
+                                width: 1,
+                              ),
                       ),
                       child: Row(
                         children: [
                           Container(
-                            padding: EdgeInsets.all(Responsive.width(1.8, context)),
+                            padding:
+                                EdgeInsets.all(Responsive.width(1.8, context)),
                             decoration: BoxDecoration(
                               color: isSelected
-                                  ? Colors.white.withOpacity(0.1)
+                                  ? Colors.white.withValues(alpha: 0.1)
                                   : (themeChange.getThem()
-                                  ? AppColors.darkContainerBackground
-                                  : AppColors.containerBackground),
+                                      ? AppColors.darkContainerBackground
+                                      : AppColors.containerBackground),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: SvgPicture.asset(
@@ -247,8 +264,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               color: isSelected
                                   ? Colors.white
                                   : (themeChange.getThem()
-                                  ? Colors.white
-                                  : AppColors.drawerIcon),
+                                      ? Colors.white
+                                      : AppColors.drawerIcon),
                             ),
                           ),
                           SizedBox(width: Responsive.width(3.5, context)),
@@ -259,8 +276,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                 color: isSelected
                                     ? Colors.white
                                     : (themeChange.getThem()
-                                    ? Colors.white
-                                    : Colors.black87),
+                                        ? Colors.white
+                                        : Colors.black87),
                                 fontWeight: isSelected
                                     ? FontWeight.w600
                                     : FontWeight.w500,
@@ -287,7 +304,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     );
   }
 
-  Widget _buildDrawerHeader(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildDrawerHeader(
+      BuildContext context, DarkThemeProvider themeChange) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -296,7 +314,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           end: Alignment.bottomRight,
           colors: [
             AppColors.primary,
-            AppColors.primary.withOpacity(0.8),
+            AppColors.primary.withValues(alpha: 0.8),
           ],
         ),
       ),
@@ -304,7 +322,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         child: Padding(
           padding: EdgeInsets.all(Responsive.width(4, context)),
           child: FutureBuilder<DriverUserModel?>(
-              future: FireStoreUtils.getDriverProfile(FireStoreUtils.getCurrentUid()),
+              future: FireStoreUtils.getDriverProfile(
+                  FireStoreUtils.getCurrentUid()),
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.waiting:
@@ -342,20 +361,22 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                 imageUrl: driverModel.profilePic.toString(),
                                 fit: BoxFit.cover,
                                 placeholder: (context, url) => Container(
-                                  color: Colors.grey.withOpacity(0.3),
+                                  color: Colors.grey.withValues(alpha: 0.3),
                                   child: Center(
                                     child: SizedBox(
                                       width: Responsive.width(5, context),
                                       height: Responsive.width(5, context),
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.white),
                                       ),
                                     ),
                                   ),
                                 ),
                                 errorWidget: (context, url, error) => Container(
-                                  color: Colors.grey.withOpacity(0.3),
+                                  color: Colors.grey.withValues(alpha: 0.3),
                                   child: Icon(
                                     Icons.person,
                                     color: Colors.white,
@@ -398,56 +419,60 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                             // Status Online/Offline
                             GetBuilder<AutoAssignmentController>(
                                 builder: (autoController) {
-                                  return Obx(() {
-                                    return Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: Responsive.width(2.5, context),
-                                        vertical: Responsive.height(0.4, context),
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: autoController.isOnline.value
-                                            ? AppColors.darkModePrimary.withOpacity(0.2)
-                                            : AppColors.subTitleColor.withOpacity(0.2),
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
+                              return Obx(() {
+                                return Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: Responsive.width(2.5, context),
+                                    vertical: Responsive.height(0.4, context),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: autoController.isOnline.value
+                                        ? AppColors.darkModePrimary
+                                            .withValues(alpha: 0.2)
+                                        : AppColors.subTitleColor
+                                            .withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(
+                                      color: autoController.isOnline.value
+                                          ? AppColors.darkModePrimary
+                                          : AppColors.subTitleColor,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        width: Responsive.width(1.8, context),
+                                        height: Responsive.width(1.8, context),
+                                        decoration: BoxDecoration(
                                           color: autoController.isOnline.value
                                               ? AppColors.darkModePrimary
                                               : AppColors.subTitleColor,
-                                          width: 1,
+                                          shape: BoxShape.circle,
                                         ),
                                       ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Container(
-                                            width: Responsive.width(1.8, context),
-                                            height: Responsive.width(1.8, context),
-                                            decoration: BoxDecoration(
-                                              color: autoController.isOnline.value
-                                                  ? AppColors.darkModePrimary
-                                                  : AppColors.subTitleColor,
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                          SizedBox(width: Responsive.width(1.5, context)),
-                                          Text(
-                                            autoController.isOnline.value
-                                                ? 'Online - Ativo'
-                                                : 'Offline',
-                                            style: GoogleFonts.poppins(
-                                              color: autoController.isOnline.value
-                                                  ? AppColors.darkModePrimary
-                                                  : AppColors.subTitleColor,
-                                              fontSize: Responsive.width(2.5, context),
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ],
+                                      SizedBox(
+                                          width:
+                                              Responsive.width(1.5, context)),
+                                      Text(
+                                        autoController.isOnline.value
+                                            ? 'Online - Ativo'
+                                            : 'Offline',
+                                        style: GoogleFonts.poppins(
+                                          color: autoController.isOnline.value
+                                              ? AppColors.darkModePrimary
+                                              : AppColors.subTitleColor,
+                                          fontSize:
+                                              Responsive.width(2.5, context),
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
-                                    );
-                                  });
-                                }
-                            ),
+                                    ],
+                                  ),
+                                );
+                              });
+                            }),
                           ],
                         ),
                       );
@@ -466,106 +491,11 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                       ),
                     );
                 }
-              }
-          ),
+              }),
         ),
       ),
     );
   }
 
-  Future<void> _showAlertDialog(BuildContext context, String type) async {
-    final themeChange = Provider.of<DarkThemeProvider>(context, listen: false);
-    final controllerDashBoard = Get.put(DashBoardController());
 
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: themeChange.getThem()
-              ? AppColors.darkContainerBackground
-              : AppColors.containerBackground,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-            side: BorderSide(
-              color: themeChange.getThem()
-                  ? AppColors.darkContainerBorder
-                  : AppColors.containerBorder,
-              width: 1,
-            ),
-          ),
-          title: Text(
-            'Information'.tr,
-            style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600,
-              fontSize: Responsive.width(4.5, context),
-              color: themeChange.getThem() ? Colors.white : Colors.black,
-            ),
-          ),
-          content: SingleChildScrollView(
-            child: Text(
-              'To start earning with GoRide you need to fill in your personal information'.tr,
-              style: GoogleFonts.poppins(
-                fontSize: Responsive.width(3.5, context),
-                color: themeChange.getThem() ? Colors.white70 : Colors.black87,
-                height: 1.4,
-              ),
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(
-                  horizontal: Responsive.width(5, context),
-                  vertical: Responsive.height(1, context),
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                'No'.tr,
-                style: GoogleFonts.poppins(
-                  color: AppColors.subTitleColor,
-                  fontWeight: FontWeight.w500,
-                  fontSize: Responsive.width(3.5, context),
-                ),
-              ),
-              onPressed: () {
-                Get.back();
-              },
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                padding: EdgeInsets.symmetric(
-                  horizontal: Responsive.width(5, context),
-                  vertical: Responsive.height(1, context),
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                'Yes'.tr,
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: Responsive.width(3.5, context),
-                ),
-              ),
-              onPressed: () {
-                Get.back();
-                if (type == "document") {
-                  controllerDashBoard.onSelectItem(5);
-                } else {
-                  controllerDashBoard.onSelectItem(6);
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 }

@@ -28,7 +28,6 @@ class RideAssignmentModal extends StatefulWidget {
 
 class _RideAssignmentModalState extends State<RideAssignmentModal>
     with TickerProviderStateMixin {
-
   late AnimationController _animationController;
   late AnimationController _progressController;
   late Animation<double> _scaleAnimation;
@@ -43,7 +42,8 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
   @override
   void initState() {
     super.initState();
-    print('📱 Inicializando RideAssignmentModal para corrida ${widget.orderModel.id}');
+    print(
+        '📱 Inicializando RideAssignmentModal para corrida ${widget.orderModel.id}');
 
     // Inicializa notifiers
     _secondsNotifier = ValueNotifier<int>(60);
@@ -80,7 +80,8 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
 
   @override
   void dispose() {
-    print('📱 Descartando RideAssignmentModal para corrida ${widget.orderModel.id}');
+    print(
+        '📱 Descartando RideAssignmentModal para corrida ${widget.orderModel.id}');
 
     // Dispose dos notifiers
     _secondsNotifier.dispose();
@@ -107,7 +108,6 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
 
         _secondsNotifier.value = secondsRemaining;
         _isUrgentNotifier.value = secondsRemaining <= 5;
-
       } else {
         timer.cancel();
         if (!_hasResponded && mounted) {
@@ -170,7 +170,8 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                     color: themeChange.getThem()
                         ? AppColors.darkContainerBackground
                         : AppColors.containerBackground,
-                    borderRadius: BorderRadius.circular(Responsive.width(5, context)),
+                    borderRadius:
+                        BorderRadius.circular(Responsive.width(5, context)),
                     border: Border.all(
                       color: themeChange.getThem()
                           ? AppColors.darkContainerBorder
@@ -191,7 +192,6 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-
                         SizedBox(height: Responsive.height(2, context)),
 
                         // Countdown Timer SEM REBUILD
@@ -229,7 +229,8 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
   }
 
   /// WIDGET: Timer que NÃO causa rebuild do widget pai
-  Widget _buildCountdownTimerFixed(DarkThemeProvider themeChange, BuildContext context) {
+  Widget _buildCountdownTimerFixed(
+      DarkThemeProvider themeChange, BuildContext context) {
     return Column(
       children: [
         Stack(
@@ -349,7 +350,8 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
     );
   }
 
-  Widget _buildInfoItem(String label, String value, IconData icon, DarkThemeProvider themeChange, BuildContext context) {
+  Widget _buildInfoItem(String label, String value, IconData icon,
+      DarkThemeProvider themeChange, BuildContext context) {
     // RESPONSIVIDADE HORIZONTAL: Flexible para dividir o espaço da Row
     return Flexible(
       child: Column(
@@ -398,11 +400,13 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
     // Certifique-se de que LocationView é responsivo internamente (usa Flexible/Expanded em textos)
     return LocationView(
       sourceLocation: widget.orderModel.sourceLocationName ?? 'Local de origem',
-      destinationLocation: widget.orderModel.destinationLocationName ?? 'Destino',
+      destinationLocation:
+          widget.orderModel.destinationLocationName ?? 'Destino',
     );
   }
 
-  Widget _buildActionButtons(DarkThemeProvider themeChange, BuildContext context) {
+  Widget _buildActionButtons(
+      DarkThemeProvider themeChange, BuildContext context) {
     // Os botões já estão responsivos horizontalmente graças aos Expanded
     return Row(
       children: [
@@ -419,9 +423,11 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
             child: TextButton(
               onPressed: _hasResponded ? null : _handleReject,
               style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: Responsive.height(1.8, context)),
+                padding: EdgeInsets.symmetric(
+                    vertical: Responsive.height(1.8, context)),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(Responsive.width(3, context)),
+                  borderRadius:
+                      BorderRadius.circular(Responsive.width(3, context)),
                 ),
               ),
               child: Row(
@@ -459,9 +465,11 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
             child: TextButton(
               onPressed: _hasResponded ? null : _handleAccept,
               style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(vertical: Responsive.height(1.8, context)),
+                padding: EdgeInsets.symmetric(
+                    vertical: Responsive.height(1.8, context)),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(Responsive.width(3, context)),
+                  borderRadius:
+                      BorderRadius.circular(Responsive.width(3, context)),
                 ),
               ),
               child: Row(

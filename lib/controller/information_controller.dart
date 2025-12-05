@@ -15,9 +15,8 @@ class InformationController extends GetxController {
 
   var maskFormatter = MaskTextInputFormatter(
       mask: '(##) #####-####',
-      filter: { "#": RegExp(r'[0-9]+') },
-      type: MaskAutoCompletionType.lazy
-  );
+      filter: {"#": RegExp(r'[0-9]+')},
+      type: MaskAutoCompletionType.lazy);
 
   @override
   void onInit() {
@@ -33,7 +32,8 @@ class InformationController extends GetxController {
       userModel.value = argumentData['userModel'];
       loginType.value = userModel.value.loginType.toString();
       if (loginType.value == Constant.phoneLoginType) {
-        phoneNumberController.value.text = userModel.value.phoneNumber.toString();
+        phoneNumberController.value.text =
+            userModel.value.phoneNumber.toString();
         countryCode.value = userModel.value.countryCode.toString();
       } else {
         emailController.value.text = userModel.value.email.toString();

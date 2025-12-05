@@ -17,15 +17,46 @@ class AcceptedOrdersController extends GetxController {
   }
 
   // Método para buscar pedidos aceitos
+  // NOTA: Busca tanto no campo novo (assignedDriverId) quanto no legado (acceptedDriverId)
   void fetchAcceptedOrders() {
-    FirebaseFirestore.instance
+    // Busca 1: Pedidos com sistema novo (assignedDriverId)
+    final stream1 = FirebaseFirestore.instance
+        .collection(CollectionName.orders)
+        .where('assignedDriverId', isEqualTo: currentUserId)
+        .where('status', whereIn: ['new', 'confirmed'])
+        .snapshots();
+
+    // Busca 2: Pedidos com sistema legado (acceptedDriverId array)
+    final stream2 = FirebaseFirestore.instance
         .collection(CollectionName.orders)
         .where('acceptedDriverId', arrayContains: currentUserId)
-        .snapshots()
-        .listen((snapshot) {
-      acceptedOrders.value = snapshot.docs
-          .map((doc) => OrderModel.fromJson(doc.data()))
-          .toList();
+        .where('status', whereIn: ['new', 'confirmed'])
+        .snapshots();
+
+    // Combina ambos os streams
+    stream1.listen((snapshot1) {
+      stream2.listen((snapshot2) {
+        final Set<String> orderIds = {};
+        final List<OrderModel> orders = [];
+
+        // Adiciona pedidos do stream1
+        for (var doc in snapshot1.docs) {
+          if (!orderIds.contains(doc.id)) {
+            orderIds.add(doc.id);
+            orders.add(OrderModel.fromJson(doc.data()));
+          }
+        }
+
+        // Adiciona pedidos do stream2 (se não duplicados)
+        for (var doc in snapshot2.docs) {
+          if (!orderIds.contains(doc.id)) {
+            orderIds.add(doc.id);
+            orders.add(OrderModel.fromJson(doc.data()));
+          }
+        }
+
+        acceptedOrders.value = orders;
+      });
     });
   }
 

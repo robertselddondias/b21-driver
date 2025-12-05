@@ -8,7 +8,8 @@ class AppColors {
 
   // ==================== BACKGROUNDS PRINCIPAIS ====================
   static const Color background = Color(0xffFFFFFF);
-  static const Color darkBackground = Color(0xff0F1114); // Mais escuro para melhor contraste
+  static const Color darkBackground =
+      Color(0xff0F1114); // Mais escuro para melhor contraste
 
   // ==================== ÍCONES E ELEMENTOS ====================
   static const Color drawerIcon = Color(0xffC2C7D4);
@@ -23,21 +24,25 @@ class AppColors {
 
   // ==================== TEXTOS E SUBTÍTULOS ====================
   static const Color subTitleColor = Color(0xff888888);
-  static const Color darkSubTitleColor = Color(0xffB8BCC2); // Muito mais claro no dark
+  static const Color darkSubTitleColor =
+      Color(0xffB8BCC2); // Muito mais claro no dark
 
   // ==================== CONTAINERS ====================
   static const Color containerBackground = Color(0xFFFFFFFF);
-  static const Color darkContainerBackground = Color(0xFF1D2126); // Mais claro que o background
+  static const Color darkContainerBackground =
+      Color(0xFF1D2126); // Mais claro que o background
 
   static const Color containerBorder = Color(0xFFBFCED2);
   static const Color darkContainerBorder = Color(0xFF4A515A); // Bem mais claro
 
   // ==================== CAMPOS DE TEXTO ====================
   static const Color textField = Color(0xFFFDFDFF);
-  static const Color darkTextField = Color(0xFF262B32); // Mais claro que container
+  static const Color darkTextField =
+      Color(0xFF262B32); // Mais claro que container
 
   static const Color textFieldBorder = Color(0xFFB7C2DA);
-  static const Color darkTextFieldBorder = Color(0xFF52596B); // Muito mais visível
+  static const Color darkTextFieldBorder =
+      Color(0xFF52596B); // Muito mais visível
 
   // ==================== SERVIÇOS E ESPECIAIS ====================
   static const Color darkService = Color(0xff343A42); // Mais claro
@@ -49,7 +54,8 @@ class AppColors {
 
   // ==================== CORES DE STATUS ====================
   static const Color success = Color(0xff4CAF50);
-  static const Color darkSuccess = Color(0xff7DD321); // Verde mais brilhante no dark
+  static const Color darkSuccess =
+      Color(0xff7DD321); // Verde mais brilhante no dark
 
   static const Color warning = Color(0xffFF9800);
   static const Color darkWarning = Color(0xffFFB74D);

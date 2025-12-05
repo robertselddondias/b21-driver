@@ -43,49 +43,46 @@ class MyApp extends StatelessWidget {
       ],
       child: Consumer<DarkThemeProvider>(
           builder: (context, themeChangeProvider, child) {
-            return GetMaterialApp(
-              title: 'B-21 Driver',
-              debugShowCheckedModeBanner: false,
-              theme: ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-                useMaterial3: true,
-              ),
-              darkTheme: ThemeData.dark(),
-              themeMode: themeChangeProvider.darkTheme == 0
-                  ? ThemeMode.system
-                  : themeChangeProvider.darkTheme == 1
+        return GetMaterialApp(
+          title: 'B-21 Driver',
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData.dark(),
+          themeMode: themeChangeProvider.darkTheme == 0
+              ? ThemeMode.system
+              : themeChangeProvider.darkTheme == 1
                   ? ThemeMode.dark
                   : ThemeMode.light,
-              localizationsDelegates: const [
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              locale: const Locale('pt'),
-              supportedLocales: const [
-                Locale('pt', 'BR')
-              ],
-              fallbackLocale: LocalizationService.locale,
-              translations: LocalizationService(),
-              builder: EasyLoading.init(),
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          locale: const Locale('pt'),
+          supportedLocales: const [Locale('pt', 'BR')],
+          fallbackLocale: LocalizationService.locale,
+          translations: LocalizationService(),
+          builder: EasyLoading.init(),
 
-              // Inicializa controllers globais
-              initialBinding: BindingsBuilder(() {
-                Get.put(GlobalSettingController());
+          // Inicializa controllers globais
+          initialBinding: BindingsBuilder(() {
+            Get.put(GlobalSettingController());
 
-                // Inicializa AutoAssignmentController apenas quando o usuário estiver logado
-                // Isso será feito no DashBoardScreen após login
-              }),
+            // Inicializa AutoAssignmentController apenas quando o usuário estiver logado
+            // Isso será feito no DashBoardScreen após login
+          }),
 
-              home: GetBuilder<GlobalSettingController>(
-                init: GlobalSettingController(),
-                builder: (context) {
-                  return const SplashScreen();
-                },
-              ),
-            );
-          }
-      ),
+          home: GetBuilder<GlobalSettingController>(
+            init: GlobalSettingController(),
+            builder: (context) {
+              return const SplashScreen();
+            },
+          ),
+        );
+      }),
     );
   }
 }

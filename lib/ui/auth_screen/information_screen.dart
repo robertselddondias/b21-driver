@@ -47,7 +47,8 @@ class InformationScreen extends StatelessWidget {
   }
 
   /// Imagem de cabeçalho responsiva
-  Widget _buildHeaderImage(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildHeaderImage(
+      BuildContext context, DarkThemeProvider themeChange) {
     return Container(
       width: double.infinity,
       height: Responsive.height(30, context),
@@ -57,7 +58,7 @@ class InformationScreen extends StatelessWidget {
           end: Alignment.bottomCenter,
           colors: [
             AppColors.primary,
-            AppColors.primary.withOpacity(0.8),
+            AppColors.primary.withValues(alpha: 0.8),
           ],
         ),
       ),
@@ -82,8 +83,9 @@ class InformationScreen extends StatelessWidget {
                   colors: [
                     Colors.transparent,
                     (themeChange.getThem()
-                        ? AppColors.darkBackground
-                        : AppColors.background).withOpacity(0.1),
+                            ? AppColors.darkBackground
+                            : AppColors.background)
+                        .withValues(alpha: 0.1),
                   ],
                 ),
               ),
@@ -100,9 +102,9 @@ class InformationScreen extends StatelessWidget {
               child: Container(
                 padding: EdgeInsets.all(Responsive.width(2, context)),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(25),
-                  border: Border.all(color: Colors.white.withOpacity(0.3)),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
                 ),
                 child: Icon(
                   Icons.arrow_back_ios_new,
@@ -126,7 +128,7 @@ class InformationScreen extends StatelessWidget {
                     vertical: Responsive.height(1, context),
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -147,7 +149,8 @@ class InformationScreen extends StatelessWidget {
   }
 
   /// Conteúdo do formulário
-  Widget _buildFormContent(BuildContext context, InformationController controller, DarkThemeProvider themeChange) {
+  Widget _buildFormContent(BuildContext context,
+      InformationController controller, DarkThemeProvider themeChange) {
     return Padding(
       padding: EdgeInsets.all(Responsive.width(5, context)),
       child: Column(
@@ -180,7 +183,8 @@ class InformationScreen extends StatelessWidget {
   }
 
   /// Seção de boas-vindas
-  Widget _buildWelcomeSection(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildWelcomeSection(
+      BuildContext context, DarkThemeProvider themeChange) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -189,7 +193,7 @@ class InformationScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(Responsive.width(2.5, context)),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(
@@ -208,7 +212,8 @@ class InformationScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w700,
                       fontSize: Responsive.width(6, context),
-                      color: themeChange.getThem() ? Colors.white : Colors.black,
+                      color:
+                          themeChange.getThem() ? Colors.white : Colors.black,
                     ),
                   ),
                   Text(
@@ -216,7 +221,9 @@ class InformationScreen extends StatelessWidget {
                     style: GoogleFonts.poppins(
                       fontWeight: FontWeight.w400,
                       fontSize: Responsive.width(3.5, context),
-                      color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                      color: themeChange.getThem()
+                          ? Colors.white70
+                          : Colors.black54,
                       height: 1.4,
                     ),
                   ),
@@ -230,7 +237,8 @@ class InformationScreen extends StatelessWidget {
   }
 
   /// Indicador de progresso
-  Widget _buildProgressIndicator(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildProgressIndicator(
+      BuildContext context, DarkThemeProvider themeChange) {
     return Container(
       padding: EdgeInsets.all(Responsive.width(4, context)),
       decoration: BoxDecoration(
@@ -294,7 +302,7 @@ class InformationScreen extends StatelessWidget {
                 child: Container(
                   height: 6,
                   decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.3),
+                    color: Colors.grey.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -307,7 +315,8 @@ class InformationScreen extends StatelessWidget {
   }
 
   /// Campos do formulário
-  Widget _buildFormFields(BuildContext context, InformationController controller, DarkThemeProvider themeChange) {
+  Widget _buildFormFields(BuildContext context,
+      InformationController controller, DarkThemeProvider themeChange) {
     return Column(
       children: [
         // Campo Nome Completo
@@ -346,7 +355,9 @@ class InformationScreen extends StatelessWidget {
             context,
             hintText: 'Email'.tr,
             controller: controller.emailController.value,
-            enable: controller.loginType.value == Constant.googleLoginType ? false : true,
+            enable: controller.loginType.value == Constant.googleLoginType
+                ? false
+                : true,
             keyBoardType: TextInputType.emailAddress,
           ),
           themeChange: themeChange,
@@ -357,12 +368,12 @@ class InformationScreen extends StatelessWidget {
 
   /// Container para campos do formulário
   Widget _buildFormField(
-      BuildContext context, {
-        required String label,
-        required IconData icon,
-        required Widget child,
-        required DarkThemeProvider themeChange,
-      }) {
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    required Widget child,
+    required DarkThemeProvider themeChange,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -371,7 +382,7 @@ class InformationScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(Responsive.width(1.5, context)),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(
@@ -397,7 +408,7 @@ class InformationScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -410,7 +421,8 @@ class InformationScreen extends StatelessWidget {
   }
 
   /// Campo de telefone customizado
-  Widget _buildPhoneField(BuildContext context, InformationController controller, DarkThemeProvider themeChange) {
+  Widget _buildPhoneField(BuildContext context,
+      InformationController controller, DarkThemeProvider themeChange) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
@@ -422,13 +434,16 @@ class InformationScreen extends StatelessWidget {
         ),
       ),
       child: TextFormField(
-        validator: (value) => value != null && value.isNotEmpty ? null : 'Required',
+        validator: (value) =>
+            value != null && value.isNotEmpty ? null : 'Required',
         keyboardType: TextInputType.phone,
         textCapitalization: TextCapitalization.sentences,
         controller: controller.phoneNumberController.value,
         textAlign: TextAlign.start,
         inputFormatters: [controller.maskFormatter],
-        enabled: controller.loginType.value == Constant.phoneLoginType ? false : true,
+        enabled: controller.loginType.value == Constant.phoneLoginType
+            ? false
+            : true,
         style: GoogleFonts.poppins(
           color: themeChange.getThem() ? Colors.white : Colors.black,
           fontSize: Responsive.width(4, context),
@@ -444,7 +459,8 @@ class InformationScreen extends StatelessWidget {
             horizontal: Responsive.width(1, context),
           ),
           prefixIcon: Container(
-            padding: EdgeInsets.symmetric(horizontal: Responsive.width(2, context)),
+            padding:
+                EdgeInsets.symmetric(horizontal: Responsive.width(2, context)),
             child: CountryCodePicker(
               onChanged: (value) {
                 controller.countryCode.value = value.dialCode.toString();
@@ -494,7 +510,8 @@ class InformationScreen extends StatelessWidget {
   }
 
   /// Botão de criar conta
-  Widget _buildCreateAccountButton(BuildContext context, InformationController controller) {
+  Widget _buildCreateAccountButton(
+      BuildContext context, InformationController controller) {
     return Container(
       width: double.infinity,
       height: Responsive.height(7, context),
@@ -505,7 +522,7 @@ class InformationScreen extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.4),
+            color: AppColors.primary.withValues(alpha: 0.4),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -567,7 +584,8 @@ class InformationScreen extends StatelessWidget {
       return;
     }
 
-    if (Constant.validateEmail(controller.emailController.value.text) == false) {
+    if (Constant.validateEmail(controller.emailController.value.text) ==
+        false) {
       ShowToastDialog.showToast("Please enter valid email".tr);
       return;
     }
@@ -579,7 +597,8 @@ class InformationScreen extends StatelessWidget {
       userModel.fullName = controller.fullNameController.value.text.trim();
       userModel.email = controller.emailController.value.text.trim();
       userModel.countryCode = controller.countryCode.value;
-      userModel.phoneNumber = controller.phoneNumberController.value.text.trim();
+      userModel.phoneNumber =
+          controller.phoneNumberController.value.text.trim();
       userModel.documentVerification = false;
       userModel.isOnline = false;
       userModel.createdAt = Timestamp.now();

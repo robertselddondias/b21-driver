@@ -33,221 +33,243 @@ class SettingScreen extends StatelessWidget {
           body: controller.isLoading.value
               ? Center(child: Constant.loader(context))
               : Column(
-            children: [
-              SizedBox(
-                height: Responsive.height(6, context),
-                width: Responsive.width(100, context),
-              ),
-              Expanded(
-                child: Container(
-                  width: Responsive.width(100, context),
-                  decoration: BoxDecoration(
-                    color: themeChange.getThem()
-                        ? AppColors.darkBackground
-                        : AppColors.background,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(25),
-                      topRight: Radius.circular(25),
+                  children: [
+                    SizedBox(
+                      height: Responsive.height(6, context),
+                      width: Responsive.width(100, context),
                     ),
-                  ),
-                  child: Column(
-                    children: [
-                      // Header melhorado
-                      Padding(
-                        padding: EdgeInsets.all(Responsive.width(4, context)),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: EdgeInsets.all(Responsive.width(2, context)),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Icon(
-                                Icons.settings_outlined,
-                                color: AppColors.primary,
-                                size: Responsive.width(5, context),
-                              ),
-                            ),
-                            SizedBox(width: Responsive.width(2.5, context)),
-                            Text(
-                              'Configurações'.tr,
-                              style: GoogleFonts.poppins(
-                                fontSize: Responsive.width(4.2, context),
-                                fontWeight: FontWeight.w600,
-                                color: themeChange.getThem()
-                                    ? Colors.white
-                                    : Colors.black87,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Content
-                      Expanded(
-                        child: ListView(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: Responsive.width(4, context),
-                            vertical: Responsive.height(1, context),
+                    Expanded(
+                      child: Container(
+                        width: Responsive.width(100, context),
+                        decoration: BoxDecoration(
+                          color: themeChange.getThem()
+                              ? AppColors.darkBackground
+                              : AppColors.background,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25),
                           ),
+                        ),
+                        child: Column(
                           children: [
-                            // Theme Setting
-                            _buildSettingCard(
-                              context,
-                              themeChange,
-                              controller,
-                              icon: 'assets/icons/ic_light_drak.svg',
-                              title: "Light/dark mod".tr,
-                              subtitle: _getThemeSubtitle(controller.selectedMode.value),
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                  horizontal: Responsive.width(2.5, context),
-                                  vertical: Responsive.height(0.5, context),
-                                ),
-                                decoration: BoxDecoration(
-                                  color: themeChange.getThem()
-                                      ? AppColors.darkContainerBackground
-                                      : AppColors.containerBackground,
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(
-                                    color: themeChange.getThem()
-                                        ? AppColors.darkContainerBorder
-                                        : AppColors.containerBorder,
+                            // Header melhorado
+                            Padding(
+                              padding:
+                                  EdgeInsets.all(Responsive.width(4, context)),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: EdgeInsets.all(
+                                        Responsive.width(2, context)),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary.withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Icon(
+                                      Icons.settings_outlined,
+                                      color: AppColors.primary,
+                                      size: Responsive.width(5, context),
+                                    ),
                                   ),
+                                  SizedBox(
+                                      width: Responsive.width(2.5, context)),
+                                  Text(
+                                    'Configurações'.tr,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: Responsive.width(4.2, context),
+                                      fontWeight: FontWeight.w600,
+                                      color: themeChange.getThem()
+                                          ? Colors.white
+                                          : Colors.black87,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Content
+                            Expanded(
+                              child: ListView(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: Responsive.width(4, context),
+                                  vertical: Responsive.height(1, context),
                                 ),
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton<String>(
-                                    isDense: true,
-                                    isExpanded: false,
-                                    value: controller.selectedMode.isEmpty
-                                        ? null
-                                        : controller.selectedMode.value,
-                                    onChanged: (value) {
-                                      controller.selectedMode.value = value!;
-                                      Preferences.setString(
-                                          Preferences.themKey, value.toString());
-                                      if (controller.selectedMode.value ==
-                                          "Dark mode") {
-                                        themeChange.darkTheme = 0;
-                                      } else if (controller.selectedMode.value ==
-                                          "Light mode") {
-                                        themeChange.darkTheme = 1;
-                                      } else {
-                                        themeChange.darkTheme = 2;
-                                      }
-                                    },
-                                    hint: Text(
-                                      "select".tr,
-                                      style: GoogleFonts.poppins(
-                                        fontSize: Responsive.width(3, context),
-                                        color: AppColors.subTitleColor,
+                                children: [
+                                  // Theme Setting
+                                  _buildSettingCard(
+                                    context,
+                                    themeChange,
+                                    controller,
+                                    icon: 'assets/icons/ic_light_drak.svg',
+                                    title: "Light/dark mod".tr,
+                                    subtitle: _getThemeSubtitle(
+                                        controller.selectedMode.value),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal:
+                                            Responsive.width(2.5, context),
+                                        vertical:
+                                            Responsive.height(0.5, context),
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: themeChange.getThem()
+                                            ? AppColors.darkContainerBackground
+                                            : AppColors.containerBackground,
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(
+                                          color: themeChange.getThem()
+                                              ? AppColors.darkContainerBorder
+                                              : AppColors.containerBorder,
+                                        ),
+                                      ),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton<String>(
+                                          isDense: true,
+                                          isExpanded: false,
+                                          value: controller.selectedMode.isEmpty
+                                              ? null
+                                              : controller.selectedMode.value,
+                                          onChanged: (value) {
+                                            controller.selectedMode.value =
+                                                value!;
+                                            Preferences.setString(
+                                                Preferences.themKey,
+                                                value.toString());
+                                            if (controller.selectedMode.value ==
+                                                "Dark mode") {
+                                              themeChange.darkTheme = 0;
+                                            } else if (controller
+                                                    .selectedMode.value ==
+                                                "Light mode") {
+                                              themeChange.darkTheme = 1;
+                                            } else {
+                                              themeChange.darkTheme = 2;
+                                            }
+                                          },
+                                          hint: Text(
+                                            "select".tr,
+                                            style: GoogleFonts.poppins(
+                                              fontSize:
+                                                  Responsive.width(3, context),
+                                              color: AppColors.subTitleColor,
+                                            ),
+                                          ),
+                                          icon: Icon(
+                                            Icons.keyboard_arrow_down_rounded,
+                                            color: themeChange.getThem()
+                                                ? Colors.white54
+                                                : Colors.black54,
+                                            size:
+                                                Responsive.width(4.5, context),
+                                          ),
+                                          dropdownColor: themeChange.getThem()
+                                              ? AppColors
+                                                  .darkContainerBackground
+                                              : AppColors.containerBackground,
+                                          items:
+                                              controller.modeList.map((item) {
+                                            return DropdownMenuItem(
+                                              value: item,
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  Icon(
+                                                    _getThemeIcon(item),
+                                                    size: Responsive.width(
+                                                        3.5, context),
+                                                    color: themeChange.getThem()
+                                                        ? Colors.white70
+                                                        : Colors.black87,
+                                                  ),
+                                                  SizedBox(
+                                                      width: Responsive.width(
+                                                          1.5, context)),
+                                                  Text(
+                                                    item.toString(),
+                                                    style: GoogleFonts.poppins(
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      fontSize:
+                                                          Responsive.width(
+                                                              3, context),
+                                                      color:
+                                                          themeChange.getThem()
+                                                              ? Colors.white
+                                                              : Colors.black,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
                                       ),
                                     ),
-                                    icon: Icon(
-                                      Icons.keyboard_arrow_down_rounded,
-                                      color: themeChange.getThem()
-                                          ? Colors.white54
-                                          : Colors.black54,
-                                      size: Responsive.width(4.5, context),
-                                    ),
-                                    dropdownColor: themeChange.getThem()
-                                        ? AppColors.darkContainerBackground
-                                        : AppColors.containerBackground,
-                                    items: controller.modeList.map((item) {
-                                      return DropdownMenuItem(
-                                        value: item,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              _getThemeIcon(item),
-                                              size: Responsive.width(3.5, context),
-                                              color: themeChange.getThem()
-                                                  ? Colors.white70
-                                                  : Colors.black87,
-                                            ),
-                                            SizedBox(
-                                                width:
-                                                Responsive.width(1.5, context)),
-                                            Text(
-                                              item.toString(),
-                                              style: GoogleFonts.poppins(
-                                                fontWeight: FontWeight.w500,
-                                                fontSize:
-                                                Responsive.width(3, context),
-                                                color: themeChange.getThem()
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    }).toList(),
                                   ),
-                                ),
+
+                                  SizedBox(
+                                      height: Responsive.height(1.2, context)),
+
+                                  // Support
+                                  _buildSettingCard(
+                                    context,
+                                    themeChange,
+                                    controller,
+                                    icon: 'assets/icons/ic_support.svg',
+                                    title: "Support".tr,
+                                    subtitle: "Entre em contato conosco",
+                                    isAction: true,
+                                    onTap: () async {
+                                      final Uri url = Uri.parse(
+                                          Constant.supportURL.toString());
+                                      if (!await launchUrl(url)) {
+                                        throw Exception(
+                                          'Could not launch ${Constant.supportURL.toString()}'
+                                              .tr,
+                                        );
+                                      }
+                                    },
+                                  ),
+
+                                  SizedBox(
+                                      height: Responsive.height(1.2, context)),
+
+                                  // Delete Account
+                                  _buildSettingCard(
+                                    context,
+                                    themeChange,
+                                    controller,
+                                    icon: 'assets/icons/ic_delete.svg',
+                                    title: "Delete Account".tr,
+                                    subtitle:
+                                        "Excluir permanentemente sua conta",
+                                    isAction: true,
+                                    isDangerous: true,
+                                    onTap: () {
+                                      _showDeleteAccountDialog(
+                                          context, themeChange);
+                                    },
+                                  ),
+                                ],
                               ),
                             ),
 
-                            SizedBox(height: Responsive.height(1.2, context)),
-
-                            // Support
-                            _buildSettingCard(
-                              context,
-                              themeChange,
-                              controller,
-                              icon: 'assets/icons/ic_support.svg',
-                              title: "Support".tr,
-                              subtitle: "Entre em contato conosco",
-                              isAction: true,
-                              onTap: () async {
-                                final Uri url =
-                                Uri.parse(Constant.supportURL.toString());
-                                if (!await launchUrl(url)) {
-                                  throw Exception(
-                                    'Could not launch ${Constant.supportURL.toString()}'
-                                        .tr,
-                                  );
-                                }
-                              },
-                            ),
-
-                            SizedBox(height: Responsive.height(1.2, context)),
-
-                            // Delete Account
-                            _buildSettingCard(
-                              context,
-                              themeChange,
-                              controller,
-                              icon: 'assets/icons/ic_delete.svg',
-                              title: "Delete Account".tr,
-                              subtitle: "Excluir permanentemente sua conta",
-                              isAction: true,
-                              isDangerous: true,
-                              onTap: () {
-                                _showDeleteAccountDialog(context, themeChange);
-                              },
-                            ),
+                            // Version Footer com FutureBuilder
+                            _buildVersionFooter(context, themeChange),
                           ],
                         ),
                       ),
-
-                      // Version Footer com FutureBuilder
-                      _buildVersionFooter(context, themeChange),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         );
       },
     );
   }
 
   /// Footer de versão com informações do package
-  Widget _buildVersionFooter(BuildContext context, DarkThemeProvider themeChange) {
+  Widget _buildVersionFooter(
+      BuildContext context, DarkThemeProvider themeChange) {
     return Container(
       padding: EdgeInsets.all(Responsive.width(4, context)),
       child: FutureBuilder<PackageInfo>(
@@ -257,7 +279,8 @@ class SettingScreen extends StatelessWidget {
 
           if (snapshot.hasData) {
             final packageInfo = snapshot.data!;
-            versionText = "Versão ${packageInfo.version} (${packageInfo.buildNumber})";
+            versionText =
+                "Versão ${packageInfo.version} (${packageInfo.buildNumber})";
           } else if (snapshot.hasError) {
             versionText = "Versão ${Constant.appVersion}";
           }
@@ -304,17 +327,17 @@ class SettingScreen extends StatelessWidget {
   }
 
   Widget _buildSettingCard(
-      BuildContext context,
-      DarkThemeProvider themeChange,
-      SettingController controller, {
-        required String icon,
-        required String title,
-        String? subtitle,
-        Widget? child,
-        bool isAction = false,
-        bool isDangerous = false,
-        VoidCallback? onTap,
-      }) {
+    BuildContext context,
+    DarkThemeProvider themeChange,
+    SettingController controller, {
+    required String icon,
+    required String title,
+    String? subtitle,
+    Widget? child,
+    bool isAction = false,
+    bool isDangerous = false,
+    VoidCallback? onTap,
+  }) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: Responsive.height(0.3, context)),
       decoration: BoxDecoration(
@@ -323,22 +346,21 @@ class SettingScreen extends StatelessWidget {
             : AppColors.containerBackground,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isDangerous
-              ? Colors.red.withOpacity(0.3)
-              : (themeChange.getThem()
-              ? AppColors.darkContainerBorder
-              : AppColors.containerBorder),
+                      color: isDangerous
+                          ? Colors.red.withValues(alpha: 0.3)                 : (themeChange.getThem()
+                    ? AppColors.darkContainerBorder
+                    : AppColors.containerBorder),
           width: 1,
         ),
         boxShadow: themeChange.getThem()
             ? null
             : [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.04),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
       ),
       child: InkWell(
         onTap: onTap,
@@ -352,9 +374,8 @@ class SettingScreen extends StatelessWidget {
                 width: Responsive.width(10, context),
                 height: Responsive.width(10, context),
                 decoration: BoxDecoration(
-                  color: isDangerous
-                      ? Colors.red.withOpacity(0.1)
-                      : AppColors.primary.withOpacity(0.1),
+                            color: isDangerous
+                                ? Colors.red.withValues(alpha: 0.1)                      : AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Center(
@@ -382,8 +403,8 @@ class SettingScreen extends StatelessWidget {
                         color: isDangerous
                             ? Colors.red
                             : (themeChange.getThem()
-                            ? Colors.white
-                            : Colors.black87),
+                                ? Colors.white
+                                : Colors.black87),
                       ),
                     ),
                     if (subtitle != null) ...[
@@ -412,8 +433,8 @@ class SettingScreen extends StatelessWidget {
                   color: isDangerous
                       ? Colors.red
                       : (themeChange.getThem()
-                      ? Colors.grey.shade600
-                      : Colors.grey.shade400),
+                          ? Colors.grey.shade600
+                          : Colors.grey.shade400),
                   size: Responsive.width(4.5, context),
                 ),
             ],
@@ -473,7 +494,7 @@ class SettingScreen extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(Responsive.width(2, context)),
                 decoration: BoxDecoration(
-                  color: Colors.red.withOpacity(0.15),
+                  color: Colors.red.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
@@ -496,7 +517,8 @@ class SettingScreen extends StatelessWidget {
             ],
           ),
           content: Padding(
-            padding: EdgeInsets.symmetric(vertical: Responsive.height(0.5, context)),
+            padding:
+                EdgeInsets.symmetric(vertical: Responsive.height(0.5, context)),
             child: Text(
               "Are you sure want to delete Account.".tr,
               style: GoogleFonts.poppins(
@@ -528,7 +550,8 @@ class SettingScreen extends StatelessWidget {
                 child: Text(
                   "Cancel".tr,
                   style: GoogleFonts.poppins(
-                    color: themeChange.getThem() ? Colors.white : Colors.black87,
+                    color:
+                        themeChange.getThem() ? Colors.white : Colors.black87,
                     fontWeight: FontWeight.w600,
                     fontSize: Responsive.width(3.2, context),
                   ),

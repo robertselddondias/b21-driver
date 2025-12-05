@@ -15,33 +15,44 @@ class PaymentModel {
 
   PaymentModel(
       {this.flutterWave,
-        this.payStack,
-        this.strip,
-        this.wallet,
-        this.mercadoPago,
-        this.razorpay,
-        this.paytm,
-        this.payfast,
-        this.cash,
-        this.paypal,
-        this.xendit,
-        this.orangePay,
-        this.midtrans});
+      this.payStack,
+      this.strip,
+      this.wallet,
+      this.mercadoPago,
+      this.razorpay,
+      this.paytm,
+      this.payfast,
+      this.cash,
+      this.paypal,
+      this.xendit,
+      this.orangePay,
+      this.midtrans});
 
   PaymentModel.fromJson(Map<String, dynamic> json) {
-    flutterWave = json['flutterWave'] != null ? FlutterWave.fromJson(json['flutterWave']) : null;
-    payStack = json['payStack'] != null ? PayStack.fromJson(json['payStack']) : null;
+    flutterWave = json['flutterWave'] != null
+        ? FlutterWave.fromJson(json['flutterWave'])
+        : null;
+    payStack =
+        json['payStack'] != null ? PayStack.fromJson(json['payStack']) : null;
     strip = json['strip'] != null ? Strip.fromJson(json['strip']) : null;
     wallet = json['wallet'] != null ? Wallet.fromJson(json['wallet']) : null;
-    mercadoPago = json['mercadoPago'] != null ? MercadoPago.fromJson(json['mercadoPago']) : null;
-    razorpay = json['razorpay'] != null ? RazorpayModel.fromJson(json['razorpay']) : null;
+    mercadoPago = json['mercadoPago'] != null
+        ? MercadoPago.fromJson(json['mercadoPago'])
+        : null;
+    razorpay = json['razorpay'] != null
+        ? RazorpayModel.fromJson(json['razorpay'])
+        : null;
     paytm = json['paytm'] != null ? Paytm.fromJson(json['paytm']) : null;
-    payfast = json['payfast'] != null ? Payfast.fromJson(json['payfast']) : null;
+    payfast =
+        json['payfast'] != null ? Payfast.fromJson(json['payfast']) : null;
     cash = json['cash'] != null ? Wallet.fromJson(json['cash']) : null;
     paypal = json['paypal'] != null ? Paypal.fromJson(json['paypal']) : null;
     xendit = json['xendit'] != null ? Xendit.fromJson(json['xendit']) : null;
-    orangePay = json['orangePay'] != null ? OrangePay.fromJson(json['orangePay']) : null;
-    midtrans = json['midtrans'] != null ? Midtrans.fromJson(json['midtrans']) : null;
+    orangePay = json['orangePay'] != null
+        ? OrangePay.fromJson(json['orangePay'])
+        : null;
+    midtrans =
+        json['midtrans'] != null ? Midtrans.fromJson(json['midtrans']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -97,7 +108,13 @@ class FlutterWave {
   String? encryptionKey;
   bool? isSandbox;
 
-  FlutterWave({this.secretKey, this.enable, this.name, this.publicKey, this.encryptionKey, this.isSandbox});
+  FlutterWave(
+      {this.secretKey,
+      this.enable,
+      this.name,
+      this.publicKey,
+      this.encryptionKey,
+      this.isSandbox});
 
   FlutterWave.fromJson(Map<String, dynamic> json) {
     secretKey = json['secretKey'];
@@ -129,7 +146,14 @@ class PayStack {
   bool? isSandbox;
   String? webhookURL;
 
-  PayStack({this.secretKey, this.enable, this.name, this.callbackURL, this.publicKey, this.isSandbox, this.webhookURL});
+  PayStack(
+      {this.secretKey,
+      this.enable,
+      this.name,
+      this.callbackURL,
+      this.publicKey,
+      this.isSandbox,
+      this.webhookURL});
 
   PayStack.fromJson(Map<String, dynamic> json) {
     secretKey = json['secretKey'];
@@ -161,7 +185,12 @@ class Strip {
   String? name;
   bool? isSandbox;
 
-  Strip({this.clientpublishableKey, this.stripeSecret, this.enable, this.name, this.isSandbox});
+  Strip(
+      {this.clientpublishableKey,
+      this.stripeSecret,
+      this.enable,
+      this.name,
+      this.isSandbox});
 
   Strip.fromJson(Map<String, dynamic> json) {
     clientpublishableKey = json['clientpublishableKey'];
@@ -208,7 +237,12 @@ class MercadoPago {
   String? accessToken;
   bool? isSandbox;
 
-  MercadoPago({this.enable, this.name, this.publicKey, this.accessToken, this.isSandbox});
+  MercadoPago(
+      {this.enable,
+      this.name,
+      this.publicKey,
+      this.accessToken,
+      this.isSandbox});
 
   MercadoPago.fromJson(Map<String, dynamic> json) {
     enable = json['enable'];
@@ -236,7 +270,12 @@ class RazorpayModel {
   String? razorpaySecret;
   String? name;
 
-  RazorpayModel({this.name, this.enable, this.razorpayKey, this.isSandbox, this.razorpaySecret});
+  RazorpayModel(
+      {this.name,
+      this.enable,
+      this.razorpayKey,
+      this.isSandbox,
+      this.razorpaySecret});
 
   RazorpayModel.fromJson(Map<String, dynamic> json) {
     enable = json['enable'];
@@ -264,7 +303,12 @@ class Paytm {
   String? merchantKey;
   String? name;
 
-  Paytm({this.name, this.enable, this.paytmMID, this.isSandbox, this.merchantKey});
+  Paytm(
+      {this.name,
+      this.enable,
+      this.paytmMID,
+      this.isSandbox,
+      this.merchantKey});
 
   Paytm.fromJson(Map<String, dynamic> json) {
     enable = json['enable'];
@@ -295,7 +339,15 @@ class Payfast {
   String? cancelUrl;
   String? merchantKey;
 
-  Payfast({this.merchantId, this.enable, this.name, this.returnUrl, this.notifyUrl, this.isSandbox, this.cancelUrl, this.merchantKey});
+  Payfast(
+      {this.merchantId,
+      this.enable,
+      this.name,
+      this.returnUrl,
+      this.notifyUrl,
+      this.isSandbox,
+      this.cancelUrl,
+      this.merchantKey});
 
   Payfast.fromJson(Map<String, dynamic> json) {
     merchantId = json['merchantId'];
@@ -330,7 +382,13 @@ class Paypal {
   String? image;
   bool? isSandbox;
 
-  Paypal({this.name, this.enable, this.paypalSecret, this.isSandbox, this.paypalClient, this.image});
+  Paypal(
+      {this.name,
+      this.enable,
+      this.paypalSecret,
+      this.isSandbox,
+      this.paypalClient,
+      this.image});
 
   Paypal.fromJson(Map<String, dynamic> json) {
     enable = json['enable'];
@@ -439,16 +497,16 @@ class OrangePay {
 
   OrangePay(
       {this.clientId = '',
-        this.clientSecret = '',
-        this.merchantKey,
-        this.auth,
-        this.returnUrl = '',
-        this.cancelUrl = '',
-        this.notifUrl = '',
-        this.name,
-        this.isSandbox = false,
-        this.image,
-        this.enable = false});
+      this.clientSecret = '',
+      this.merchantKey,
+      this.auth,
+      this.returnUrl = '',
+      this.cancelUrl = '',
+      this.notifUrl = '',
+      this.name,
+      this.isSandbox = false,
+      this.image,
+      this.enable = false});
 
   OrangePay.fromJson(Map<String, dynamic> parsedJson) {
     clientId = parsedJson['clientId'];

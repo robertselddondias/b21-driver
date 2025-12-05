@@ -35,7 +35,8 @@ class Utils {
 
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, handle appropriately.
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     // When we reach here, permissions are granted and we can
@@ -43,7 +44,8 @@ class Utils {
 
     Position? position = await Geolocator.getCurrentPosition();
 
-    Constant.currentLocation = LocationLatLng(latitude: position.latitude, longitude: position.longitude);
+    Constant.currentLocation = LocationLatLng(
+        latitude: position.latitude, longitude: position.longitude);
     return await Geolocator.getCurrentPosition();
   }
 
@@ -72,8 +74,11 @@ class Utils {
     return await Geolocator.getCurrentPosition();
   }
 
-
-  static redirectMap({required String mapType, required String name, required double latitude, required double longLatitude}) async {
+  static redirectMap(
+      {required String mapType,
+      required String name,
+      required double latitude,
+      required double longLatitude}) async {
     if (mapType == "google") {
       bool? isAvailable = await MapLauncher.isMapAvailable(MapType.google);
       if (isAvailable == true) {
@@ -148,6 +153,4 @@ class Utils {
       }
     }
   }
-
-
 }

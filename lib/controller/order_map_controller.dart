@@ -17,8 +17,10 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class OrderMapController extends GetxController {
-  final Completer<GoogleMapController> mapController = Completer<GoogleMapController>();
-  Rx<TextEditingController> enterOfferRateController = TextEditingController().obs;
+  final Completer<GoogleMapController> mapController =
+      Completer<GoogleMapController>();
+  Rx<TextEditingController> enterOfferRateController =
+      TextEditingController().obs;
 
   RxBool isLoading = true.obs;
 
@@ -26,7 +28,9 @@ class OrderMapController extends GetxController {
   void onInit() {
     if (Constant.selectedMapType == 'osm') {
       ShowToastDialog.showLoader("Aguarde...");
-      mapOsmController = MapController(initPosition: GeoPoint(latitude: 20.9153, longitude: -100.7439), useExternalTracking: false); //OSM
+      mapOsmController = MapController(
+          initPosition: GeoPoint(latitude: 20.9153, longitude: -100.7439),
+          useExternalTracking: false); //OSM
     }
     addMarkerSetup();
     getArgument();
@@ -51,13 +55,18 @@ class OrderMapController extends GetxController {
       String orderId = argumentData['orderModel'];
       await getData(orderId);
       newAmount.value = orderModel.value.offerRate.toString();
-      enterOfferRateController.value.text = orderModel.value.offerRate.toString();
+      enterOfferRateController.value.text =
+          orderModel.value.offerRate.toString();
       if (Constant.selectedMapType == 'google') {
         getPolyline();
       }
     }
 
-    FireStoreUtils.fireStore.collection(CollectionName.driverUsers).doc(FireStoreUtils.getCurrentUid()).snapshots().listen((event) {
+    FireStoreUtils.fireStore
+        .collection(CollectionName.driverUsers)
+        .doc(FireStoreUtils.getCurrentUid())
+        .snapshots()
+        .listen((event) {
       if (event.exists) {
         driverModel.value = DriverUserModel.fromJson(event.data()!);
       }
@@ -78,13 +87,17 @@ class OrderMapController extends GetxController {
 
   addMarkerSetup() async {
     if (Constant.selectedMapType == 'google') {
-      final Uint8List departure = await Constant().getBytesFromAsset('assets/images/pickup.png', 100);
-      final Uint8List destination = await Constant().getBytesFromAsset('assets/images/dropoff.png', 100);
+      final Uint8List departure =
+          await Constant().getBytesFromAsset('assets/images/pickup.png', 100);
+      final Uint8List destination =
+          await Constant().getBytesFromAsset('assets/images/dropoff.png', 100);
       departureIcon = BitmapDescriptor.fromBytes(departure);
       destinationIcon = BitmapDescriptor.fromBytes(destination);
     } else {
-      departureOsmIcon = Image.asset("assets/images/pickup.png", width: 30, height: 30); //OSM
-      destinationOsmIcon = Image.asset("assets/images/dropoff.png", width: 30, height: 30); //OSM
+      departureOsmIcon =
+          Image.asset("assets/images/pickup.png", width: 30, height: 30); //OSM
+      destinationOsmIcon =
+          Image.asset("assets/images/dropoff.png", width: 30, height: 30); //OSM
     }
   }
 
@@ -93,12 +106,17 @@ class OrderMapController extends GetxController {
   PolylinePoints polylinePoints = PolylinePoints();
 
   void getPolyline() async {
-    if (orderModel.value.sourceLocationLAtLng != null && orderModel.value.destinationLocationLAtLng != null) {
+    if (orderModel.value.sourceLocationLAtLng != null &&
+        orderModel.value.destinationLocationLAtLng != null) {
       movePosition();
       List<LatLng> polylineCoordinates = [];
       PolylineRequest polylineRequest = PolylineRequest(
-        origin: PointLatLng(orderModel.value.sourceLocationLAtLng!.latitude ?? 0.0, orderModel.value.sourceLocationLAtLng!.longitude ?? 0.0),
-        destination: PointLatLng(orderModel.value.destinationLocationLAtLng!.latitude ?? 0.0, orderModel.value.destinationLocationLAtLng!.longitude ?? 0.0),
+        origin: PointLatLng(
+            orderModel.value.sourceLocationLAtLng!.latitude ?? 0.0,
+            orderModel.value.sourceLocationLAtLng!.longitude ?? 0.0),
+        destination: PointLatLng(
+            orderModel.value.destinationLocationLAtLng!.latitude ?? 0.0,
+            orderModel.value.destinationLocationLAtLng!.longitude ?? 0.0),
         mode: TravelMode.driving,
       );
       PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
@@ -113,8 +131,16 @@ class OrderMapController extends GetxController {
         print(result.errorMessage.toString());
       }
       _addPolyLine(polylineCoordinates);
-      addMarker(LatLng(orderModel.value.sourceLocationLAtLng!.latitude ?? 0.0, orderModel.value.sourceLocationLAtLng!.longitude ?? 0.0), "Source", departureIcon);
-      addMarker(LatLng(orderModel.value.destinationLocationLAtLng!.latitude ?? 0.0, orderModel.value.destinationLocationLAtLng!.longitude ?? 0.0), "Destination", destinationIcon);
+      addMarker(
+          LatLng(orderModel.value.sourceLocationLAtLng!.latitude ?? 0.0,
+              orderModel.value.sourceLocationLAtLng!.longitude ?? 0.0),
+          "Source",
+          departureIcon);
+      addMarker(
+          LatLng(orderModel.value.destinationLocationLAtLng!.latitude ?? 0.0,
+              orderModel.value.destinationLocationLAtLng!.longitude ?? 0.0),
+          "Destination",
+          destinationIcon);
     }
   }
 
@@ -130,8 +156,12 @@ class OrderMapController extends GetxController {
             1609.32)
         .toString());
     LatLng center = LatLng(
-      (orderModel.value.sourceLocationLAtLng!.latitude! + orderModel.value.destinationLocationLAtLng!.latitude!) / 2,
-      (orderModel.value.sourceLocationLAtLng!.longitude! + orderModel.value.destinationLocationLAtLng!.longitude!) / 2,
+      (orderModel.value.sourceLocationLAtLng!.latitude! +
+              orderModel.value.destinationLocationLAtLng!.latitude!) /
+          2,
+      (orderModel.value.sourceLocationLAtLng!.longitude! +
+              orderModel.value.destinationLocationLAtLng!.longitude!) /
+          2,
     );
 
     double radiusElevated = (distance / 2) + ((distance / 2) / 2);
@@ -155,7 +185,8 @@ class OrderMapController extends GetxController {
 
   addMarker(LatLng? position, String id, BitmapDescriptor? descriptor) {
     MarkerId markerId = MarkerId(id);
-    Marker marker = Marker(markerId: markerId, icon: descriptor!, position: position!);
+    Marker marker =
+        Marker(markerId: markerId, icon: descriptor!, position: position!);
     markers[markerId] = marker;
   }
 
@@ -168,36 +199,61 @@ class OrderMapController extends GetxController {
 
   void getOSMPolyline(themeChange) async {
     try {
-      if (orderModel.value.sourceLocationLAtLng != null && orderModel.value.destinationLocationLAtLng != null) {
+      if (orderModel.value.sourceLocationLAtLng != null &&
+          orderModel.value.destinationLocationLAtLng != null) {
         setOsmMarker(
-          departure: GeoPoint(latitude: orderModel.value.sourceLocationLAtLng?.latitude ?? 0.0, longitude: orderModel.value.sourceLocationLAtLng?.longitude ?? 0.0),
-          destination: GeoPoint(latitude: orderModel.value.destinationLocationLAtLng?.latitude ?? 0.0, longitude: orderModel.value.destinationLocationLAtLng?.longitude ?? 0.0),
+          departure: GeoPoint(
+              latitude: orderModel.value.sourceLocationLAtLng?.latitude ?? 0.0,
+              longitude:
+                  orderModel.value.sourceLocationLAtLng?.longitude ?? 0.0),
+          destination: GeoPoint(
+              latitude:
+                  orderModel.value.destinationLocationLAtLng?.latitude ?? 0.0,
+              longitude:
+                  orderModel.value.destinationLocationLAtLng?.longitude ?? 0.0),
         );
         await mapOsmController.removeLastRoad();
         roadInfo.value = await mapOsmController.drawRoad(
-          GeoPoint(latitude: orderModel.value.sourceLocationLAtLng?.latitude ?? 0, longitude: orderModel.value.sourceLocationLAtLng?.longitude ?? 0),
-          GeoPoint(latitude: orderModel.value.destinationLocationLAtLng?.latitude ?? 0, longitude: orderModel.value.destinationLocationLAtLng?.longitude ?? 0),
+          GeoPoint(
+              latitude: orderModel.value.sourceLocationLAtLng?.latitude ?? 0,
+              longitude: orderModel.value.sourceLocationLAtLng?.longitude ?? 0),
+          GeoPoint(
+              latitude:
+                  orderModel.value.destinationLocationLAtLng?.latitude ?? 0,
+              longitude:
+                  orderModel.value.destinationLocationLAtLng?.longitude ?? 0),
           roadType: RoadType.car,
           roadOption: RoadOption(
             roadWidth: 15,
-            roadColor: themeChange ? AppColors.darkModePrimary : AppColors.primary,
+            roadColor:
+                themeChange ? AppColors.darkModePrimary : AppColors.primary,
             zoomInto: false,
           ),
         );
 
         updateCameraLocation(
-            source: GeoPoint(latitude: orderModel.value.sourceLocationLAtLng?.latitude ?? 0, longitude: orderModel.value.sourceLocationLAtLng?.longitude ?? 0),
-            destination: GeoPoint(latitude: orderModel.value.destinationLocationLAtLng?.latitude ?? 0, longitude: orderModel.value.destinationLocationLAtLng?.longitude ?? 0));
+            source: GeoPoint(
+                latitude: orderModel.value.sourceLocationLAtLng?.latitude ?? 0,
+                longitude:
+                    orderModel.value.sourceLocationLAtLng?.longitude ?? 0),
+            destination: GeoPoint(
+                latitude:
+                    orderModel.value.destinationLocationLAtLng?.latitude ?? 0,
+                longitude:
+                    orderModel.value.destinationLocationLAtLng?.longitude ??
+                        0));
       }
     } catch (e) {
       print('Error: $e');
     }
   }
 
-  Future<void> updateCameraLocation({required GeoPoint source, required GeoPoint destination}) async {
+  Future<void> updateCameraLocation(
+      {required GeoPoint source, required GeoPoint destination}) async {
     BoundingBox bounds;
 
-    if (source.latitude > destination.latitude && source.longitude > destination.longitude) {
+    if (source.latitude > destination.latitude &&
+        source.longitude > destination.longitude) {
       bounds = BoundingBox(
         north: source.latitude,
         south: destination.latitude,
@@ -230,7 +286,8 @@ class OrderMapController extends GetxController {
     await mapOsmController.zoomToBoundingBox(bounds, paddinInPixel: 300);
   }
 
-  setOsmMarker({required GeoPoint departure, required GeoPoint destination}) async {
+  setOsmMarker(
+      {required GeoPoint departure, required GeoPoint destination}) async {
     if (osmMarkers.containsKey('Source')) {
       await mapOsmController.removeMarker(osmMarkers['Source']!);
     }

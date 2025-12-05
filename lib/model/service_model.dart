@@ -7,7 +7,14 @@ class ServiceModel {
   String? title;
   String? kmCharge;
 
-  ServiceModel({this.image, this.enable,this.intercityType,this.offerRate, this.id, this.title,this.kmCharge});
+  ServiceModel(
+      {this.image,
+      this.enable,
+      this.intercityType,
+      this.offerRate,
+      this.id,
+      this.title,
+      this.kmCharge});
 
   ServiceModel.fromJson(Map<String, dynamic> json) {
     image = json['image'];

@@ -37,12 +37,18 @@ class RatingController extends GetxController {
         intercityOrderModel.value = argumentData['interCityOrderModel'];
       }
     }
-    await FireStoreUtils.getCustomer(type.value == "orderModel" ? orderModel.value.userId.toString() : intercityOrderModel.value.userId.toString()).then((value) {
+    await FireStoreUtils.getCustomer(type.value == "orderModel"
+            ? orderModel.value.userId.toString()
+            : intercityOrderModel.value.userId.toString())
+        .then((value) {
       if (value != null) {
         userModel.value = value;
       }
     });
-    await FireStoreUtils.getReview(type.value == "orderModel" ? orderModel.value.id.toString() : intercityOrderModel.value.id.toString()).then((value) {
+    await FireStoreUtils.getReview(type.value == "orderModel"
+            ? orderModel.value.id.toString()
+            : intercityOrderModel.value.id.toString())
+        .then((value) {
       if (value != null) {
         reviewModel.value = value;
         rating.value = double.parse(reviewModel.value.rating.toString());

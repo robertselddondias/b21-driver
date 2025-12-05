@@ -4,9 +4,11 @@
 
 import 'dart:convert';
 
-StripePayFailedModel stripePayFailedModelFromJson(String str) => StripePayFailedModel.fromJson(json.decode(str));
+StripePayFailedModel stripePayFailedModelFromJson(String str) =>
+    StripePayFailedModel.fromJson(json.decode(str));
 
-String stripePayFailedModelToJson(StripePayFailedModel data) => json.encode(data.toJson());
+String stripePayFailedModelToJson(StripePayFailedModel data) =>
+    json.encode(data.toJson());
 
 class StripePayFailedModel {
   StripePayFailedModel({
@@ -15,7 +17,8 @@ class StripePayFailedModel {
 
   Error error;
 
-  factory StripePayFailedModel.fromJson(Map<String, dynamic> json) => StripePayFailedModel(
+  factory StripePayFailedModel.fromJson(Map<String, dynamic> json) =>
+      StripePayFailedModel(
         error: Error.fromJson(json["error"]),
       );
 

@@ -18,17 +18,17 @@ class ThemedText extends StatelessWidget {
   final TextStyle? style;
 
   const ThemedText(
-      this.text, {
-        super.key,
-        this.fontSize,
-        this.fontWeight,
-        this.color,
-        this.isSecondary = false,
-        this.textAlign,
-        this.maxLines,
-        this.overflow,
-        this.style,
-      });
+    this.text, {
+    super.key,
+    this.fontSize,
+    this.fontWeight,
+    this.color,
+    this.isSecondary = false,
+    this.textAlign,
+    this.maxLines,
+    this.overflow,
+    this.style,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +47,12 @@ class ThemedText extends StatelessWidget {
 
     return Text(
       text,
-      style: style?.copyWith(color: textColor) ?? GoogleFonts.poppins(
-        fontSize: fontSize,
-        fontWeight: fontWeight,
-        color: textColor,
-      ),
+      style: style?.copyWith(color: textColor) ??
+          GoogleFonts.poppins(
+            fontSize: fontSize,
+            fontWeight: fontWeight,
+            color: textColor,
+          ),
       textAlign: textAlign,
       maxLines: maxLines,
       overflow: overflow,
@@ -67,12 +68,12 @@ class ThemedHeading extends StatelessWidget {
   final int? maxLines;
 
   const ThemedHeading(
-      this.text, {
-        super.key,
-        this.fontSize = 18,
-        this.textAlign,
-        this.maxLines,
-      });
+    this.text, {
+    super.key,
+    this.fontSize = 18,
+    this.textAlign,
+    this.maxLines,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -93,12 +94,12 @@ class ThemedSubtitle extends StatelessWidget {
   final int? maxLines;
 
   const ThemedSubtitle(
-      this.text, {
-        super.key,
-        this.fontSize = 14,
-        this.textAlign,
-        this.maxLines,
-      });
+    this.text, {
+    super.key,
+    this.fontSize = 14,
+    this.textAlign,
+    this.maxLines,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -122,14 +123,14 @@ class ThemedBody extends StatelessWidget {
   final TextOverflow? overflow;
 
   const ThemedBody(
-      this.text, {
-        super.key,
-        this.fontSize = 16,
-        this.fontWeight = FontWeight.w400,
-        this.textAlign,
-        this.maxLines,
-        this.overflow,
-      });
+    this.text, {
+    super.key,
+    this.fontSize = 16,
+    this.fontWeight = FontWeight.w400,
+    this.textAlign,
+    this.maxLines,
+    this.overflow,
+  });
 
   @override
   Widget build(BuildContext context) {

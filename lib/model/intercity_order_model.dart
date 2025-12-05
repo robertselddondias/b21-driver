@@ -30,8 +30,17 @@ class InterCityOrderModel {
   String? parcelDimension;
   String? parcelWeight;
   List<dynamic>? parcelImage;
+
+  // Campos para sistema de atribuição automática (paridade com OrderModel)
+  String? assignedDriverId;
+  Timestamp? assignedAt;
+  Timestamp? acceptedAt;
+  List<dynamic>? rejectedDriverIds;
+
+  // Campos legados (mantidos apenas para leitura de dados antigos)
   List<dynamic>? acceptedDriverId;
   List<dynamic>? rejectedDriverId;
+
   Positions? position;
   Timestamp? createdDate;
   Timestamp? updateDate;
@@ -51,39 +60,51 @@ class InterCityOrderModel {
   ZoneModel? zone;
   String? zoneId;
 
-  InterCityOrderModel(
-      {this.position,
-        this.intercityServiceId,
-        this.paymentType,
-        this.sourceLocationName,
-        this.sourceCity,
-        this.destinationLocationName,
-        this.destinationCity,
-        this.sourceLocationLAtLng,
-        this.destinationLocationLAtLng,
-        this.id,
-        this.userId,
-        this.distance,
-        this.distanceType,
-        this.status,
-        this.driverId,
-        this.parcelWeight,
-        this.parcelDimension,
-        this.offerRate,
-        this.finalRate,
-        this.paymentStatus,
-        this.createdDate,
-        this.updateDate,
-        this.taxList,
-        this.coupon,
-        this.intercityService,
-        this.whenTime,
-        this.numberOfPassenger,
-        this.whenDates,
-        this.comments,
-        this.otp,
-        this.someOneElse,
-        this.adminCommission,this.zone,this.zoneId});
+  InterCityOrderModel({
+    this.position,
+    this.intercityServiceId,
+    this.paymentType,
+    this.sourceLocationName,
+    this.sourceCity,
+    this.destinationLocationName,
+    this.destinationCity,
+    this.sourceLocationLAtLng,
+    this.destinationLocationLAtLng,
+    this.id,
+    this.userId,
+    this.distance,
+    this.distanceType,
+    this.status,
+    this.driverId,
+    this.parcelWeight,
+    this.parcelDimension,
+    this.offerRate,
+    this.finalRate,
+    this.paymentStatus,
+    this.createdDate,
+    this.updateDate,
+    this.taxList,
+    this.coupon,
+    this.intercityService,
+    this.whenTime,
+    this.numberOfPassenger,
+    this.whenDates,
+    this.comments,
+    this.otp,
+    this.someOneElse,
+    this.adminCommission,
+    this.zone,
+    this.zoneId,
+    // Campos de auto-assignment
+    this.assignedDriverId,
+    this.assignedAt,
+    this.acceptedAt,
+    this.rejectedDriverIds,
+    // Campos legados
+    this.acceptedDriverId,
+    this.rejectedDriverId,
+    this.parcelImage,
+  });
 
   InterCityOrderModel.fromJson(Map<String, dynamic> json) {
     intercityServiceId = json['intercityServiceId'];
@@ -92,11 +113,20 @@ class InterCityOrderModel {
     paymentType = json['paymentType'];
     destinationLocationName = json['destinationLocationName'];
     destinationCity = json['destinationCity'];
-    sourceLocationLAtLng = json['sourceLocationLAtLng'] != null ? LocationLatLng.fromJson(json['sourceLocationLAtLng']) : null;
-    destinationLocationLAtLng = json['destinationLocationLAtLng'] != null ? LocationLatLng.fromJson(json['destinationLocationLAtLng']) : null;
-    coupon = json['coupon'] != null ? CouponModel.fromJson(json['coupon']) : null;
-    freightVehicle = json['freightVehicle'] != null ? FreightVehicle.fromJson(json['freightVehicle']) : null;
-    intercityService = json['intercityService'] != null ? IntercityServiceModel.fromJson(json['intercityService']) : null;
+    sourceLocationLAtLng = json['sourceLocationLAtLng'] != null
+        ? LocationLatLng.fromJson(json['sourceLocationLAtLng'])
+        : null;
+    destinationLocationLAtLng = json['destinationLocationLAtLng'] != null
+        ? LocationLatLng.fromJson(json['destinationLocationLAtLng'])
+        : null;
+    coupon =
+        json['coupon'] != null ? CouponModel.fromJson(json['coupon']) : null;
+    freightVehicle = json['freightVehicle'] != null
+        ? FreightVehicle.fromJson(json['freightVehicle'])
+        : null;
+    intercityService = json['intercityService'] != null
+        ? IntercityServiceModel.fromJson(json['intercityService'])
+        : null;
     id = json['id'];
     userId = json['userId'];
     offerRate = json['offerRate'];
@@ -110,17 +140,30 @@ class InterCityOrderModel {
     createdDate = json['createdDate'];
     updateDate = json['updateDate'];
     parcelImage = json['parcelImage'];
+    paymentStatus = json['paymentStatus'];
+
+    // Campos de auto-assignment
+    assignedDriverId = json['assignedDriverId'];
+    assignedAt = json['assignedAt'];
+    acceptedAt = json['acceptedAt'];
+    rejectedDriverIds = json['rejectedDriverIds'];
+
+    // Campos legados
     acceptedDriverId = json['acceptedDriverId'];
     rejectedDriverId = json['rejectedDriverId'];
-    paymentStatus = json['paymentStatus'];
     whenTime = json['whenTime'];
     whenDates = json['whenDates'];
     numberOfPassenger = json['numberOfPassenger'];
     comments = json['comments'];
     otp = json['otp'];
-    position = json['position'] != null ? Positions.fromJson(json['position']) : null;
-    adminCommission = json['adminCommission'] != null ? AdminCommission.fromJson(json['adminCommission']) : null;
-    someOneElse = json['someOneElse'] != null ? ContactModel.fromJson(json['someOneElse']) : null;
+    position =
+        json['position'] != null ? Positions.fromJson(json['position']) : null;
+    adminCommission = json['adminCommission'] != null
+        ? AdminCommission.fromJson(json['adminCommission'])
+        : null;
+    someOneElse = json['someOneElse'] != null
+        ? ContactModel.fromJson(json['someOneElse'])
+        : null;
     zone = json['zone'] != null ? ZoneModel.fromJson(json['zone']) : null;
     zoneId = json['zoneId'];
     if (json['taxList'] != null) {
@@ -174,9 +217,17 @@ class InterCityOrderModel {
     data['createdDate'] = createdDate;
     data['updateDate'] = updateDate;
     data['parcelImage'] = parcelImage;
+    data['paymentStatus'] = paymentStatus;
+
+    // Campos de auto-assignment
+    data['assignedDriverId'] = assignedDriverId;
+    data['assignedAt'] = assignedAt;
+    data['acceptedAt'] = acceptedAt;
+    data['rejectedDriverIds'] = rejectedDriverIds;
+
+    // Campos legados
     data['acceptedDriverId'] = acceptedDriverId;
     data['rejectedDriverId'] = rejectedDriverId;
-    data['paymentStatus'] = paymentStatus;
     data['whenTime'] = whenTime;
     data['whenDates'] = whenDates;
     data['numberOfPassenger'] = numberOfPassenger;
@@ -193,4 +244,53 @@ class InterCityOrderModel {
     }
     return data;
   }
+
+  /// Retorna lista unificada de motoristas que rejeitaram
+  /// Combina dados novos (rejectedDriverIds) com legados (rejectedDriverId)
+  List<dynamic> get allRejectedDriverIds {
+    final Set<dynamic> rejected = {};
+    if (rejectedDriverIds != null) {
+      rejected.addAll(rejectedDriverIds!);
+    }
+    if (rejectedDriverId != null) {
+      rejected.addAll(rejectedDriverId!);
+    }
+    return rejected.toList();
+  }
+
+  /// Retorna lista unificada de motoristas que aceitaram
+  /// Combina dados novos com legados
+  List<dynamic> get allAcceptedDriverIds {
+    final Set<dynamic> accepted = {};
+    if (assignedDriverId != null) {
+      accepted.add(assignedDriverId!);
+    }
+    if (acceptedDriverId != null) {
+      accepted.addAll(acceptedDriverId!);
+    }
+    return accepted.toList();
+  }
+
+  /// Verifica se a corrida foi atribuída automaticamente
+  bool get isAutoAssigned => assignedDriverId != null;
+
+  /// Verifica se a corrida foi aceita pelo motorista atribuído
+  bool get isAcceptedByAssignedDriver =>
+      assignedDriverId != null &&
+      driverId == assignedDriverId &&
+      acceptedAt != null;
+
+  /// Verifica se o motorista rejeitou a corrida
+  /// Usa lista unificada (dados novos + legados)
+  bool isRejectedByDriver(String driverId) =>
+      allRejectedDriverIds.contains(driverId);
+
+  /// Tempo desde a atribuição em minutos
+  int get minutesSinceAssignment {
+    if (assignedAt == null) return 0;
+    return DateTime.now().difference(assignedAt!.toDate()).inMinutes;
+  }
+
+  /// Verifica se a atribuição expirou (15 minutos)
+  bool get isAssignmentExpired => minutesSinceAssignment > 15;
 }

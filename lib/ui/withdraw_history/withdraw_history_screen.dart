@@ -38,7 +38,11 @@ class WithDrawHistoryScreen extends StatelessWidget {
           ),
           Expanded(
             child: Container(
-              decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: const BorderRadius.only(topLeft: Radius.circular(25), topRight: Radius.circular(25))),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(25),
+                      topRight: Radius.circular(25))),
               child: Padding(
                 padding: const EdgeInsets.only(top: 20, left: 10, right: 10),
                 child: FutureBuilder<List<WithdrawModel>?>(
@@ -52,37 +56,62 @@ class WithDrawHistoryScreen extends StatelessWidget {
                             return Text(snapshot.error.toString());
                           } else {
                             return snapshot.data!.isEmpty
-                                ?  Center(child: Text("No transaction found".tr))
+                                ? Center(child: Text("No transaction found".tr))
                                 : ListView.builder(
                                     itemCount: snapshot.data!.length,
                                     itemBuilder: (context, index) {
-                                      WithdrawModel walletTransactionModel = snapshot.data![index];
+                                      WithdrawModel walletTransactionModel =
+                                          snapshot.data![index];
                                       return Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Container(
                                             decoration: BoxDecoration(
-                                              color: themeChange.getThem() ? AppColors.darkContainerBackground : AppColors.containerBackground,
-                                              borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                              border: Border.all(color: themeChange.getThem() ? AppColors.darkContainerBorder : AppColors.containerBorder, width: 0.5),
+                                              color: themeChange.getThem()
+                                                  ? AppColors
+                                                      .darkContainerBackground
+                                                  : AppColors
+                                                      .containerBackground,
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(10)),
+                                              border: Border.all(
+                                                  color: themeChange.getThem()
+                                                      ? AppColors
+                                                          .darkContainerBorder
+                                                      : AppColors
+                                                          .containerBorder,
+                                                  width: 0.5),
                                               boxShadow: themeChange.getThem()
                                                   ? null
                                                   : [
                                                       BoxShadow(
-                                                        color: Colors.grey.withOpacity(0.5),
+                                                        color: Colors.grey
+                                                            .withOpacity(0.5),
                                                         blurRadius: 8,
-                                                        offset: const Offset(0, 2), // changes position of shadow
+                                                        offset: const Offset(0,
+                                                            2), // changes position of shadow
                                                       ),
                                                     ],
                                             ),
                                             child: Padding(
-                                              padding: const EdgeInsets.all(8.0),
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
                                               child: Row(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
                                                 children: [
                                                   Container(
-                                                      decoration: BoxDecoration(color: AppColors.lightGray, borderRadius: BorderRadius.circular(50)),
+                                                      decoration: BoxDecoration(
+                                                          color: AppColors
+                                                              .lightGray,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      50)),
                                                       child: Padding(
-                                                        padding: const EdgeInsets.all(12.0),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(12.0),
                                                         child: SvgPicture.asset(
                                                           'assets/icons/ic_wallet.svg',
                                                           width: 24,
@@ -94,19 +123,34 @@ class WithDrawHistoryScreen extends StatelessWidget {
                                                   ),
                                                   Expanded(
                                                     child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
                                                       children: [
                                                         Row(
                                                           children: [
                                                             Expanded(
                                                               child: Text(
-                                                                DateFormat('KK:mm:ss a, dd MMM yyyy').format(walletTransactionModel.createdDate!.toDate()).toUpperCase(),
-                                                                style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+                                                                DateFormat(
+                                                                        'KK:mm:ss a, dd MMM yyyy')
+                                                                    .format(walletTransactionModel
+                                                                        .createdDate!
+                                                                        .toDate())
+                                                                    .toUpperCase(),
+                                                                style: GoogleFonts.poppins(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w600),
                                                               ),
                                                             ),
                                                             Text(
                                                               "- ${Constant.amountShow(amount: walletTransactionModel.amount.toString().replaceAll("-", ""))}",
-                                                              style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: Colors.red),
+                                                              style: GoogleFonts.poppins(
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w600,
+                                                                  color: Colors
+                                                                      .red),
                                                             ),
                                                           ],
                                                         ),
@@ -114,14 +158,31 @@ class WithDrawHistoryScreen extends StatelessWidget {
                                                           children: [
                                                             Expanded(
                                                               child: Text(
-                                                                walletTransactionModel.note.toString(),
-                                                                style: GoogleFonts.poppins(fontWeight: FontWeight.w400),
+                                                                walletTransactionModel
+                                                                    .note
+                                                                    .toString(),
+                                                                style: GoogleFonts.poppins(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w400),
                                                               ),
                                                             ),
                                                             Text(
-                                                              walletTransactionModel.paymentStatus.toString().toUpperCase(),
+                                                              walletTransactionModel
+                                                                  .paymentStatus
+                                                                  .toString()
+                                                                  .toUpperCase(),
                                                               style: GoogleFonts.poppins(
-                                                                  fontWeight: FontWeight.w400, color: walletTransactionModel.paymentStatus == "approved" ? Colors.green : Colors.red),
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w400,
+                                                                  color: walletTransactionModel
+                                                                              .paymentStatus ==
+                                                                          "approved"
+                                                                      ? Colors
+                                                                          .green
+                                                                      : Colors
+                                                                          .red),
                                                             ),
                                                           ],
                                                         ),
@@ -136,7 +197,7 @@ class WithDrawHistoryScreen extends StatelessWidget {
                                   );
                           }
                         default:
-                          return  Text('Error'.tr);
+                          return Text('Error'.tr);
                       }
                     }),
               ),

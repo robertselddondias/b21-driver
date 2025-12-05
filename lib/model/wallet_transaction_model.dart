@@ -11,7 +11,16 @@ class WalletTransactionModel {
   String? orderType;
   String? userType;
 
-  WalletTransactionModel({this.amount, this.createdDate, this.id, this.userId, this.transactionId, this.paymentType, this.note, this.orderType,this.userType});
+  WalletTransactionModel(
+      {this.amount,
+      this.createdDate,
+      this.id,
+      this.userId,
+      this.transactionId,
+      this.paymentType,
+      this.note,
+      this.orderType,
+      this.userType});
 
   WalletTransactionModel.fromJson(Map<String, dynamic> json) {
     amount = json['amount'];

@@ -47,7 +47,8 @@ class OrderScreen extends StatelessWidget {
   }
 
   /// AppBar responsiva com design consistente
-  PreferredSizeWidget _buildAppBar(BuildContext context, DarkThemeProvider themeChange) {
+  PreferredSizeWidget _buildAppBar(
+      BuildContext context, DarkThemeProvider themeChange) {
     return AppBar(
       backgroundColor: AppColors.primary,
       elevation: 0,
@@ -148,7 +149,8 @@ class OrderScreen extends StatelessWidget {
   }
 
   /// Lista de cards de pedidos
-  Widget _buildOrderCards(BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot, DarkThemeProvider themeChange) {
+  Widget _buildOrderCards(BuildContext context,
+      AsyncSnapshot<QuerySnapshot> snapshot, DarkThemeProvider themeChange) {
     return RefreshIndicator(
       color: AppColors.primary,
       onRefresh: () async {
@@ -160,8 +162,7 @@ class OrderScreen extends StatelessWidget {
         itemCount: snapshot.data!.docs.length,
         itemBuilder: (context, index) {
           OrderModel orderModel = OrderModel.fromJson(
-              snapshot.data!.docs[index].data() as Map<String, dynamic>
-          );
+              snapshot.data!.docs[index].data() as Map<String, dynamic>);
           return _buildOrderCard(context, orderModel, themeChange);
         },
       ),
@@ -169,7 +170,8 @@ class OrderScreen extends StatelessWidget {
   }
 
   /// Card individual do pedido
-  Widget _buildOrderCard(BuildContext context, OrderModel orderModel, DarkThemeProvider themeChange) {
+  Widget _buildOrderCard(BuildContext context, OrderModel orderModel,
+      DarkThemeProvider themeChange) {
     return Padding(
       padding: EdgeInsets.only(bottom: Responsive.height(2, context)),
       child: InkWell(
@@ -193,19 +195,19 @@ class OrderScreen extends StatelessWidget {
             ),
             boxShadow: themeChange.getThem()
                 ? [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ]
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
                 : [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                blurRadius: 10,
-                offset: const Offset(0, 3),
-              ),
-            ],
+                    BoxShadow(
+                      color: Colors.grey.withValues(alpha: 0.2),
+                      blurRadius: 10,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
           ),
           child: Padding(
             padding: EdgeInsets.all(Responsive.width(4, context)),
@@ -225,7 +227,8 @@ class OrderScreen extends StatelessWidget {
                 // Informações de localização
                 LocationView(
                   sourceLocation: orderModel.sourceLocationName.toString(),
-                  destinationLocation: orderModel.destinationLocationName.toString(),
+                  destinationLocation:
+                      orderModel.destinationLocationName.toString(),
                 ),
 
                 SizedBox(height: Responsive.height(1.5, context)),
@@ -257,7 +260,8 @@ class OrderScreen extends StatelessWidget {
   }
 
   /// Container de status responsivo
-  Widget _buildStatusContainer(BuildContext context, OrderModel orderModel, DarkThemeProvider themeChange) {
+  Widget _buildStatusContainer(BuildContext context, OrderModel orderModel,
+      DarkThemeProvider themeChange) {
     final isCompleteOrActive = orderModel.status == Constant.rideComplete ||
         orderModel.status == Constant.rideActive;
 
@@ -273,49 +277,53 @@ class OrderScreen extends StatelessWidget {
       ),
       child: isCompleteOrActive
           ? Row(
-        children: [
-          Expanded(
-            child: Text(
-              orderModel.status.toString(),
-              style: GoogleFonts.poppins(
-                fontWeight: FontWeight.w600,
-                fontSize: Responsive.width(3.5, context),
-                color: themeChange.getThem() ? Colors.white : Colors.black87,
-              ),
-            ),
-          ),
-          Text(
-            Constant().formatTimestamp(orderModel.createdDate),
-            style: GoogleFonts.poppins(
-              fontSize: Responsive.width(3, context),
-              color: themeChange.getThem() ? Colors.white70 : Colors.black54,
-            ),
-          ),
-        ],
-      )
+              children: [
+                Expanded(
+                  child: Text(
+                    orderModel.status.toString(),
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: Responsive.width(3.5, context),
+                      color:
+                          themeChange.getThem() ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ),
+                Text(
+                  Constant().formatTimestamp(orderModel.createdDate),
+                  style: GoogleFonts.poppins(
+                    fontSize: Responsive.width(3, context),
+                    color:
+                        themeChange.getThem() ? Colors.white70 : Colors.black54,
+                  ),
+                ),
+              ],
+            )
           : Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.access_time_outlined,
-            size: Responsive.width(4, context),
-            color: themeChange.getThem() ? Colors.white : Colors.black87,
-          ),
-          SizedBox(width: Responsive.width(2, context)),
-          Text(
-            Constant().formatTimestamp(orderModel.createdDate),
-            style: GoogleFonts.poppins(
-              fontSize: Responsive.width(3.5, context),
-              color: themeChange.getThem() ? Colors.white : Colors.black87,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.access_time_outlined,
+                  size: Responsive.width(4, context),
+                  color: themeChange.getThem() ? Colors.white : Colors.black87,
+                ),
+                SizedBox(width: Responsive.width(2, context)),
+                Text(
+                  Constant().formatTimestamp(orderModel.createdDate),
+                  style: GoogleFonts.poppins(
+                    fontSize: Responsive.width(3.5, context),
+                    color:
+                        themeChange.getThem() ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
     );
   }
 
   /// Botões de ação (Review, Chat, Telefone)
-  Widget _buildActionButtons(BuildContext context, OrderModel orderModel, DarkThemeProvider themeChange) {
+  Widget _buildActionButtons(BuildContext context, OrderModel orderModel,
+      DarkThemeProvider themeChange) {
     return Row(
       children: [
         // Botão Review
@@ -345,11 +353,9 @@ class OrderScreen extends StatelessWidget {
             themeChange: themeChange,
             onTap: () async {
               UserModel? customer = await FireStoreUtils.getCustomer(
-                  orderModel.userId.toString()
-              );
+                  orderModel.userId.toString());
               DriverUserModel? driver = await FireStoreUtils.getDriverProfile(
-                  orderModel.driverId.toString()
-              );
+                  orderModel.driverId.toString());
 
               Get.to(ChatScreens(
                 driverId: driver!.id,
@@ -363,18 +369,16 @@ class OrderScreen extends StatelessWidget {
               ));
             },
           ),
-
           SizedBox(width: Responsive.width(2, context)),
-
           _buildActionIconButton(
             context,
             icon: Icons.call,
             themeChange: themeChange,
             onTap: () async {
               UserModel? customer = await FireStoreUtils.getCustomer(
-                  orderModel.userId.toString()
-              );
-              Constant.makePhoneCall("${customer!.countryCode}${customer.phoneNumber}");
+                  orderModel.userId.toString());
+              Constant.makePhoneCall(
+                  "${customer!.countryCode}${customer.phoneNumber}");
             },
           ),
         ],
@@ -384,11 +388,11 @@ class OrderScreen extends StatelessWidget {
 
   /// Botão de ação com ícone
   Widget _buildActionIconButton(
-      BuildContext context, {
-        required IconData icon,
-        required DarkThemeProvider themeChange,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context, {
+    required IconData icon,
+    required DarkThemeProvider themeChange,
+    required VoidCallback onTap,
+  }) {
     final buttonSize = Responsive.height(5.5, context);
 
     return InkWell(
@@ -398,7 +402,9 @@ class OrderScreen extends StatelessWidget {
         height: buttonSize,
         width: buttonSize,
         decoration: BoxDecoration(
-          color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
+          color: themeChange.getThem()
+              ? AppColors.darkModePrimary
+              : AppColors.primary,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(
@@ -411,7 +417,8 @@ class OrderScreen extends StatelessWidget {
   }
 
   /// Botão de status de pagamento
-  Widget _buildPaymentButton(BuildContext context, OrderModel orderModel, DarkThemeProvider themeChange) {
+  Widget _buildPaymentButton(BuildContext context, OrderModel orderModel,
+      DarkThemeProvider themeChange) {
     return ButtonThem.buildButton(
       context,
       title: orderModel.paymentStatus == true
@@ -424,7 +431,8 @@ class OrderScreen extends StatelessWidget {
   }
 
   /// Botão para confirmar pagamento em dinheiro
-  Widget _buildCashPaymentButton(BuildContext context, OrderModel orderModel, DarkThemeProvider themeChange) {
+  Widget _buildCashPaymentButton(BuildContext context, OrderModel orderModel,
+      DarkThemeProvider themeChange) {
     return ButtonThem.buildButton(
       context,
       title: "Conform cash payment".tr,
@@ -451,42 +459,71 @@ class OrderScreen extends StatelessWidget {
           couponAmount = orderModel.coupon!.amount.toString();
         } else {
           couponAmount = ((double.parse(orderModel.finalRate.toString()) *
-              double.parse(orderModel.coupon!.amount.toString())) / 100)
+                      double.parse(orderModel.coupon!.amount.toString())) /
+                  100)
               .toString();
         }
       }
 
-      // Transação da comissão do admin
+      // CÁLCULO CORRETO: Valor que o motorista recebe
+      double finalRateDouble = double.parse(orderModel.finalRate.toString());
+      double couponAmountDouble = double.parse(couponAmount.toString());
+      double rideValue = finalRateDouble - couponAmountDouble;
+
+      // Calcular comissão do admin
+      double adminCommissionAmount = Constant.calculateAdminCommission(
+        amount: rideValue.toString(),
+        adminCommission: orderModel.adminCommission
+      );
+
+      // Valor líquido que o motorista recebe (valor da corrida - comissão)
+      double driverNetAmount = rideValue - adminCommissionAmount;
+
+      // 1. ADICIONAR valor da corrida à carteira do motorista
+      WalletTransactionModel driverEarningTransaction = WalletTransactionModel(
+        id: Constant.getUuid(),
+        amount: rideValue.toString(), // Valor total da corrida
+        createdDate: Timestamp.now(),
+        paymentType: "cash".tr,
+        transactionId: orderModel.id,
+        orderType: "city",
+        userType: "driver",
+        userId: orderModel.driverId.toString(),
+        note: "Ganho da corrida #${orderModel.id}".tr,
+      );
+
+      await FireStoreUtils.setWalletTransaction(driverEarningTransaction)
+          .then((value) async {
+        if (value == true) {
+          // Adiciona valor da corrida à carteira
+          await FireStoreUtils.updatedDriverWallet(amount: rideValue.toString());
+        }
+      });
+
+      // 2. SUBTRAIR comissão do admin
       WalletTransactionModel adminCommissionWallet = WalletTransactionModel(
         id: Constant.getUuid(),
-        amount: "-${Constant.calculateAdminCommission(
-            amount: (double.parse(orderModel.finalRate.toString()) -
-                double.parse(couponAmount.toString())).toString(),
-            adminCommission: orderModel.adminCommission
-        )}",
+        amount: "-$adminCommissionAmount",
         createdDate: Timestamp.now(),
         paymentType: "wallet".tr,
         transactionId: orderModel.id,
         orderType: "city",
         userType: "driver",
         userId: orderModel.driverId.toString(),
-        note: "Admin commission debited".tr,
+        note: "Comissão B21 (${ orderModel.adminCommission?.type == "fix" ? "R\$ ${orderModel.adminCommission?.amount}" : "${orderModel.adminCommission?.amount}%" })".tr,
       );
 
-      await FireStoreUtils.setWalletTransaction(adminCommissionWallet).then((value) async {
+      await FireStoreUtils.setWalletTransaction(adminCommissionWallet)
+          .then((value) async {
         if (value == true) {
-          await FireStoreUtils.updatedDriverWallet(
-              amount: "-${Constant.calculateAdminCommission(
-                  amount: (double.parse(orderModel.finalRate.toString()) -
-                      double.parse(couponAmount.toString())).toString(),
-                  adminCommission: orderModel.adminCommission
-              )}"
-          );
+          // Subtrai comissão da carteira
+          await FireStoreUtils.updatedDriverWallet(amount: "-$adminCommissionAmount");
         }
       });
 
       // Enviar notificação para o cliente
-      await FireStoreUtils.getCustomer(orderModel.userId.toString()).then((value) async {
+      await FireStoreUtils.getCustomer(orderModel.userId.toString())
+          .then((value) async {
         if (value != null) {
           await SendNotification.sendOneNotification(
             token: value.fcmToken.toString(),

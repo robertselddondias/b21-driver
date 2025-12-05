@@ -43,189 +43,57 @@ class OnlineRegistrationScreen extends StatelessWidget {
             body: controller.isLoading.value
                 ? Constant.loader(context)
                 : Column(
-              children: [
-                SizedBox(
-                  height: Responsive.width(10, context),
-                  width: Responsive.width(100, context),
-                ),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(25),
-                            topRight: Radius.circular(25))),
-                    child: Column(
-                      children: [
-                        // Header informativo
-                        Padding(
-                          padding: EdgeInsets.all(Responsive.width(5, context)),
+                    children: [
+                      SizedBox(
+                        height: Responsive.width(10, context),
+                        width: Responsive.width(100, context),
+                      ),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.surface,
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(25),
+                                  topRight: Radius.circular(25))),
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(Responsive.width(2.5, context)),
-                                    decoration: BoxDecoration(
-                                      color: AppColors.primary.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Icon(
-                                      Icons.description_outlined,
-                                      color: AppColors.primary,
-                                      size: Responsive.width(6, context),
-                                    ),
-                                  ),
-                                  SizedBox(width: Responsive.width(3, context)),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                              // Header informativo
+                              Padding(
+                                padding: EdgeInsets.all(
+                                    Responsive.width(5, context)),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
                                       children: [
-                                        Text(
-                                          "Documentos Necessários".tr,
-                                          style: GoogleFonts.poppins(
-                                            fontSize: Responsive.width(4.2, context),
-                                            fontWeight: FontWeight.w600,
-                                            color: themeChange.getThem()
-                                                ? Colors.white
-                                                : Colors.black87,
-                                          ),
-                                        ),
-                                        SizedBox(height: Responsive.height(0.3, context)),
-                                        Text(
-                                          "${controller.documentList.length} documentos".tr,
-                                          style: GoogleFonts.poppins(
-                                            fontSize: Responsive.width(3.2, context),
-                                            color: themeChange.getThem()
-                                                ? Colors.grey.shade400
-                                                : Colors.grey.shade600,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Lista de documentos
-                        Expanded(
-                          child: ListView.builder(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: Responsive.width(4, context),
-                              vertical: Responsive.height(1, context),
-                            ),
-                            itemCount: controller.documentList.length,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              DocumentModel documentModel =
-                              controller.documentList[index];
-                              Documents documents = Documents();
-
-                              var contain = controller.driverDocumentList
-                                  .where((element) =>
-                              element.documentId ==
-                                  documentModel.id);
-                              if (contain.isNotEmpty) {
-                                documents = controller.driverDocumentList
-                                    .firstWhere((itemToCheck) =>
-                                itemToCheck.documentId ==
-                                    documentModel.id);
-                              }
-
-                              final bool isVerified =
-                                  documents.verified == true;
-
-                              return InkWell(
-                                onTap: () {
-                                  Get.to(const DetailsUploadScreen(),
-                                      arguments: {
-                                        'documentModel': documentModel
-                                      });
-                                },
-                                borderRadius: BorderRadius.circular(12),
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                      bottom: Responsive.height(1.5, context)),
-                                  decoration: BoxDecoration(
-                                    color: themeChange.getThem()
-                                        ? AppColors.darkContainerBackground
-                                        : AppColors.containerBackground,
-                                    borderRadius:
-                                    BorderRadius.circular(12),
-                                    border: Border.all(
-                                        color: themeChange.getThem()
-                                            ? AppColors.darkContainerBorder
-                                            : AppColors.containerBorder,
-                                        width: 1),
-                                    boxShadow: themeChange.getThem()
-                                        ? null
-                                        : [
-                                      BoxShadow(
-                                        color: Colors.black
-                                            .withOpacity(0.05),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 2),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(
-                                        Responsive.width(4, context)),
-                                    child: Row(
-                                      children: [
-                                        // Ícone do documento
                                         Container(
-                                          width: Responsive.width(12, context),
-                                          height: Responsive.width(12, context),
+                                          padding: EdgeInsets.all(
+                                              Responsive.width(2.5, context)),
                                           decoration: BoxDecoration(
-                                            color: isVerified
-                                                ? (themeChange.getThem()
-                                                ? AppColors.darkSuccess
-                                                .withOpacity(0.15)
-                                                : AppColors.success
-                                                .withOpacity(0.1))
-                                                : (themeChange.getThem()
-                                                ? AppColors.darkWarning
-                                                .withOpacity(0.15)
-                                                : AppColors.warning
-                                                .withOpacity(0.1)),
+                                            color: AppColors.primary
+                                                .withValues(alpha: 0.1),
                                             borderRadius:
-                                            BorderRadius.circular(10),
+                                                BorderRadius.circular(12),
                                           ),
                                           child: Icon(
-                                            isVerified
-                                                ? Icons.verified_outlined
-                                                : Icons.description_outlined,
-                                            color: isVerified
-                                                ? (themeChange.getThem()
-                                                ? AppColors.darkSuccess
-                                                : AppColors.success)
-                                                : (themeChange.getThem()
-                                                ? AppColors.darkWarning
-                                                : AppColors.warning),
+                                            Icons.description_outlined,
+                                            color: AppColors.primary,
                                             size: Responsive.width(6, context),
                                           ),
                                         ),
-
                                         SizedBox(
-                                            width: Responsive.width(3, context)),
-
-                                        // Informações do documento
+                                            width:
+                                                Responsive.width(3, context)),
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                documentModel.title
-                                                    .toString(),
+                                                "Documentos Necessários".tr,
                                                 style: GoogleFonts.poppins(
                                                   fontSize: Responsive.width(
-                                                      3.8, context),
+                                                      4.2, context),
                                                   fontWeight: FontWeight.w600,
                                                   color: themeChange.getThem()
                                                       ? Colors.white
@@ -234,88 +102,256 @@ class OnlineRegistrationScreen extends StatelessWidget {
                                               ),
                                               SizedBox(
                                                   height: Responsive.height(
-                                                      0.5, context)),
-                                              Row(
-                                                children: [
-                                                  Container(
-                                                    width: Responsive.width(
-                                                        1.5, context),
-                                                    height: Responsive.width(
-                                                        1.5, context),
-                                                    decoration: BoxDecoration(
-                                                      color: isVerified
-                                                          ? (themeChange
-                                                          .getThem()
-                                                          ? AppColors
-                                                          .darkSuccess
-                                                          : AppColors
-                                                          .success)
-                                                          : (themeChange
-                                                          .getThem()
-                                                          ? AppColors
-                                                          .darkWarning
-                                                          : AppColors
-                                                          .warning),
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                  ),
-                                                  SizedBox(
-                                                      width: Responsive.width(
-                                                          1.5, context)),
-                                                  Text(
-                                                    isVerified
-                                                        ? "Verificado".tr
-                                                        : "Pendente".tr,
-                                                    style:
-                                                    GoogleFonts.poppins(
-                                                      fontSize:
-                                                      Responsive.width(
-                                                          3.2, context),
-                                                      fontWeight:
-                                                      FontWeight.w500,
-                                                      color: isVerified
-                                                          ? (themeChange
-                                                          .getThem()
-                                                          ? AppColors
-                                                          .darkSuccess
-                                                          : AppColors
-                                                          .success)
-                                                          : (themeChange
-                                                          .getThem()
-                                                          ? AppColors
-                                                          .darkWarning
-                                                          : AppColors
-                                                          .warning),
-                                                    ),
-                                                  ),
-                                                ],
+                                                      0.3, context)),
+                                              Text(
+                                                "${controller.documentList.length} documentos"
+                                                    .tr,
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: Responsive.width(
+                                                      3.2, context),
+                                                  color: themeChange.getThem()
+                                                      ? Colors.grey.shade400
+                                                      : Colors.grey.shade600,
+                                                ),
                                               ),
                                             ],
                                           ),
                                         ),
-
-                                        // Ícone de navegação
-                                        Icon(
-                                          Icons.arrow_forward_ios_rounded,
-                                          color: themeChange.getThem()
-                                              ? Colors.grey.shade600
-                                              : Colors.grey.shade400,
-                                          size: Responsive.width(4, context),
-                                        ),
                                       ],
                                     ),
-                                  ),
+                                  ],
                                 ),
-                              );
-                            },
+                              ),
+
+                              // Lista de documentos
+                              Expanded(
+                                child: ListView.builder(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: Responsive.width(4, context),
+                                    vertical: Responsive.height(1, context),
+                                  ),
+                                  itemCount: controller.documentList.length,
+                                  shrinkWrap: true,
+                                  itemBuilder: (context, index) {
+                                    DocumentModel documentModel =
+                                        controller.documentList[index];
+                                    Documents documents = Documents();
+
+                                    var contain = controller.driverDocumentList
+                                        .where((element) =>
+                                            element.documentId ==
+                                            documentModel.id);
+                                    if (contain.isNotEmpty) {
+                                      documents = controller.driverDocumentList
+                                          .firstWhere((itemToCheck) =>
+                                              itemToCheck.documentId ==
+                                              documentModel.id);
+                                    }
+
+                                    final bool isVerified =
+                                        documents.verified == true;
+
+                                    return InkWell(
+                                      onTap: () {
+                                        Get.to(const DetailsUploadScreen(),
+                                            arguments: {
+                                              'documentModel': documentModel
+                                            });
+                                      },
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Container(
+                                        margin: EdgeInsets.only(
+                                            bottom: Responsive.height(
+                                                1.5, context)),
+                                        decoration: BoxDecoration(
+                                          color: themeChange.getThem()
+                                              ? AppColors
+                                                  .darkContainerBackground
+                                              : AppColors.containerBackground,
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          border: Border.all(
+                                              color: themeChange.getThem()
+                                                  ? AppColors
+                                                      .darkContainerBorder
+                                                  : AppColors.containerBorder,
+                                              width: 1),
+                                          boxShadow: themeChange.getThem()
+                                              ? null
+                                              : [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withValues(alpha: 0.05),
+                                                    blurRadius: 10,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
+                                        ),
+                                        child: Padding(
+                                          padding: EdgeInsets.all(
+                                              Responsive.width(4, context)),
+                                          child: Row(
+                                            children: [
+                                              // Ícone do documento
+                                              Container(
+                                                width: Responsive.width(
+                                                    12, context),
+                                                height: Responsive.width(
+                                                    12, context),
+                                                decoration: BoxDecoration(
+                                                  color: isVerified
+                                                      ? (themeChange.getThem()
+                                                          ? AppColors
+                                                              .darkSuccess
+                                                              .withValues(alpha: 0.15)
+                                                          : AppColors.success
+                                                              .withValues(alpha: 0.1))
+                                                      : (themeChange.getThem()
+                                                          ? AppColors
+                                                              .darkWarning
+                                                              .withValues(alpha: 0.15)
+                                                          : AppColors.warning
+                                                              .withValues(
+                                                                  alpha: 0.1)),
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                                child: Icon(
+                                                  isVerified
+                                                      ? Icons.verified_outlined
+                                                      : Icons
+                                                          .description_outlined,
+                                                  color: isVerified
+                                                      ? (themeChange.getThem()
+                                                          ? AppColors
+                                                              .darkSuccess
+                                                          : AppColors.success)
+                                                      : (themeChange.getThem()
+                                                          ? AppColors
+                                                              .darkWarning
+                                                          : AppColors.warning),
+                                                  size: Responsive.width(
+                                                      6, context),
+                                                ),
+                                              ),
+
+                                              SizedBox(
+                                                  width: Responsive.width(
+                                                      3, context)),
+
+                                              // Informações do documento
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      documentModel.title
+                                                          .toString(),
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontSize:
+                                                            Responsive.width(
+                                                                3.8, context),
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: themeChange
+                                                                .getThem()
+                                                            ? Colors.white
+                                                            : Colors.black87,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                        height:
+                                                            Responsive.height(
+                                                                0.5, context)),
+                                                    Row(
+                                                      children: [
+                                                        Container(
+                                                          width:
+                                                              Responsive.width(
+                                                                  1.5, context),
+                                                          height:
+                                                              Responsive.width(
+                                                                  1.5, context),
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: isVerified
+                                                                ? (themeChange
+                                                                        .getThem()
+                                                                    ? AppColors
+                                                                        .darkSuccess
+                                                                    : AppColors
+                                                                        .success)
+                                                                : (themeChange
+                                                                        .getThem()
+                                                                    ? AppColors
+                                                                        .darkWarning
+                                                                    : AppColors
+                                                                        .warning),
+                                                            shape:
+                                                                BoxShape.circle,
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                            width: Responsive
+                                                                .width(1.5,
+                                                                    context)),
+                                                        Text(
+                                                          isVerified
+                                                              ? "Verificado".tr
+                                                              : "Pendente".tr,
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            fontSize: Responsive
+                                                                .width(3.2,
+                                                                    context),
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color: isVerified
+                                                                ? (themeChange
+                                                                        .getThem()
+                                                                    ? AppColors
+                                                                        .darkSuccess
+                                                                    : AppColors
+                                                                        .success)
+                                                                : (themeChange
+                                                                        .getThem()
+                                                                    ? AppColors
+                                                                        .darkWarning
+                                                                    : AppColors
+                                                                        .warning),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+
+                                              // Ícone de navegação
+                                              Icon(
+                                                Icons.arrow_forward_ios_rounded,
+                                                color: themeChange.getThem()
+                                                    ? Colors.grey.shade600
+                                                    : Colors.grey.shade400,
+                                                size: Responsive.width(
+                                                    4, context),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
           );
         });
   }

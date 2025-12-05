@@ -12,12 +12,13 @@ class WithdrawModel {
 
   WithdrawModel(
       {this.id,
-        this.userId,
-        this.note,
-        this.adminNote,
-        this.paymentStatus,
-        this.createdDate,
-        this.paymentDate,this.amount});
+      this.userId,
+      this.note,
+      this.adminNote,
+      this.paymentStatus,
+      this.createdDate,
+      this.paymentDate,
+      this.amount});
 
   WithdrawModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];

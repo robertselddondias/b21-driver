@@ -31,11 +31,14 @@ class ButtonThem {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(btnRadius),
           ),
-          color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
+          color: themeChange.getThem()
+              ? AppColors.darkModePrimary
+              : AppColors.primary,
           child: Text(
             title.toUpperCase(),
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(fontSize: txtSize, fontWeight: FontWeight.w600),
+            style: GoogleFonts.poppins(
+                fontSize: txtSize, fontWeight: FontWeight.w600),
           ),
         ),
       ),
@@ -63,13 +66,19 @@ class ButtonThem {
         height: btnHeight,
         child: ElevatedButton(
           style: ButtonStyle(
-            backgroundColor: WidgetStateProperty.all<Color>(themeChange.getThem() ? Colors.transparent : Colors.white),
-            foregroundColor: WidgetStateProperty.all<Color>(themeChange.getThem() ? AppColors.darkModePrimary : Colors.white),
+            backgroundColor: WidgetStateProperty.all<Color>(
+                themeChange.getThem() ? Colors.transparent : Colors.white),
+            foregroundColor: WidgetStateProperty.all<Color>(
+                themeChange.getThem()
+                    ? AppColors.darkModePrimary
+                    : Colors.white),
             shape: WidgetStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(borderRadius),
                 side: BorderSide(
-                  color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
+                  color: themeChange.getThem()
+                      ? AppColors.darkModePrimary
+                      : AppColors.primary,
                 ),
               ),
             ),
@@ -83,13 +92,19 @@ class ButtonThem {
                 visible: iconVisibility,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Image.asset(iconAssetImage, fit: BoxFit.cover, width: 32),
+                  child:
+                      Image.asset(iconAssetImage, fit: BoxFit.cover, width: 32),
                 ),
               ),
               Text(
                 title.toUpperCase(),
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary, fontSize: txtSize, fontWeight: FontWeight.w600),
+                style: GoogleFonts.poppins(
+                    color: themeChange.getThem()
+                        ? AppColors.darkModePrimary
+                        : AppColors.primary,
+                    fontSize: txtSize,
+                    fontWeight: FontWeight.w600),
               ),
             ],
           ),
@@ -120,11 +135,14 @@ class ButtonThem {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(30),
           ),
-          color: themeChange.getThem() ? AppColors.darkModePrimary : AppColors.primary,
+          color: themeChange.getThem()
+              ? AppColors.darkModePrimary
+              : AppColors.primary,
           child: Text(
             title.toUpperCase(),
             textAlign: TextAlign.center,
-            style: GoogleFonts.poppins(fontSize: txtSize, fontWeight: FontWeight.w600),
+            style: GoogleFonts.poppins(
+                fontSize: txtSize, fontWeight: FontWeight.w600),
           ),
         ),
       ),

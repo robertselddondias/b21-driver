@@ -9,7 +9,13 @@ class ReviewModel {
   String? type;
   Timestamp? date;
 
-  ReviewModel({this.comment, this.rating, this.id, this.date, this.customerId, this.driverId});
+  ReviewModel(
+      {this.comment,
+      this.rating,
+      this.id,
+      this.date,
+      this.customerId,
+      this.driverId});
 
   ReviewModel.fromJson(Map<String, dynamic> json) {
     comment = json['comment'];

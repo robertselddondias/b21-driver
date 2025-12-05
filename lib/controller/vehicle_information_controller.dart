@@ -15,9 +15,11 @@ class VehicleInformationController extends GetxController {
   // ============================================================================
   // CONTROLLERS DE TEXTO
   // ============================================================================
-  Rx<TextEditingController> vehicleNumberController = TextEditingController().obs;
+  Rx<TextEditingController> vehicleNumberController =
+      TextEditingController().obs;
   Rx<TextEditingController> seatsController = TextEditingController().obs;
-  Rx<TextEditingController> registrationDateController = TextEditingController().obs;
+  Rx<TextEditingController> registrationDateController =
+      TextEditingController().obs;
   Rx<TextEditingController> driverRulesController = TextEditingController().obs;
   Rx<TextEditingController> zoneNameController = TextEditingController().obs;
 
@@ -31,13 +33,24 @@ class VehicleInformationController extends GetxController {
   // ============================================================================
   // CONTROLE DE CADASTRO - SEM POSSIBILIDADE DE EDIÇÃO APÓS CADASTRAR
   // ============================================================================
-  RxBool hasVehicleRegistered = false.obs; // Indica se já tem veículo cadastrado
+  RxBool hasVehicleRegistered =
+      false.obs; // Indica se já tem veículo cadastrado
   RxBool isEditable = false.obs; // Se false, campos ficam bloqueados
 
   List<String> carColorList = <String>[
-    'Vermelho', 'Preto', 'Branco', 'Azul', 'Verde',
-    'Laranjado', 'Prata', 'Cinza', 'Amarelo', 'Marron',
-    'Dourado', 'Bege', 'Roxo'
+    'Vermelho',
+    'Preto',
+    'Branco',
+    'Azul',
+    'Verde',
+    'Laranjado',
+    'Prata',
+    'Cinza',
+    'Amarelo',
+    'Marron',
+    'Dourado',
+    'Bege',
+    'Roxo'
   ].obs;
   List<String> sheetList = <String>['1', '2', '3', '4'].obs;
 
@@ -55,7 +68,6 @@ class VehicleInformationController extends GetxController {
 
   Rx<VehicleTypeModel> selectedVehicle = VehicleTypeModel().obs;
   List<VehicleTypeModel> vehicleList = [];
-
 
   List<Color> vehicleColorList = [
     AppColors.serviceColor1,
@@ -115,7 +127,6 @@ class VehicleInformationController extends GetxController {
       if (driverModel.value.vehicleInformation != null &&
           driverModel.value.vehicleInformation!.vehicleNumber != null &&
           driverModel.value.vehicleInformation!.vehicleNumber!.isNotEmpty) {
-
         // ✅ JÁ TEM VEÍCULO CADASTRADO
         hasVehicleRegistered.value = true;
         isEditable.value = false; // BLOQUEIA PARA SEMPRE
@@ -138,7 +149,6 @@ class VehicleInformationController extends GetxController {
 
         seatsController.value.text =
             driverModel.value.vehicleInformation!.seats ?? "2";
-
       } else {
         // ✅ NÃO TEM VEÍCULO CADASTRADO
         hasVehicleRegistered.value = false;
@@ -154,7 +164,7 @@ class VehicleInformationController extends GetxController {
           if (list.isNotEmpty) {
             selectedZone.add(element);
             zoneString.value =
-            "$zoneString${zoneString.isEmpty ? "" : ","} ${list.first.name}";
+                "$zoneString${zoneString.isEmpty ? "" : ","} ${list.first.name}";
           }
         }
         zoneNameController.value.text = zoneString.value;
@@ -186,7 +196,7 @@ class VehicleInformationController extends GetxController {
         if (driverModel.value.vehicleInformation != null) {
           if (driverModel.value.vehicleInformation!.driverRules != null) {
             for (var element
-            in driverModel.value.vehicleInformation!.driverRules!) {
+                in driverModel.value.vehicleInformation!.driverRules!) {
               selectedDriverRulesList.add(element);
             }
           }

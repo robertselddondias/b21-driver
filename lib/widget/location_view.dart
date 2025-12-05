@@ -11,7 +11,8 @@ class LocationView extends StatelessWidget {
   final String? sourceLocation;
   final String? destinationLocation;
 
-  const LocationView({super.key, this.sourceLocation, this.destinationLocation});
+  const LocationView(
+      {super.key, this.sourceLocation, this.destinationLocation});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +44,8 @@ class LocationView extends StatelessWidget {
 
             // Linha tracejada
             Container(
-              margin: EdgeInsets.symmetric(vertical: Responsive.height(0.5, context)),
+              margin: EdgeInsets.symmetric(
+                  vertical: Responsive.height(0.5, context)),
               child: Dash(
                 direction: Axis.vertical,
                 length: Responsive.height(6, context),
@@ -159,7 +161,8 @@ class LocationView extends StatelessWidget {
                     ),
                     SizedBox(height: Responsive.height(0.3, context)),
                     Text(
-                      destinationLocation?.toString() ?? 'Destino não informado',
+                      destinationLocation?.toString() ??
+                          'Destino não informado',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.poppins(

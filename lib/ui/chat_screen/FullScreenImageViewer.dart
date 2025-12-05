@@ -7,7 +7,8 @@ class FullScreenImageViewer extends StatelessWidget {
   final String imageUrl;
   final File? imageFile;
 
-  const FullScreenImageViewer({super.key, required this.imageUrl, this.imageFile});
+  const FullScreenImageViewer(
+      {super.key, required this.imageUrl, this.imageFile});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +23,9 @@ class FullScreenImageViewer extends StatelessWidget {
           child: Hero(
             tag: imageUrl,
             child: PhotoView(
-              imageProvider: imageFile == null ? NetworkImage(imageUrl) : Image.file(imageFile!).image,
+              imageProvider: imageFile == null
+                  ? NetworkImage(imageUrl)
+                  : Image.file(imageFile!).image,
             ),
           ),
         ));

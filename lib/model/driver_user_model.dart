@@ -59,13 +59,18 @@ class DriverUserModel {
     serviceId = json['serviceId'];
     fcmToken = json['fcmToken'];
     email = json['email'];
-    vehicleInformation = json['vehicleInformation'] != null ? VehicleInformation.fromJson(json['vehicleInformation']) : null;
+    vehicleInformation = json['vehicleInformation'] != null
+        ? VehicleInformation.fromJson(json['vehicleInformation'])
+        : null;
     reviewsCount = json['reviewsCount'] ?? '0.0';
     reviewsSum = json['reviewsSum'] ?? '0.0';
     rotation = json['rotation'];
     walletAmount = json['walletAmount'] ?? "0.0";
-    location = json['location'] != null ? LocationLatLng.fromJson(json['location']) : null;
-    position = json['position'] != null ? Positions.fromJson(json['position']) : null;
+    location = json['location'] != null
+        ? LocationLatLng.fromJson(json['location'])
+        : null;
+    position =
+        json['position'] != null ? Positions.fromJson(json['position']) : null;
     createdAt = json['createdAt'];
     zoneIds = json['zoneIds'];
   }
@@ -111,7 +116,14 @@ class VehicleInformation {
   String? seats;
   List<DriverRulesModel>? driverRules;
 
-  VehicleInformation({this.vehicleType, this.vehicleTypeId, this.registrationDate, this.vehicleColor, this.vehicleNumber, this.seats, this.driverRules});
+  VehicleInformation(
+      {this.vehicleType,
+      this.vehicleTypeId,
+      this.registrationDate,
+      this.vehicleColor,
+      this.vehicleNumber,
+      this.seats,
+      this.driverRules});
 
   VehicleInformation.fromJson(Map<String, dynamic> json) {
     vehicleType = json['vehicleType'];

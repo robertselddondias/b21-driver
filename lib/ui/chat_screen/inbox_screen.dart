@@ -42,8 +42,7 @@ class InboxScreen extends StatelessWidget {
                     : AppColors.background,
                 borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(25),
-                    topRight: Radius.circular(25)
-                ),
+                    topRight: Radius.circular(25)),
               ),
               child: Column(
                 children: [
@@ -55,7 +54,9 @@ class InboxScreen extends StatelessWidget {
                       children: [
                         Icon(
                           Icons.inbox,
-                          color: themeChange.getThem() ? Colors.white : Colors.black87,
+                          color: themeChange.getThem()
+                              ? Colors.white
+                              : Colors.black87,
                           size: Responsive.width(6, context),
                         ),
                         SizedBox(width: Responsive.width(3, context)),
@@ -64,7 +65,9 @@ class InboxScreen extends StatelessWidget {
                           style: GoogleFonts.poppins(
                             fontSize: Responsive.width(5, context),
                             fontWeight: FontWeight.w600,
-                            color: themeChange.getThem() ? Colors.white : Colors.black,
+                            color: themeChange.getThem()
+                                ? Colors.white
+                                : Colors.black,
                           ),
                         ),
                       ],
@@ -81,20 +84,24 @@ class InboxScreen extends StatelessWidget {
                       child: FirestorePagination(
                         physics: const BouncingScrollPhysics(),
                         itemBuilder: (context, documentSnapshots, index) {
-                          final data = documentSnapshots[index].data() as Map<String, dynamic>?;
+                          final data = documentSnapshots[index].data()
+                              as Map<String, dynamic>?;
                           InboxModel inboxModel = InboxModel.fromJson(data!);
-                          return _buildInboxItem(context, inboxModel, themeChange);
+                          return _buildInboxItem(
+                              context, inboxModel, themeChange);
                         },
                         shrinkWrap: true,
                         onEmpty: _buildEmptyState(context, themeChange),
                         query: FirebaseFirestore.instance
                             .collection(CollectionName.chat)
-                            .where("driverId", isEqualTo: FireStoreUtils.getCurrentUid())
+                            .where("driverId",
+                                isEqualTo: FireStoreUtils.getCurrentUid())
                             .orderBy('createdAt', descending: true),
                         viewType: ViewType.list,
                         initialLoader: Center(
                           child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                AppColors.primary),
                           ),
                         ),
                         isLive: true,
@@ -110,13 +117,16 @@ class InboxScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInboxItem(BuildContext context, InboxModel inboxModel, DarkThemeProvider themeChange) {
+  Widget _buildInboxItem(BuildContext context, InboxModel inboxModel,
+      DarkThemeProvider themeChange) {
     return Container(
       margin: EdgeInsets.only(bottom: Responsive.height(1, context)),
       child: InkWell(
         onTap: () async {
-          UserModel? customer = await FireStoreUtils.getCustomer(inboxModel.customerId.toString());
-          DriverUserModel? driver = await FireStoreUtils.getDriverProfile(inboxModel.driverId.toString());
+          UserModel? customer = await FireStoreUtils.getCustomer(
+              inboxModel.customerId.toString());
+          DriverUserModel? driver = await FireStoreUtils.getDriverProfile(
+              inboxModel.driverId.toString());
 
           Get.to(ChatScreens(
             driverId: driver!.id,
@@ -145,12 +155,12 @@ class InboxScreen extends StatelessWidget {
             boxShadow: themeChange.getThem()
                 ? null
                 : [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
+                    BoxShadow(
+                      color: Colors.grey.withValues(alpha: 0.1),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
           ),
           child: Padding(
             padding: EdgeInsets.all(Responsive.width(4, context)),
@@ -163,7 +173,7 @@ class InboxScreen extends StatelessWidget {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.primary.withOpacity(0.3),
+                      color: AppColors.primary.withValues(alpha: 0.3),
                       width: 2,
                     ),
                   ),
@@ -210,7 +220,9 @@ class InboxScreen extends StatelessWidget {
                               style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.w600,
                                 fontSize: Responsive.width(4, context),
-                                color: themeChange.getThem() ? Colors.white : Colors.black87,
+                                color: themeChange.getThem()
+                                    ? Colors.white
+                                    : Colors.black87,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -236,7 +248,7 @@ class InboxScreen extends StatelessWidget {
                           vertical: Responsive.height(0.3, context),
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
@@ -260,8 +272,8 @@ class InboxScreen extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: themeChange.getThem()
-                                ? Colors.white.withOpacity(0.05)
-                                : Colors.grey.withOpacity(0.1),
+                                ? Colors.white.withValues(alpha: 0.05)
+                                : Colors.grey.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Row(
@@ -278,7 +290,9 @@ class InboxScreen extends StatelessWidget {
                                   style: GoogleFonts.poppins(
                                     fontSize: Responsive.width(3.2, context),
                                     fontWeight: FontWeight.w400,
-                                    color: themeChange.getThem() ? Colors.white70 : Colors.black54,
+                                    color: themeChange.getThem()
+                                        ? Colors.white70
+                                        : Colors.black54,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -315,7 +329,7 @@ class InboxScreen extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(Responsive.width(8, context)),
             decoration: BoxDecoration(
-              color: AppColors.subTitleColor.withOpacity(0.1),
+              color: AppColors.subTitleColor.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
