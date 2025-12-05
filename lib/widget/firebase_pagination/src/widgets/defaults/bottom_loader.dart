@@ -1,4 +1,5 @@
 // Flutter Packages
+import 'package:driver/themes/responsive.dart';
 import 'package:flutter/material.dart';
 
 /// A circular progress indicator that spins when the [Stream] is loading.
@@ -16,11 +17,11 @@ class BottomLoader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        width: 25,
-        height: 25,
-        margin: const EdgeInsets.all(10),
-        child: const CircularProgressIndicator.adaptive(
-          strokeWidth: 2.5,
+        width: Responsive.width(6, context),
+        height: Responsive.width(6, context),
+        margin: EdgeInsets.all(Responsive.width(2.5, context)),
+        child: CircularProgressIndicator.adaptive(
+          strokeWidth: Responsive.width(0.6, context),
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:driver/themes/app_colors.dart';
+import 'package:driver/themes/responsive.dart';
 import 'package:driver/utils/DarkThemeProvider.dart';
 import 'package:driver/utils/utils.dart';
 import 'package:driver/widget/osm_map_search_place.dart';
@@ -58,8 +59,8 @@ class _LocationPickerState extends State<LocationPicker> {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         await mapController
             .addMarker(position,
-                markerIcon: const MarkerIcon(
-                  icon: Icon(Icons.location_on, size: 26),
+                markerIcon: MarkerIcon(
+                  icon: Icon(Icons.location_on, size: Responsive.width(6.5, context)),
                 ))
             .then((v) {
           _markers.add(position);
@@ -140,16 +141,20 @@ class _LocationPickerState extends State<LocationPicker> {
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                margin: const EdgeInsets.only(bottom: 100, left: 40, right: 40),
-                padding: const EdgeInsets.all(20),
+                margin: EdgeInsets.only(
+                  bottom: Responsive.height(12, context),
+                  left: Responsive.width(10, context),
+                  right: Responsive.width(10, context),
+                ),
+                padding: EdgeInsets.all(Responsive.width(5, context)),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: const [
+                  borderRadius: BorderRadius.circular(Responsive.width(2.5, context)),
+                  boxShadow: [
                     BoxShadow(
                       color: Colors.black26,
-                      blurRadius: 6,
-                      offset: Offset(0, 2),
+                      blurRadius: Responsive.width(1.5, context),
+                      offset: Offset(0, Responsive.height(0.25, context)),
                     ),
                   ],
                 ),
@@ -159,16 +164,19 @@ class _LocationPickerState extends State<LocationPicker> {
                     Expanded(
                       child: Text(
                         place?.displayName ?? '',
-                        style: const TextStyle(fontSize: 16,color: Colors.black),
+                        style: TextStyle(
+                          fontSize: Responsive.width(4, context),
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                     IconButton(
                         onPressed: () {
                           Get.back(result: place);
                         },
-                        icon: const Icon(
+                        icon: Icon(
                           Icons.check_circle,
-                          size: 40,
+                          size: Responsive.width(10, context),
                           color: Colors.black,
                         ))
                   ],
@@ -176,26 +184,30 @@ class _LocationPickerState extends State<LocationPicker> {
               ),
             ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+            padding: EdgeInsets.symmetric(
+              horizontal: Responsive.width(1.5, context),
+              vertical: Responsive.height(0.5, context),
+            ),
             child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 4),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 00),
-                  child: InkWell(
-                    onTap: () async {
-                      Get.to(const OsmSearchPlacesApi())?.then((value) async {
-                        if (value != null) {
-                          SearchInfo place = value;
-                          textController = TextEditingController(text: place.address.toString());
-                          await addMarker(place.point);
-                          print("Search :: ${place.point.toString()}");
-                        }
-                      });
-                    },
-                    child: buildTextField(
-                      title: "Search Address".tr,
-                      textController: textController,
-                    ),
+                padding: EdgeInsets.symmetric(
+                  vertical: Responsive.height(0.5, context),
+                  horizontal: Responsive.width(1, context),
+                ),
+                child: InkWell(
+                  onTap: () async {
+                    Get.to(const OsmSearchPlacesApi())?.then((value) async {
+                      if (value != null) {
+                        SearchInfo place = value;
+                        textController = TextEditingController(text: place.address.toString());
+                        await addMarker(place.point);
+                        print("Search :: ${place.point.toString()}");
+                      }
+                    });
+                  },
+                  child: buildTextField(
+                    context: context,
+                    title: "Search Address".tr,
+                    textController: textController,
                   ),
                 )),
           ),
@@ -208,27 +220,41 @@ class _LocationPickerState extends State<LocationPicker> {
     );
   }
 
-  Widget buildTextField({required title, required TextEditingController textController}) {
+  Widget buildTextField({
+    required BuildContext context,
+    required String title,
+    required TextEditingController textController,
+  }) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4.0),
+      padding: EdgeInsets.only(left: Responsive.width(1, context)),
       child: TextField(
         controller: textController,
         textInputAction: TextInputAction.done,
-        style: TextStyle(color: Colors.black),
+        style: TextStyle(
+          color: Colors.black,
+          fontSize: Responsive.width(4, context),
+        ),
         decoration: InputDecoration(
           prefixIcon: IconButton(
-            icon: const Icon(Icons.location_on,color: Colors.black,),
+            icon: Icon(
+              Icons.location_on,
+              color: Colors.black,
+              size: Responsive.width(6, context),
+            ),
             onPressed: () {},
           ),
           fillColor: Colors.white,
           filled: true,
           hintText: title,
-          hintStyle: TextStyle(color: Colors.black),
+          hintStyle: TextStyle(
+            color: Colors.black,
+            fontSize: Responsive.width(3.5, context),
+          ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(Responsive.width(2.5, context)),
           ),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10.0),
+            borderRadius: BorderRadius.circular(Responsive.width(2.5, context)),
           ),
           enabled: false,
         ),

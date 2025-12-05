@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:driver/constant/constant.dart';
 import 'package:driver/model/user_model.dart';
 import 'package:driver/themes/app_colors.dart';
+import 'package:driver/themes/responsive.dart';
 import 'package:driver/utils/fire_store_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -145,10 +146,10 @@ class UserView extends StatelessWidget {
 
   Widget _buildLoadingState(BuildContext context, double avatarSize) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(Responsive.width(3, context)),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(Responsive.width(3, context)),
       ),
       child: Row(
         children: [
@@ -157,36 +158,36 @@ class UserView extends StatelessWidget {
             width: avatarSize,
             decoration: BoxDecoration(
               color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(Responsive.width(2.5, context)),
             ),
-            child: const Center(
+            child: Center(
               child: SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
+                width: Responsive.width(5, context),
+                height: Responsive.width(5, context),
+                child: CircularProgressIndicator(strokeWidth: Responsive.width(0.5, context)),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: Responsive.width(3, context)),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  height: 16,
-                  width: 120,
+                  height: Responsive.height(2, context),
+                  width: Responsive.width(30, context),
                   decoration: BoxDecoration(
                     color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(Responsive.width(1, context)),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: Responsive.height(1, context)),
                 Container(
-                  height: 14,
+                  height: Responsive.height(1.8, context),
                   width: double.infinity,
                   decoration: BoxDecoration(
                     color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(Responsive.width(1, context)),
                   ),
                 ),
               ],
@@ -199,10 +200,10 @@ class UserView extends StatelessWidget {
 
   Widget _buildErrorState(BuildContext context, String error) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: EdgeInsets.all(Responsive.width(3, context)),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.errorContainer.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(Responsive.width(3, context)),
         border: Border.all(
           color: Theme.of(context).colorScheme.error.withOpacity(0.3),
         ),
@@ -212,14 +213,15 @@ class UserView extends StatelessWidget {
           Icon(
             Icons.error_outline,
             color: Theme.of(context).colorScheme.error,
+            size: Responsive.width(6, context),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: Responsive.width(3, context)),
           Expanded(
             child: Text(
               'Erro ao carregar usuário',
               style: GoogleFonts.poppins(
                 color: Theme.of(context).colorScheme.error,
-                fontSize: 14,
+                fontSize: Responsive.width(3.5, context),
               ),
             ),
           ),
@@ -261,16 +263,16 @@ class UserView extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(Responsive.width(4, context)),
         border: Border.all(
           color: theme.colorScheme.outline.withOpacity(0.2),
-          width: 1,
+          width: Responsive.width(0.25, context),
         ),
         boxShadow: [
           BoxShadow(
             color: theme.shadowColor.withOpacity(0.08),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            blurRadius: Responsive.width(3, context),
+            offset: Offset(0, Responsive.height(0.5, context)),
           ),
         ],
       ),
@@ -284,7 +286,7 @@ class UserView extends StatelessWidget {
               Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(Responsive.width(3, context)),
                     child: CachedNetworkImage(
                       height: avatarSize,
                       width: avatarSize,
@@ -294,10 +296,10 @@ class UserView extends StatelessWidget {
                         color: theme.colorScheme.surfaceContainerHighest,
                         child: Center(
                           child: SizedBox(
-                            width: 20,
-                            height: 20,
+                            width: Responsive.width(5, context),
+                            height: Responsive.width(5, context),
                             child: CircularProgressIndicator(
-                              strokeWidth: 2,
+                              strokeWidth: Responsive.width(0.5, context),
                               color: theme.colorScheme.primary,
                             ),
                           ),
@@ -314,17 +316,17 @@ class UserView extends StatelessWidget {
                     ),
                   ),
                   Positioned(
-                    bottom: 2,
-                    right: 2,
+                    bottom: Responsive.width(0.5, context),
+                    right: Responsive.width(0.5, context),
                     child: Container(
-                      width: 10,
-                      height: 10,
+                      width: Responsive.width(2.5, context),
+                      height: Responsive.width(2.5, context),
                       decoration: BoxDecoration(
                         color: Colors.green,
                         shape: BoxShape.circle,
                         border: Border.all(
                           color: theme.colorScheme.surface,
-                          width: 2,
+                          width: Responsive.width(0.5, context),
                         ),
                       ),
                     ),
@@ -340,14 +342,14 @@ class UserView extends StatelessWidget {
                       userName,
                       style: GoogleFonts.poppins(
                         fontWeight: FontWeight.w600,
-                        fontSize: screenWidth < 360 ? 14 : 16,
+                        fontSize: Responsive.width(4, context),
                         color: theme.colorScheme.onSurface,
                         letterSpacing: 0.2,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    SizedBox(height: 2),
+                    SizedBox(height: Responsive.height(0.25, context)),
                     Row(
                       children: [
                         Icon(
@@ -355,12 +357,12 @@ class UserView extends StatelessWidget {
                           size: iconSize,
                           color: AppColors.ratingColour,
                         ),
-                        SizedBox(width: 4),
+                        SizedBox(width: Responsive.width(1, context)),
                         Text(
                           rating,
                           style: GoogleFonts.poppins(
                             fontWeight: FontWeight.w600,
-                            fontSize: screenWidth < 360 ? 12 : 13,
+                            fontSize: Responsive.width(3.2, context),
                             color: theme.colorScheme.onSurface,
                           ),
                         ),
@@ -417,15 +419,15 @@ class UserView extends StatelessWidget {
 
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: isSmallScreen ? 8 : 10,
-        vertical: isSmallScreen ? 8 : 10,
+        horizontal: Responsive.width(2.5, context),
+        vertical: Responsive.width(2.5, context),
       ),
       decoration: BoxDecoration(
         color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(Responsive.width(3, context)),
         border: Border.all(
           color: color.withOpacity(0.3),
-          width: 1,
+          width: Responsive.width(0.25, context),
         ),
       ),
       child: Column(
@@ -436,10 +438,10 @@ class UserView extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                padding: const EdgeInsets.all(4),
+                padding: EdgeInsets.all(Responsive.width(1, context)),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(Responsive.width(1.5, context)),
                 ),
                 child: Icon(
                   icon,
@@ -447,13 +449,13 @@ class UserView extends StatelessWidget {
                   color: color,
                 ),
               ),
-              SizedBox(width: 6),
+              SizedBox(width: Responsive.width(1.5, context)),
               Flexible(
                 child: Text(
                   label,
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.w500,
-                    fontSize: isSmallScreen ? 10 : 11,
+                    fontSize: Responsive.width(2.7, context),
                     color: theme.colorScheme.onSurface.withOpacity(0.7),
                     letterSpacing: 0.3,
                   ),
@@ -463,12 +465,12 @@ class UserView extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 4),
+          SizedBox(height: Responsive.height(0.5, context)),
           Text(
             value,
             style: GoogleFonts.poppins(
               fontWeight: FontWeight.w700,
-              fontSize: isSmallScreen ? 13 : 14,
+              fontSize: Responsive.width(3.5, context),
               color: theme.colorScheme.onSurface,
               letterSpacing: 0.2,
             ),
