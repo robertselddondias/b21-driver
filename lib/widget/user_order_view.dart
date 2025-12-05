@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:driver/constant/constant.dart';
 import 'package:driver/model/user_model.dart';
 import 'package:driver/themes/app_colors.dart';
+import 'package:driver/themes/responsive.dart';
 import 'package:driver/utils/fire_store_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,121 +25,24 @@ class UserDriverView extends StatelessWidget {
               if (snapshot.hasError) {
                 return Text(snapshot.error.toString());
               } else {
-                if(snapshot.data == null){
-                  return Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.all(Radius.circular(10)),
-                            child: CachedNetworkImage(
-                              height: 50,
-                              width: 50,
-                              imageUrl: Constant.userPlaceHolder,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => Constant.loader(context),
-                              errorWidget: (context, url, error) => Image.network(
-                                  'https://firebasestorage.googleapis.com/v0/b/goride-1a752.appspot.com/o/placeholderImages%2Fuser-placeholder.jpeg?alt=media&token=34a73d67-ba1d-4fe4-a29f-271d3e3ca115'),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Asynchronous user", style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.star,
-                                            size: 22,
-                                            color: AppColors.ratingColour,
-                                          ),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text(Constant.calculateReview(reviewCount: "0.0", reviewSum: "0.0"),
-                                              style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
-                                        ],
-                                      ),
-                                    ),
-                                    Text(
-                                      Constant.amountShow(amount: amount),
-                                      style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                if (snapshot.data == null) {
+                  // User not found - show placeholder
+                  return _buildUserCard(
+                    context: context,
+                    imageUrl: Constant.userPlaceHolder,
+                    name: "Asynchronous user",
+                    reviewCount: "0.0",
+                    reviewSum: "0.0",
                   );
-                }else{
+                } else {
+                  // User found - show real data
                   UserModel driverModel = snapshot.data!;
-                  return Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.all(Radius.circular(10)),
-                            child: CachedNetworkImage(
-                              height: 50,
-                              width: 50,
-                              imageUrl: driverModel.profilePic.toString(),
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => Constant.loader(context),
-                              errorWidget: (context, url, error) => Image.network(
-                                  'https://firebasestorage.googleapis.com/v0/b/goride-1a752.appspot.com/o/placeholderImages%2Fuser-placeholder.jpeg?alt=media&token=34a73d67-ba1d-4fe4-a29f-271d3e3ca115'),
-                            ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(driverModel.fullName.toString(), style: GoogleFonts.poppins(fontWeight: FontWeight.w600)),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.star,
-                                            size: 22,
-                                            color: AppColors.ratingColour,
-                                          ),
-                                          const SizedBox(
-                                            width: 5,
-                                          ),
-                                          Text(Constant.calculateReview(reviewCount: driverModel.reviewsCount.toString(), reviewSum: driverModel.reviewsSum.toString()),
-                                              style: GoogleFonts.poppins(fontWeight: FontWeight.w500)),
-                                        ],
-                                      ),
-                                    ),
-                                    Text(
-                                      Constant.amountShow(amount: amount),
-                                      style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
-                                    ),
-
-                                  ],
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
+                  return _buildUserCard(
+                    context: context,
+                    imageUrl: driverModel.profilePic.toString(),
+                    name: driverModel.fullName.toString(),
+                    reviewCount: driverModel.reviewsCount.toString(),
+                    reviewSum: driverModel.reviewsSum.toString(),
                   );
                 }
               }
@@ -146,5 +50,97 @@ class UserDriverView extends StatelessWidget {
               return const Text('Error');
           }
         });
+  }
+
+  /// RESPONSIVO: Card de informações do usuário
+  Widget _buildUserCard({
+    required BuildContext context,
+    required String imageUrl,
+    required String name,
+    required String reviewCount,
+    required String reviewSum,
+  }) {
+    return Column(
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Avatar responsivo
+            ClipRRect(
+              borderRadius: BorderRadius.all(
+                Radius.circular(Responsive.width(2.5, context)),
+              ),
+              child: CachedNetworkImage(
+                height: Responsive.width(12, context),
+                width: Responsive.width(12, context),
+                imageUrl: imageUrl,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Constant.loader(context),
+                errorWidget: (context, url, error) => Image.network(
+                  Constant.userPlaceHolder,
+                ),
+              ),
+            ),
+
+            SizedBox(width: Responsive.width(2.5, context)),
+
+            // Informações do usuário
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Nome
+                  Text(
+                    name,
+                    style: GoogleFonts.poppins(
+                      fontWeight: FontWeight.w600,
+                      fontSize: Responsive.width(4, context),
+                    ),
+                  ),
+
+                  // Rating e Valor
+                  Row(
+                    children: [
+                      // Rating
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.star,
+                              size: Responsive.width(5, context),
+                              color: AppColors.ratingColour,
+                            ),
+                            SizedBox(width: Responsive.width(1.2, context)),
+                            Text(
+                              Constant.calculateReview(
+                                reviewCount: reviewCount,
+                                reviewSum: reviewSum,
+                              ),
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w500,
+                                fontSize: Responsive.width(3.5, context),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Valor
+                      Text(
+                        Constant.amountShow(amount: amount),
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: Responsive.width(4, context),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:driver/constant/collection_name.dart';
 import 'package:driver/constant/constant.dart';
 import 'package:driver/controller/auto_assignment_controller.dart';
@@ -32,8 +34,8 @@ class HomeController extends GetxController {
     if (index >= 0 && index < widgetOptions.length) {
       selectedIndex.value = index;
     } else {
-      print('⚠️ Índice inválido: $index. Máximo permitido: ${widgetOptions.length - 1}');
-      selectedIndex.value = 0; // Volta para o primeiro tab
+      // Em caso de índice inválido, volta para o primeiro tab
+      selectedIndex.value = 0;
     }
   }
 
@@ -57,71 +59,142 @@ class HomeController extends GetxController {
 
   Rx<DriverUserModel> driverModel = DriverUserModel().obs;
   RxBool isLoading = true.obs;
+  RxBool hasError = false.obs;
+  RxString errorMessage = ''.obs;
   RxInt isActiveValue = 0.obs;
 
   getDriver() async {
-    updateCurrentLocation();
-    FireStoreUtils.fireStore
-        .collection(CollectionName.driverUsers)
-        .doc(FireStoreUtils.getCurrentUid())
-        .snapshots()
-        .listen((event) {
-      if (event.exists) {
-        driverModel.value = DriverUserModel.fromJson(event.data()!);
-        isLoading.value = false;
-      }
-    });
+    try {
+      isLoading.value = true;
+      hasError.value = false;
+
+      updateCurrentLocation();
+
+      FireStoreUtils.fireStore
+          .collection(CollectionName.driverUsers)
+          .doc(FireStoreUtils.getCurrentUid())
+          .snapshots()
+          .listen(
+            (event) {
+              if (event.exists) {
+                try {
+                  driverModel.value = DriverUserModel.fromJson(event.data()!);
+                  isLoading.value = false;
+                  hasError.value = false;
+                } catch (e) {
+                  hasError.value = true;
+                  errorMessage.value = 'Erro ao processar dados do motorista';
+                  isLoading.value = false;
+                }
+              } else {
+                hasError.value = true;
+                errorMessage.value = 'Motorista não encontrado';
+                isLoading.value = false;
+              }
+            },
+            onError: (error) {
+              hasError.value = true;
+              errorMessage.value = 'Erro ao carregar dados: ${error.toString()}';
+              isLoading.value = false;
+            },
+          );
+    } catch (e) {
+      hasError.value = true;
+      errorMessage.value = 'Erro inesperado: ${e.toString()}';
+      isLoading.value = false;
+    }
   }
 
   getActiveRide() {
-    FireStoreUtils.fireStore
-        .collection(CollectionName.orders)
-        .where('driverId', isEqualTo: FireStoreUtils.getCurrentUid())
-        .where('status', whereIn: [Constant.rideInProgress, Constant.rideActive])
-        .snapshots()
-        .listen((event) {
-      isActiveValue.value = event.docs.length;
-    });
+    try {
+      FireStoreUtils.fireStore
+          .collection(CollectionName.orders)
+          .where('driverId', isEqualTo: FireStoreUtils.getCurrentUid())
+          .where('status', whereIn: [Constant.rideInProgress, Constant.rideActive])
+          .snapshots()
+          .listen(
+            (event) {
+              isActiveValue.value = event.docs.length;
+            },
+            onError: (error) {
+              // Em caso de erro, mantém o valor atual
+              isActiveValue.value = 0;
+            },
+          );
+    } catch (e) {
+      isActiveValue.value = 0;
+    }
+  }
+
+  /// Tenta recarregar os dados do motorista
+  Future<void> retryLoadDriver() async {
+    await getDriver();
   }
 
   updateCurrentLocation() async {
     Location location = Location();
-    PermissionStatus permissionStatus = await location.hasPermission();
 
-    if (permissionStatus == PermissionStatus.granted) {
-      location.enableBackgroundMode(enable: true);
-      location.changeSettings(
-          accuracy: LocationAccuracy.high,
-          distanceFilter: double.parse(Constant.driverLocationUpdate.toString()),
-          interval: 2000
+    try {
+      // 1. Verificar se o serviço de localização está ativado
+      bool serviceEnabled = await location.serviceEnabled();
+      if (!serviceEnabled) {
+        serviceEnabled = await location.requestService();
+        if (!serviceEnabled) {
+          // Serviço de localização não habilitado
+          return;
+        }
+      }
+
+      // 2. Verificar permissão de localização
+      PermissionStatus permissionStatus = await location.hasPermission();
+      if (permissionStatus == PermissionStatus.denied) {
+        permissionStatus = await location.requestPermission();
+        if (permissionStatus != PermissionStatus.granted &&
+            permissionStatus != PermissionStatus.grantedLimited) {
+          // Permissão de localização negada
+          return;
+        }
+      }
+
+      // 3. Configurar modo background (Android)
+      if (Platform.isAndroid) {
+        try {
+          await location.enableBackgroundMode(enable: true);
+        } catch (e) {
+          // Erro ao habilitar background mode - pode precisar de permissão "sempre"
+        }
+      } else {
+        try {
+          await location.enableBackgroundMode(enable: true);
+        } catch (e) {
+          // Erro no iOS - ignora
+        }
+      }
+
+      // 4. Configurar precisão e intervalo de atualização
+      await location.changeSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: double.parse(Constant.driverLocationUpdate.toString()),
+        interval: 2000,
       );
 
-      location.onLocationChanged.listen((locationData) {
-        Constant.currentLocation = LocationLatLng(
-            latitude: locationData.latitude,
-            longitude: locationData.longitude
-        );
-        updateDriverLocation();
-      });
-    } else {
-      location.requestPermission().then((permissionStatus) {
-        if (permissionStatus == PermissionStatus.granted) {
-          location.enableBackgroundMode(enable: true);
-          location.changeSettings(
-              accuracy: LocationAccuracy.high,
-              distanceFilter: double.parse(Constant.driverLocationUpdate.toString()),
-              interval: 2000
-          );
-
-          location.onLocationChanged.listen((locationData) {
+      // 5. Escutar mudanças de localização
+      location.onLocationChanged.listen(
+        (locationData) {
+          if (locationData.latitude != null && locationData.longitude != null) {
             Constant.currentLocation = LocationLatLng(
-                latitude: locationData.latitude,
-                longitude: locationData.longitude
+              latitude: locationData.latitude,
+              longitude: locationData.longitude,
             );
             updateDriverLocation();
-          });
-        }
-      });
+          }
+        },
+        onError: (error) {
+          // Erro ao receber atualização de localização
+        },
+      );
+    } catch (e) {
+      // Erro geral ao configurar localização - app continua funcionando
     }
   }
 
@@ -164,7 +237,7 @@ class HomeController extends GetxController {
     if (selectedIndex.value >= 0 && selectedIndex.value < widgetOptions.length) {
       return widgetOptions[selectedIndex.value];
     } else {
-      print('⚠️ selectedIndex fora do range, retornando primeiro widget');
+      // selectedIndex fora do range, retorna primeiro widget
       selectedIndex.value = 0;
       return widgetOptions[0];
     }
@@ -174,7 +247,6 @@ class HomeController extends GetxController {
   void resetToValidTab() {
     if (selectedIndex.value >= widgetOptions.length) {
       selectedIndex.value = 0;
-      print('🔄 Reset para tab 0 devido a índice inválido');
     }
   }
 

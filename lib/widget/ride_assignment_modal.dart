@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:driver/constant/constant.dart';
 import 'package:driver/model/order_model.dart';
 import 'package:driver/themes/app_colors.dart';
+import 'package:driver/themes/responsive.dart';
 import 'package:driver/utils/DarkThemeProvider.dart';
 import 'package:driver/widget/location_view.dart';
 import 'package:driver/widget/user_view.dart';
@@ -163,18 +164,18 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                 child: Container(
                   // RESPONSIVIDADE: Largura máxima para telas grandes e 90% para celulares
                   width: screenWidth > 500 ? 500 : screenWidth * 0.9,
-                  margin: const EdgeInsets.all(20),
-                  padding: const EdgeInsets.all(20),
+                  margin: EdgeInsets.all(Responsive.width(5, context)),
+                  padding: EdgeInsets.all(Responsive.width(5, context)),
                   decoration: BoxDecoration(
                     color: themeChange.getThem()
                         ? AppColors.darkContainerBackground
                         : AppColors.containerBackground,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(Responsive.width(5, context)),
                     border: Border.all(
                       color: themeChange.getThem()
                           ? AppColors.darkContainerBorder
                           : AppColors.containerBorder,
-                      width: 2,
+                      width: Responsive.width(0.5, context),
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -191,30 +192,30 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                       mainAxisSize: MainAxisSize.min,
                       children: [
 
-                        const SizedBox(height: 20),
+                        SizedBox(height: Responsive.height(2, context)),
 
                         // Countdown Timer SEM REBUILD
-                        _buildCountdownTimerFixed(themeChange),
+                        _buildCountdownTimerFixed(themeChange, context),
 
-                        const SizedBox(height: 20),
+                        SizedBox(height: Responsive.height(2, context)),
 
                         // Ride Info (Otimizada para responsividade horizontal)
-                        _buildRideInfo(themeChange),
+                        _buildRideInfo(themeChange, context),
 
-                        const SizedBox(height: 15),
+                        SizedBox(height: Responsive.height(1.5, context)),
 
                         // User Info
                         _buildUserInfo(),
 
-                        const SizedBox(height: 15),
+                        SizedBox(height: Responsive.height(1.5, context)),
 
                         // Location Info
                         _buildLocationInfo(),
 
-                        const SizedBox(height: 25),
+                        SizedBox(height: Responsive.height(2.5, context)),
 
                         // Action Buttons
-                        _buildActionButtons(themeChange),
+                        _buildActionButtons(themeChange, context),
                       ],
                     ),
                   ),
@@ -228,15 +229,15 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
   }
 
   /// WIDGET: Timer que NÃO causa rebuild do widget pai
-  Widget _buildCountdownTimerFixed(DarkThemeProvider themeChange) {
+  Widget _buildCountdownTimerFixed(DarkThemeProvider themeChange, BuildContext context) {
     return Column(
       children: [
         Stack(
           alignment: Alignment.center,
           children: [
             SizedBox(
-              width: 80,
-              height: 80,
+              width: Responsive.width(20, context),
+              height: Responsive.width(20, context),
               child: AnimatedBuilder(
                 animation: _progressController,
                 builder: (context, child) {
@@ -245,7 +246,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                     builder: (context, isUrgent, child) {
                       return CircularProgressIndicator(
                         value: 1.0 - _progressController.value,
-                        strokeWidth: 6,
+                        strokeWidth: Responsive.width(1.5, context),
                         backgroundColor: Colors.grey.withOpacity(0.3),
                         valueColor: AlwaysStoppedAnimation<Color>(
                           isUrgent ? Colors.red : AppColors.primary,
@@ -266,7 +267,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                     return Text(
                       '$seconds',
                       style: GoogleFonts.poppins(
-                        fontSize: 24,
+                        fontSize: Responsive.width(6, context),
                         fontWeight: FontWeight.bold,
                         color: isUrgent ? Colors.red : AppColors.primary,
                       ),
@@ -278,7 +279,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
           ],
         ),
 
-        const SizedBox(height: 10),
+        SizedBox(height: Responsive.height(1, context)),
 
         // Texto do countdown
         ValueListenableBuilder<int>(
@@ -287,7 +288,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
             return Text(
               'Responda em $seconds segundos',
               style: GoogleFonts.poppins(
-                fontSize: 14,
+                fontSize: Responsive.width(3.5, context),
                 color: Colors.grey,
               ),
             );
@@ -297,15 +298,15 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
     );
   }
 
-  Widget _buildRideInfo(DarkThemeProvider themeChange) {
+  Widget _buildRideInfo(DarkThemeProvider themeChange, BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: EdgeInsets.all(Responsive.width(4, context)),
       decoration: BoxDecoration(
         color: AppColors.primary.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(Responsive.width(3, context)),
         border: Border.all(
           color: AppColors.primary.withOpacity(0.3),
-          width: 1,
+          width: Responsive.width(0.3, context),
         ),
       ),
       // Mantenho a Row e uso Flexible nos itens para dividir o espaço
@@ -317,10 +318,11 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
             '${widget.orderModel.distance ?? '0'} ${widget.orderModel.distanceType ?? 'km'}',
             Icons.straighten,
             themeChange,
+            context,
           ),
           Container(
-            width: 1,
-            height: 40,
+            width: Responsive.width(0.3, context),
+            height: Responsive.height(5, context),
             color: Colors.grey.withOpacity(0.3),
           ),
           _buildInfoItem(
@@ -328,10 +330,11 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
             Constant.amountShow(amount: widget.orderModel.offerRate ?? '0'),
             Icons.monetization_on,
             themeChange,
+            context,
           ),
           Container(
-            width: 1,
-            height: 40,
+            width: Responsive.width(0.3, context),
+            height: Responsive.height(5, context),
             color: Colors.grey.withOpacity(0.3),
           ),
           _buildInfoItem(
@@ -339,13 +342,14 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
             '~${_calculateEstimatedTime()} min',
             Icons.access_time,
             themeChange,
+            context,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoItem(String label, String value, IconData icon, DarkThemeProvider themeChange) {
+  Widget _buildInfoItem(String label, String value, IconData icon, DarkThemeProvider themeChange, BuildContext context) {
     // RESPONSIVIDADE HORIZONTAL: Flexible para dividir o espaço da Row
     return Flexible(
       child: Column(
@@ -353,13 +357,13 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
           Icon(
             icon,
             color: AppColors.primary,
-            size: 20,
+            size: Responsive.width(5, context),
           ),
-          const SizedBox(height: 5),
+          SizedBox(height: Responsive.height(0.5, context)),
           Text(
             label,
             style: GoogleFonts.poppins(
-              fontSize: 12,
+              fontSize: Responsive.width(3, context),
               color: Colors.grey,
             ),
           ),
@@ -370,7 +374,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
               value,
               textAlign: TextAlign.center, // Centraliza o texto
               style: GoogleFonts.poppins(
-                fontSize: 14,
+                fontSize: Responsive.width(3.5, context),
                 fontWeight: FontWeight.w600,
                 color: themeChange.getThem() ? Colors.white : Colors.black,
               ),
@@ -398,7 +402,7 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
     );
   }
 
-  Widget _buildActionButtons(DarkThemeProvider themeChange) {
+  Widget _buildActionButtons(DarkThemeProvider themeChange, BuildContext context) {
     // Os botões já estão responsivos horizontalmente graças aos Expanded
     return Row(
       children: [
@@ -406,18 +410,18 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(Responsive.width(3, context)),
               border: Border.all(
                 color: Colors.red.withOpacity(0.5),
-                width: 2,
+                width: Responsive.width(0.5, context),
               ),
             ),
             child: TextButton(
               onPressed: _hasResponded ? null : _handleReject,
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 15),
+                padding: EdgeInsets.symmetric(vertical: Responsive.height(1.8, context)),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(Responsive.width(3, context)),
                 ),
               ),
               child: Row(
@@ -426,13 +430,13 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                   Icon(
                     Icons.close,
                     color: _hasResponded ? Colors.grey : Colors.red,
-                    size: 20,
+                    size: Responsive.width(5, context),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: Responsive.width(2, context)),
                   Text(
                     'Rejeitar',
                     style: GoogleFonts.poppins(
-                      fontSize: 16,
+                      fontSize: Responsive.width(4, context),
                       fontWeight: FontWeight.w600,
                       color: _hasResponded ? Colors.grey : Colors.red,
                     ),
@@ -443,21 +447,21 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
           ),
         ),
 
-        const SizedBox(width: 15),
+        SizedBox(width: Responsive.width(4, context)),
 
         // Botão Aceitar
         Expanded(
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(Responsive.width(3, context)),
               color: Colors.green,
             ),
             child: TextButton(
               onPressed: _hasResponded ? null : _handleAccept,
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 15),
+                padding: EdgeInsets.symmetric(vertical: Responsive.height(1.8, context)),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(Responsive.width(3, context)),
                 ),
               ),
               child: Row(
@@ -466,13 +470,13 @@ class _RideAssignmentModalState extends State<RideAssignmentModal>
                   Icon(
                     Icons.check,
                     color: Colors.white,
-                    size: 20,
+                    size: Responsive.width(5, context),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: Responsive.width(2, context)),
                   Text(
                     'Aceitar',
                     style: GoogleFonts.poppins(
-                      fontSize: 16,
+                      fontSize: Responsive.width(4, context),
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
                     ),
